@@ -1,0 +1,12 @@
+spring:
+
+  application:
+    name: poletto_skins
+    
+  profiles:
+    active: dev
+    
+  #security:
+   # user:
+    #  name: admin
+    #  password: 1234
