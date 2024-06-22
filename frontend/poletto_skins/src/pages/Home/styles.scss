@@ -1,0 +1,22 @@
+$primary-color: #C85CD1;
+$inactive-font-color: #555261;
+$background-color: #292733;
+$accent-color: rgba(200, 92, 209, 0.8);
+$primary-box-shadow-hover: 0 0 10px $accent-color, 0 0 15px rgba($accent-color, 0.6), 0 0 20px rgba($accent-color, 0.4);
+
+.home-main-container {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    padding: 16px 10px;
+    height: 90%;
+    box-sizing: border-box;
+
+    .central-container {
+        background-color: $background-color;
+        padding: 16px;
+        border-radius: 5px;
+        flex-grow: 1;
+    }
+
+}
