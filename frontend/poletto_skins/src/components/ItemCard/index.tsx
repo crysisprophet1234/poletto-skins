@@ -1,19 +1,18 @@
 import { useEffect, useState } from 'react'
 import './styles.css'
 
-import { ProductSkinCS } from '@/types/entities/productSkinCs'
+import { WeaponSkin } from '@/types/entities/item'
 import { FaSteam } from "react-icons/fa6"
 import { HiShoppingCart } from 'react-icons/hi'
 import { MdFavorite } from 'react-icons/md'
 
 interface ItemCardProps {
-    itemProps: ProductSkinCS
+    itemProps: WeaponSkin
 }
 
-//TODO: add hover effect to add-cart button
 const ItemCard = ({ itemProps }: ItemCardProps) => {
 
-    const [item, setItem] = useState<ProductSkinCS>()
+    const [item, setItem] = useState<WeaponSkin>()
 
     useEffect(() => {
 
@@ -40,15 +39,15 @@ const ItemCard = ({ itemProps }: ItemCardProps) => {
             <div className='item-picture-container'>
 
                 <div className='skin-image'>
-                    <img src={item?.itemImgUrl} alt='skin-image' />
+                    <img src={item?.imageUrl} alt='skin-image' />
                 </div>
 
                 <div className='sticker-stack'>
 
-                    {item?.stickerImgUrlArray.map(sticker => {
+                    {item?.stickerArray.map(sticker => {
                         return (
                             <div className='sticker'>
-                                <img src={sticker.imgUrl} alt='sticker' key={sticker.id} />
+                                <img src={sticker.imageUrl} alt='sticker' key={sticker.id} />
                             </div>
                         )
                     })}
