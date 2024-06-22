@@ -10,11 +10,23 @@ $inactive-font-color: #747180;
 
 $background-color: #1c1a24;
 
-body {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    background-color: $background-color;
-    color: $primary-font-color;
-    font-family: $primary-font;
+html,
+body,
+#root {
+  margin: 0;
+  box-sizing: border-box;
+  background-color: $background-color;
+  color: $primary-font-color;
+  font-family: $primary-font;
+  height: 100vh;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+a {
+  all: unset;
 }
