@@ -1,0 +1,30 @@
+$track-color: #555261;
+$thumb-color: #C85CD1;
+$thumb-radius: 5px;
+
+.catalog-main-container {
+
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    overflow: auto;
+
+    &::-webkit-scrollbar {
+        background-color: $track-color;
+        border-radius: $thumb-radius;
+        width: 5px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: $thumb-color;
+        border-radius: $thumb-radius;
+    }
+
+    .item-container {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+}

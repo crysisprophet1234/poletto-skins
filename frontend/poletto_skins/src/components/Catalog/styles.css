@@ -1,0 +1,21 @@
+.catalog-main-container {
+  display: flex;
+  flex-direction: row;
+  gap: 15px;
+  overflow: auto;
+}
+.catalog-main-container::-webkit-scrollbar {
+  background-color: #555261;
+  border-radius: 5px;
+  width: 5px;
+}
+.catalog-main-container::-webkit-scrollbar-thumb {
+  background-color: #C85CD1;
+  border-radius: 5px;
+}
+.catalog-main-container .item-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 15px;
+}/*# sourceMappingURL=styles.css.map */
