@@ -1,0 +1,38 @@
+$primary-color: #C85CD1;
+$inactive-font-color: #555261;
+
+.side-navbar {
+
+    text-align: center;
+
+    ul {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 40px;
+
+        li a {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            color: $inactive-font-color;
+            gap: 10px;
+            cursor: pointer;
+
+            &:hover,
+            &.active {
+                color: $primary-color;
+            }
+
+            svg {
+                font-size: 24px;
+            }
+        }
+
+    }
+}
