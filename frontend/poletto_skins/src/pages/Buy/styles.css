@@ -1,0 +1,21 @@
+.buy-main-container {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 100%;
+  gap: 10px;
+}
+.buy-main-container .main-filter {
+  display: flex;
+}
+.buy-main-container .buy-main-area {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%;
+}
+.buy-main-container .buy-main-area .catalog-container {
+  display: flex;
+  height: 100%;
+  overflow: auto;
+}/*# sourceMappingURL=styles.css.map */
