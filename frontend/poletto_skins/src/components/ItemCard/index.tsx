@@ -15,10 +15,7 @@ const ItemCard = ({ itemProps }: ItemCardProps) => {
     const [item, setItem] = useState<WeaponSkin>()
 
     useEffect(() => {
-
-        console.log('initializing itemProps')
         setItem(itemProps)
-
     }, [itemProps])
 
     return (
@@ -44,10 +41,10 @@ const ItemCard = ({ itemProps }: ItemCardProps) => {
 
                 <div className='sticker-stack'>
 
-                    {item?.stickerArray.map(sticker => {
+                    {item?.stickerArray.map((sticker, index) => {
                         return (
-                            <div className='sticker'>
-                                <img src={sticker.imageUrl} alt='sticker' key={sticker.id} />
+                            <div className='sticker' key={index}>
+                                <img src={sticker.imageUrl} alt='sticker' />
                             </div>
                         )
                     })}
