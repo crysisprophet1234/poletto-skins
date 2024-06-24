@@ -1,5 +1,7 @@
+import { UUID } from 'crypto'
+
 export type Item = {
-    id: number
+    id: number | UUID
     name: string
     imageUrl: string
     price: number
@@ -9,7 +11,7 @@ export type Item = {
 
 export type WeaponSkin = Item & {
     category: string
-    weapon: string
+    subCategory: string
     statTrak: boolean
     floatShort: string
     floatFull: number
@@ -17,22 +19,26 @@ export type WeaponSkin = Item & {
 }
 
 export type GloveSkin = Item & {
-    category: 'gloves'
-    type: string
+    category: 'Gloves'
+    subCategory: string
     floatShort: string
     floatFull: number
 }
 
 export type KnifeSkin = Item & {
-    category: 'knifes'
-    type: string
+    category: 'Knifes'
+    subCategory: string
+    statTrak: boolean
     floatShort: string
     floatFull: number
 }
 
 export type Sticker = Item & {
+    category: 'Stickers'
     rarity: 'Common' | 'Uncommon' | 'Rare' | 'Remarkable' | 'Exotic' | 'Extraordinary'
     finish: 'Regular' | 'Holo' | 'Foil' | 'Gold'
     eventOrCollection: string
     origin: 'Capsule' | 'Case' | 'Event Reward'
 }
+
+export type ItemType = WeaponSkin | Sticker | GloveSkin | KnifeSkin
