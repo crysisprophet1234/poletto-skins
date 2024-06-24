@@ -16,7 +16,7 @@ $primary-box-shadow-hover: 0 0 10px $accent-color, 0 0 15px rgba($accent-color, 
         background-color: $background-color;
         padding: 16px;
         border-radius: 5px;
-        flex-grow: 1;
+        width: 100%;
     }
 
 }
