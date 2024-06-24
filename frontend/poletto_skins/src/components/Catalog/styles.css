@@ -1,7 +1,6 @@
 .catalog-main-container {
   display: flex;
   flex-direction: row;
-  gap: 15px;
   overflow: auto;
 }
 .catalog-main-container::-webkit-scrollbar {
