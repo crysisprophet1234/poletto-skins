@@ -1,4 +1,5 @@
 $primary-color: #C85CD1;
+$secondary-color: #9F8FFF;
 $background-color: #1c1a24;
 $inactive-font-color: #555261;
 $card-bg-color: #292733;
@@ -8,9 +9,13 @@ $primary-box-shadow-hover: 0 0 10px $accent-color, 0 0 15px rgba($accent-color, 
 .item-card-main-container {
     display: flex;
     flex-direction: column;
-    padding: 15px;
+    padding: 12px 15px;
     border-radius: 5px;
     max-width: 267.5px;
+    min-width: 267.5px;
+    min-height: 344px;
+    max-height: 344px;
+    justify-content: space-between;
     background-color: $background-color;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.1);
     cursor: pointer;
@@ -18,14 +23,14 @@ $primary-box-shadow-hover: 0 0 10px $accent-color, 0 0 15px rgba($accent-color, 
     .item-info-container {
         display: flex;
         flex-direction: column;
-        gap: 5px;
 
         .skin-name {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 550;
         }
 
         .category {
+            font-size: 14px;
             color: $inactive-font-color;
             font-weight: 550;
         }
@@ -33,7 +38,9 @@ $primary-box-shadow-hover: 0 0 10px $accent-color, 0 0 15px rgba($accent-color, 
         .additional-info {
             display: flex;
             flex-direction: row;
+            margin-top: 3px;
             gap: 10px;
+            font-size: 16px;
 
             span {
                 display: flex;
@@ -50,7 +57,8 @@ $primary-box-shadow-hover: 0 0 10px $accent-color, 0 0 15px rgba($accent-color, 
 
             .float-short {
                 background-color: $card-bg-color;
-                width: 30px;
+                //width: 30px;
+                padding: 0px 5px;
                 border-radius: 5px;
             }
 
@@ -59,20 +67,26 @@ $primary-box-shadow-hover: 0 0 10px $accent-color, 0 0 15px rgba($accent-color, 
             }
         }
 
-
-
     }
 
     .item-picture-container {
-        padding: 10px 0px;
+        padding: 2px 0px;
         display: flex;
         flex-direction: row;
+        height: 100%;
+
 
         .skin-image {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            flex-grow: 1;
 
             img {
-                max-height: 150px;
-                max-width: 200px;
+                height: 100%;
+                max-height: 125px;
+                max-width: 175px;
                 transition: transform 0.5s ease;
 
                 &:hover {
@@ -87,6 +101,10 @@ $primary-box-shadow-hover: 0 0 10px $accent-color, 0 0 15px rgba($accent-color, 
             gap: 5px;
 
             .sticker {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
                 img {
                     max-height: 30px;
                     max-width: 37.5px;
@@ -116,14 +134,15 @@ $primary-box-shadow-hover: 0 0 10px $accent-color, 0 0 15px rgba($accent-color, 
 
             .discount {
                 background-color: $primary-color;
-                padding: 5px;
+                padding: 2px 5px;
                 width: fit-content;
                 border-radius: .25rem;
                 font-weight: 550;
+                font-size: 18px;
             }
 
             .price {
-                font-size: 20px;
+                font-size: 18px;
                 font-weight: 550;
             }
 
@@ -180,6 +199,7 @@ $primary-box-shadow-hover: 0 0 10px $accent-color, 0 0 15px rgba($accent-color, 
             padding: 6px;
             background-color: $card-bg-color;
             border-radius: .25rem;
+            transition: background-color 0.3s ease-in-out;
 
             .add-cart {
                 display: flex;
@@ -187,12 +207,13 @@ $primary-box-shadow-hover: 0 0 10px $accent-color, 0 0 15px rgba($accent-color, 
                 align-items: center;
 
                 svg {
-                    font-size: 24px;
+                    font-size: 22px;
                     margin: auto;
                 }
             }
 
             &:hover {
+                transition: unset;
                 background-color: $primary-color !important;
                 box-shadow: $primary-box-shadow-hover;
             }
@@ -201,7 +222,7 @@ $primary-box-shadow-hover: 0 0 10px $accent-color, 0 0 15px rgba($accent-color, 
 
     &:hover {
         .item-bottom-container .add-cart-container {
-            background-color: #9F8FFF;
+            background-color: $secondary-color;
         }
     }
 }

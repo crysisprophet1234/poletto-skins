@@ -1,9 +1,13 @@
 .item-card-main-container {
   display: flex;
   flex-direction: column;
-  padding: 15px;
+  padding: 12px 15px;
   border-radius: 5px;
   max-width: 267.5px;
+  min-width: 267.5px;
+  min-height: 344px;
+  max-height: 344px;
+  justify-content: space-between;
   background-color: #1c1a24;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.1);
   cursor: pointer;
@@ -11,20 +15,22 @@
 .item-card-main-container .item-info-container {
   display: flex;
   flex-direction: column;
-  gap: 5px;
 }
 .item-card-main-container .item-info-container .skin-name {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 550;
 }
 .item-card-main-container .item-info-container .category {
+  font-size: 14px;
   color: #555261;
   font-weight: 550;
 }
 .item-card-main-container .item-info-container .additional-info {
   display: flex;
   flex-direction: row;
+  margin-top: 3px;
   gap: 10px;
+  font-size: 16px;
 }
 .item-card-main-container .item-info-container .additional-info span {
   display: flex;
@@ -39,20 +45,29 @@
 }
 .item-card-main-container .item-info-container .additional-info .float-short {
   background-color: #292733;
-  width: 30px;
+  padding: 0px 5px;
   border-radius: 5px;
 }
 .item-card-main-container .item-info-container .additional-info .float-full {
   font-size: 16px;
 }
 .item-card-main-container .item-picture-container {
-  padding: 10px 0px;
+  padding: 2px 0px;
   display: flex;
   flex-direction: row;
+  height: 100%;
+}
+.item-card-main-container .item-picture-container .skin-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  flex-grow: 1;
 }
 .item-card-main-container .item-picture-container .skin-image img {
-  max-height: 150px;
-  max-width: 200px;
+  height: 100%;
+  max-height: 125px;
+  max-width: 175px;
   transition: transform 0.5s ease;
 }
 .item-card-main-container .item-picture-container .skin-image img:hover {
@@ -62,6 +77,11 @@
   display: grid;
   grid-template-rows: repeat(4, 1fr);
   gap: 5px;
+}
+.item-card-main-container .item-picture-container .sticker-stack .sticker {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .item-card-main-container .item-picture-container .sticker-stack .sticker img {
   max-height: 30px;
@@ -86,14 +106,15 @@
 }
 .item-card-main-container .item-bottom-container .price-container .discount {
   background-color: #C85CD1;
-  padding: 5px;
+  padding: 2px 5px;
   width: -moz-fit-content;
   width: fit-content;
   border-radius: 0.25rem;
   font-weight: 550;
+  font-size: 18px;
 }
 .item-card-main-container .item-bottom-container .price-container .price {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 550;
 }
 .item-card-main-container .item-bottom-container .price-container .steam-price {
@@ -142,6 +163,7 @@
   padding: 6px;
   background-color: #292733;
   border-radius: 0.25rem;
+  transition: background-color 0.3s ease-in-out;
 }
 .item-card-main-container .item-bottom-container .add-cart-container .add-cart {
   display: flex;
@@ -149,10 +171,11 @@
   align-items: center;
 }
 .item-card-main-container .item-bottom-container .add-cart-container .add-cart svg {
-  font-size: 24px;
+  font-size: 22px;
   margin: auto;
 }
 .item-card-main-container .item-bottom-container .add-cart-container:hover {
+  transition: unset;
   background-color: #C85CD1 !important;
   box-shadow: 0 0 10px rgba(200, 92, 209, 0.8), 0 0 15px rgba(200, 92, 209, 0.6), 0 0 20px rgba(200, 92, 209, 0.4);
 }
