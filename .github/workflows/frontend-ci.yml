@@ -31,5 +31,6 @@ jobs:
       run: yarn build
       working-directory: ./frontend/poletto_skins/
     - name: Run Tests
-      run: yarn test
+      run: #yarn test
+        echo "No tests yet"        
       working-directory: ./frontend/poletto_skins/
