@@ -4,7 +4,8 @@ import { GloveSkin, ItemType, Sticker, WeaponSkin } from '@/types/entities/item'
 import ItemCard from '../ItemCard'
 
 
-const Catalog = () => {
+
+const Catalog = ({ data }: any) => {
 
     //MOCKS
     const fetchedStickersFromApi: Sticker[] = [
@@ -216,7 +217,7 @@ const Catalog = () => {
         }
     ]
 
-    const multipliedArray: ItemType[] = [
+    const combinedArray: ItemType[] = [
         ...fetchedWeaponSkinsFromApi,
         ...fetchedStickersFromApi,
         ...fetchedGloveSkinsFromApi,
@@ -225,7 +226,7 @@ const Catalog = () => {
 
     //multipliedArray.sort((a, b) => a.price - b.price)
 
-    multipliedArray.sort((a, b) => a.name.localeCompare(b.name))
+    combinedArray.sort((a, b) => a.name.localeCompare(b.name))
 
     return (
 
@@ -233,7 +234,7 @@ const Catalog = () => {
 
             <div className='item-container'>
 
-                {multipliedArray.map((item) => {
+                {combinedArray.map((item) => {
                     return (
                         <ItemCard itemProps={item} key={item.id} />
                     )
