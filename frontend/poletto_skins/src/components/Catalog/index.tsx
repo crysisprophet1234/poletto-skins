@@ -7,6 +7,8 @@ import ItemCard from '../ItemCard'
 
 const Catalog = ({ data }: any) => {
 
+    console.log(data)
+
     //MOCKS
     const fetchedStickersFromApi: Sticker[] = [
         {
