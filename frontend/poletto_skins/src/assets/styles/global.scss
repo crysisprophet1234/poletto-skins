@@ -18,6 +18,7 @@ body,
   background-color: $background-color;
   color: $primary-font-color;
   font-family: $primary-font;
+  -webkit-font-smoothing: antialiased;
   height: 100vh;
 }
 
@@ -29,4 +30,52 @@ body,
 
 a {
   all: unset;
+}
+
+input[type='number'],
+input[type='text'],
+input[type='password'],
+input[type='email'],
+input[type='tel'],
+input[type='url'],
+input[type='search'],
+input[type='range'],
+textarea,
+select,
+button {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  border: 0px;
+  padding: 0px;
+  color: $primary-font-color;
+  font-family: $primary-font;
+  line-height: inherit;
+  box-sizing: border-box;
+  margin: 0;
+  outline: 0;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+textarea {
+  resize: vertical;
+}
+
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-color: #fff;
+  background-image: url('data:image/svg+xml;utf8,<svg ...');
+  background-position: right center;
+  background-repeat: no-repeat;
+  padding: 8px;
+  border: 1px solid #ccc;
+  font-size: inherit;
+  line-height: inherit;
 }
