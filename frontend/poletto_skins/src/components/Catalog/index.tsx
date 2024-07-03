@@ -1,14 +1,12 @@
 import './styles.css'
 
 import { GloveSkin, ItemType, Sticker, WeaponSkin } from '@/types/entities/item'
+import { Box, Grid } from '@mui/material'
 import ItemCard from '../ItemCard'
-
-
 
 const Catalog = ({ data }: any) => {
 
     console.log(data)
-
     //MOCKS
     const fetchedStickersFromApi: Sticker[] = [
         {
@@ -234,15 +232,15 @@ const Catalog = ({ data }: any) => {
 
         <div className='catalog-main-container'>
 
-            <div className='item-container'>
-
-                {combinedArray.map((item) => {
-                    return (
-                        <ItemCard itemProps={item} key={item.id} />
-                    )
-                })}
-
-            </div>
+            <Box sx={{ flexGrow: 1 }}>
+                <Grid container justifyContent='space-between' spacing={1} columns={{ xs: 4, sm: 8, md: 12, lg: 12, xl: 16 }}>
+                    {combinedArray.map((item, index) => (
+                        <Grid item xs={2} sm={4} md={4} lg={3} key={index}>
+                            <ItemCard itemProps={item} key={item.id} />
+                        </Grid>
+                    ))}
+                </Grid>
+            </Box>
 
         </div>
 

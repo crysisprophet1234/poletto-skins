@@ -11,8 +11,8 @@ $primary-box-shadow-hover: 0 0 10px $accent-color, 0 0 15px rgba($accent-color, 
     flex-direction: column;
     padding: 12px 15px;
     border-radius: 5px;
-    max-width: 267.5px;
-    min-width: 267.5px;
+    //max-width: 267.5px;
+    //min-width: 250px;
     min-height: 344px;
     max-height: 344px;
     justify-content: space-between;
@@ -70,6 +70,9 @@ $primary-box-shadow-hover: 0 0 10px $accent-color, 0 0 15px rgba($accent-color, 
     }
 
     .item-picture-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
         padding: 2px 0px;
         display: flex;
         flex-direction: row;
@@ -85,6 +88,7 @@ $primary-box-shadow-hover: 0 0 10px $accent-color, 0 0 15px rgba($accent-color, 
 
             img {
                 height: 100%;
+                width: 100%;
                 max-height: 125px;
                 max-width: 175px;
                 transition: transform 0.5s ease;
@@ -121,8 +125,8 @@ $primary-box-shadow-hover: 0 0 10px $accent-color, 0 0 15px rgba($accent-color, 
 
     .item-bottom-container {
         display: grid;
-        grid-template-rows: 1fr auto;
-        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto;
+        grid-template-columns: auto 1fr;
         gap: 10px;
 
         .price-container {
@@ -131,6 +135,7 @@ $primary-box-shadow-hover: 0 0 10px $accent-color, 0 0 15px rgba($accent-color, 
             display: flex;
             flex-direction: column;
             gap: 5px;
+            width: fit-content;
 
             .discount {
                 background-color: $primary-color;

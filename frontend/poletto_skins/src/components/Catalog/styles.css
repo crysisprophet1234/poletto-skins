@@ -2,6 +2,9 @@
   display: flex;
   flex-direction: row;
   overflow: auto;
+  height: 100%;
+  padding-right: 16px;
+  scrollbar-gutter: stable;
 }
 .catalog-main-container::-webkit-scrollbar {
   background-color: #555261;
