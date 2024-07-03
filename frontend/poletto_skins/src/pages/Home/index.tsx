@@ -1,4 +1,4 @@
-import './styles.css'
+import './styles.scss'
 
 import { Outlet } from 'react-router-dom'
 import SideNavbar from '../../components/SideNavbar'

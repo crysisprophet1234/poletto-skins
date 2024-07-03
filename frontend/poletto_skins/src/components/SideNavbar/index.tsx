@@ -5,7 +5,7 @@ import { MdOutlineHistory } from "react-icons/md"
 import { RiMoneyDollarCircleFill } from "react-icons/ri"
 import { NavLink } from 'react-router-dom'
 
-import './styles.css'
+import './styles.scss'
 
 const SideNavbar = () => {
 

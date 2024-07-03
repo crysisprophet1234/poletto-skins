@@ -1,4 +1,4 @@
-import './styles.css'
+import './styles.scss'
 
 import { GloveSkin, ItemType, Sticker, WeaponSkin } from '@/types/entities/item'
 import { Box, Grid } from '@mui/material'

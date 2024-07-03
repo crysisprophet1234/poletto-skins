@@ -1,4 +1,4 @@
-import './styles.css'
+import './styles.scss'
 
 import { ItemType } from '@/types/entities/item'
 import axios from 'axios'

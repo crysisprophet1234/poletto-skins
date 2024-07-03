@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import './styles.css'
+import './styles.scss'
 
 import Slider from '@mui/material/Slider'
 

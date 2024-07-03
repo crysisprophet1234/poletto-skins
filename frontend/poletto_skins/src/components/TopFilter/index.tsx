@@ -7,7 +7,7 @@ import { z } from 'zod'
 import FormSearchQueryText from '../FormComponents/FormQuerySearchText'
 import FormSelect from '../FormComponents/FormSelect'
 import FormToggleButton from '../FormComponents/FormToggleButton'
-import './styles.css'
+import './styles.scss'
 
 const sortOptions = [
     {
