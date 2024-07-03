@@ -7,6 +7,9 @@ $thumb-radius: 5px;
     display: flex;
     flex-direction: row;
     overflow: auto;
+    height: 100%;
+    padding-right: 16px;
+    scrollbar-gutter: stable;
 
     &::-webkit-scrollbar {
         background-color: $track-color;
