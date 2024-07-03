@@ -19,7 +19,8 @@
         .catalog-container {
             display: flex;
             height: 100%;
-            overflow: auto;
+            overflow-y: hidden;
+            overflow-x: hidden;
         }
     }
 
