@@ -3,14 +3,15 @@ import './styles.scss'
 import { ItemType } from '@/types/entities/item'
 import { useEffect, useState } from 'react'
 import { FaSteam } from 'react-icons/fa6'
-import { HiShoppingCart } from 'react-icons/hi'
 import { MdFavorite } from 'react-icons/md'
+import AddCartButton from '../AddCartButton'
 
 type ItemCardProps = {
     itemProps: ItemType
+    openModal: () => void
 }
 
-const ItemCard = ({ itemProps }: ItemCardProps) => {
+const ItemCard = ({ itemProps, openModal }: ItemCardProps) => {
 
     const [item, setItem] = useState<ItemType | null>(null)
 
@@ -23,7 +24,7 @@ const ItemCard = ({ itemProps }: ItemCardProps) => {
     }
 
     return (
-        <div className='item-card-main-container'>
+        <div className='item-card-main-container' onClick={openModal}>
 
             <div className='item-info-container'>
 
@@ -66,7 +67,7 @@ const ItemCard = ({ itemProps }: ItemCardProps) => {
             <div className='item-picture-container'>
 
                 <div className='skin-image'>
-                    <img src={item?.imageUrl} alt='skin-image' />
+                    <img src={item?.imageUrl} alt='skin-image' loading='lazy' />
                 </div>
 
                 {'stickerArray' in item && (
@@ -75,7 +76,7 @@ const ItemCard = ({ itemProps }: ItemCardProps) => {
                         {item.stickerArray.map((sticker) => {
                             return (
                                 <div className='sticker' key={sticker.id}>
-                                    <img src={sticker.imageUrl} alt='sticker' />
+                                    <img src={sticker.imageUrl} alt='sticker' loading='lazy' />
                                 </div>
                             )
                         })}
@@ -106,18 +107,16 @@ const ItemCard = ({ itemProps }: ItemCardProps) => {
 
                 </div>
 
-                <div className='favorite-container'>
+                <div className='favorite-container' >
 
-                    <div className='favorite'>
+                    <div className='favorite' onClick={(e) => { e.stopPropagation() }}>
                         <MdFavorite />
                     </div>
 
                 </div>
 
                 <div className='add-cart-container'>
-                    <div className='add-cart'>
-                        <HiShoppingCart />
-                    </div>
+                    <AddCartButton onClick={(e) => { e.stopPropagation() }} />
                 </div>
 
             </div>
