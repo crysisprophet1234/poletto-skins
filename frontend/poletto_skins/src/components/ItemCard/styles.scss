@@ -125,13 +125,13 @@ $primary-box-shadow-hover: 0 0 10px $accent-color, 0 0 15px rgba($accent-color, 
 
     .item-bottom-container {
         display: grid;
-        grid-template-rows: auto auto;
-        grid-template-columns: auto 1fr;
+        grid-template-areas:
+            'top-left top-right'
+            'bottom bottom';
         gap: 10px;
 
         .price-container {
-            grid-column: 1;
-            grid-row: 1;
+            grid-area: top-left;
             display: flex;
             flex-direction: column;
             gap: 5px;
@@ -163,8 +163,7 @@ $primary-box-shadow-hover: 0 0 10px $accent-color, 0 0 15px rgba($accent-color, 
         }
 
         .favorite-container {
-            grid-column: 2;
-            grid-row: 1;
+            grid-area: top-right;
             display: flex;
             justify-content: end;
             align-items: end;
@@ -196,37 +195,12 @@ $primary-box-shadow-hover: 0 0 10px $accent-color, 0 0 15px rgba($accent-color, 
         }
 
         .add-cart-container {
-            grid-column: 1 / span 2;
-            grid-row: 2;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 6px;
-            background-color: $card-bg-color;
-            border-radius: .25rem;
-            transition: background-color 0.3s ease-in-out;
-
-            .add-cart {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-
-                svg {
-                    font-size: 22px;
-                    margin: auto;
-                }
-            }
-
-            &:hover {
-                transition: unset;
-                background-color: $primary-color !important;
-                box-shadow: $primary-box-shadow-hover;
-            }
+            grid-area: bottom;
         }
     }
 
     &:hover {
-        .item-bottom-container .add-cart-container {
+        .item-bottom-container .add-cart-container div {
             background-color: $secondary-color;
         }
     }
