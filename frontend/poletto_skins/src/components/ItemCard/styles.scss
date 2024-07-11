@@ -199,9 +199,11 @@ $primary-box-shadow-hover: 0 0 10px $accent-color, 0 0 15px rgba($accent-color, 
         }
     }
 
+    /*TODO: how to use this without breaking the red collor that removes items from the cart?
     &:hover {
         .item-bottom-container .add-cart-container div {
             background-color: $secondary-color;
         }
     }
+        */
 }
