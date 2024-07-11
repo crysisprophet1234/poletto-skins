@@ -19,6 +19,8 @@ const ItemCard = ({ itemProps, openModal, itemAction }: ItemCardProps) => {
 
     const [item, setItem] = useState<ItemType | null>(null)
 
+    const [isHovered, setIsHovered] = useState(false)
+
     useEffect(() => {
         setItem(itemProps)
     }, [itemProps])
@@ -28,7 +30,13 @@ const ItemCard = ({ itemProps, openModal, itemAction }: ItemCardProps) => {
     }
 
     return (
-        <div className='item-card-main-container' onClick={openModal}>
+
+        <div
+            className='item-card-main-container'
+            onClick={openModal}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+        >
 
             <div className='item-info-container'>
 
@@ -120,12 +128,17 @@ const ItemCard = ({ itemProps, openModal, itemAction }: ItemCardProps) => {
                 </div>
 
                 <div className='add-cart-container' onClick={(e) => e.stopPropagation()}>
-                    <AddCartButton isItemInCart={isItemInCart(item.id)} onClick={itemAction} />
+                    <AddCartButton
+                        isItemInCart={isItemInCart(item.id)}
+                        onClick={itemAction}
+                        isHovered={isHovered}
+                    />
                 </div>
 
             </div>
 
         </div >
+
     )
 }
 

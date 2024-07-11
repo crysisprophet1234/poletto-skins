@@ -11,8 +11,6 @@ $primary-box-shadow-hover: 0 0 10px $accent-color, 0 0 15px rgba($accent-color, 
     flex-direction: column;
     padding: 12px 15px;
     border-radius: 5px;
-    //max-width: 267.5px;
-    //min-width: 250px;
     min-height: 344px;
     max-height: 344px;
     justify-content: space-between;
@@ -57,7 +55,6 @@ $primary-box-shadow-hover: 0 0 10px $accent-color, 0 0 15px rgba($accent-color, 
 
             .float-short {
                 background-color: $card-bg-color;
-                //width: 30px;
                 padding: 0px 5px;
                 border-radius: 5px;
             }
@@ -199,11 +196,4 @@ $primary-box-shadow-hover: 0 0 10px $accent-color, 0 0 15px rgba($accent-color, 
         }
     }
 
-    /*TODO: how to use this without breaking the red collor that removes items from the cart?
-    &:hover {
-        .item-bottom-container .add-cart-container div {
-            background-color: $secondary-color;
-        }
-    }
-        */
 }
