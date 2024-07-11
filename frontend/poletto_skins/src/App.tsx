@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
 
 import { lazy, Suspense } from 'react'
 import './assets/styles/global.scss'
+import { CartProvider } from './contexts/CartContext'
 import ErrorPage from './pages/ErrorPage'
 import Sell from './pages/Sell'
 import Root from './routes/root'
@@ -27,7 +28,9 @@ const router = createBrowserRouter([
         element:
           <Suspense
             fallback={<h1>Loading...</h1>}>
-            <Buy />
+            <CartProvider>
+              <Buy />
+            </CartProvider>
           </Suspense>
       },
       {
@@ -45,9 +48,9 @@ const router = createBrowserRouter([
 const App = () => {
 
   return (
-    <>
-      <RouterProvider router={router} />
-    </>
+
+    <RouterProvider router={router} />
+
   )
 }
 
