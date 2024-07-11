@@ -4,14 +4,18 @@ import { ItemType } from '@/types/entities/item'
 import { useEffect, useState } from 'react'
 import { FaSteam } from 'react-icons/fa6'
 import { MdFavorite } from 'react-icons/md'
+import { useCart } from '../../hooks/useCart'
 import AddCartButton from '../AddCartButton'
 
 type ItemCardProps = {
     itemProps: ItemType
     openModal: () => void
+    itemAction: () => void
 }
 
-const ItemCard = ({ itemProps, openModal }: ItemCardProps) => {
+const ItemCard = ({ itemProps, openModal, itemAction }: ItemCardProps) => {
+
+    const { isItemInCart } = useCart()
 
     const [item, setItem] = useState<ItemType | null>(null)
 
@@ -115,13 +119,13 @@ const ItemCard = ({ itemProps, openModal }: ItemCardProps) => {
 
                 </div>
 
-                <div className='add-cart-container'>
-                    <AddCartButton onClick={(e) => { e.stopPropagation() }} />
+                <div className='add-cart-container' onClick={(e) => e.stopPropagation()}>
+                    <AddCartButton isItemInCart={isItemInCart(item.id)} onClick={itemAction} />
                 </div>
 
             </div>
 
-        </div>
+        </div >
     )
 }
 

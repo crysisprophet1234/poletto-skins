@@ -7,6 +7,7 @@ import Box from '@mui/material/Box'
 import Modal from '@mui/material/Modal'
 import Typography from '@mui/material/Typography'
 import { FaExternalLinkAlt } from 'react-icons/fa'
+import { useCart } from '../../hooks/useCart'
 import AddCartButton from '../AddCartButton'
 import FloatBar from '../FloatBar'
 
@@ -14,9 +15,12 @@ type ItemModalProps = {
     item: ItemType
     open: boolean
     handleClose: () => void
+    itemAction: () => void
 }
 
-const ItemModal = ({ item, open, handleClose }: ItemModalProps) => {
+const ItemModal = ({ item, open, handleClose, itemAction }: ItemModalProps) => {
+
+    const { isItemInCart } = useCart()
 
     const fullFloatCategoryName = (floatShort: string) => {
         switch (floatShort.toLocaleLowerCase()) {
@@ -290,7 +294,7 @@ const ItemModal = ({ item, open, handleClose }: ItemModalProps) => {
                                 </div>
 
                                 <div className='add-cart-container'>
-                                    <AddCartButton onClick={() => {/* TODO: implement logic */ }} />
+                                    <AddCartButton isItemInCart={isItemInCart(item.id)} onClick={itemAction} />
                                 </div>
 
                             </div>
