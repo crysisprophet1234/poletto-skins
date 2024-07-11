@@ -54,7 +54,6 @@ const ItemModal = ({ item, open, handleClose, itemAction }: ItemModalProps) => {
                 left: '50%',
                 transform: 'translate(-50%, -50%)',
                 width: '1150px',
-                //maxWidth: 'fit-content',
                 bgcolor: '#282633',
                 borderRadius: '.5rem',
                 boxShadow: 24,
@@ -294,7 +293,11 @@ const ItemModal = ({ item, open, handleClose, itemAction }: ItemModalProps) => {
                                 </div>
 
                                 <div className='add-cart-container'>
-                                    <AddCartButton isItemInCart={isItemInCart(item.id)} onClick={itemAction} />
+                                    <AddCartButton
+                                        isItemInCart={isItemInCart(item.id)}
+                                        onClick={itemAction}
+                                        isHovered={true}
+                                    />
                                 </div>
 
                             </div>

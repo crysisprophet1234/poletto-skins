@@ -123,14 +123,6 @@ $item-value-text-color: #BCBCC2;
         gap: 20px;
     }
 
-    /*TODO: how to use this without breaking the red collor that removes items from the cart?
-    .add-cart-container {
-        div {
-            background-color: $secondary-color;
-        }
-    }
-        */
-
     .item-info {
         display: flex;
         flex-direction: row;
