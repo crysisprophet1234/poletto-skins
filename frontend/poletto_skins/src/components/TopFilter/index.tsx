@@ -4,10 +4,11 @@ import { debounce } from '@mui/material'
 import { useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
+import Cart from '../Cart'
 import FormSearchQueryText from '../FormComponents/FormQuerySearchText'
-import FormSelect from '../FormComponents/FormSelect'
 import FormToggleButton from '../FormComponents/FormToggleButton'
 import './styles.scss'
+import FormSelect from '../FormComponents/FormSelect'
 
 const sortOptions = [
     {
@@ -84,13 +85,20 @@ const TopFilter = ({ onFilterChange }: TopFilterProps) => {
 
         <div className='filter-top-container'>
 
-            <div className='left-container'>
-
+            <div className='filter-top-section'>
                 <FormSearchQueryText
                     name='query'
                     control={control}
                     label='query search'
                     placeholder='Busque o nome do item, skin, sticker...'
+                />
+
+                <FormSelect
+                    name='sort'
+                    control={control}
+                    label='sort'
+                    options={sortOptions}
+                    placeholder='Padrão'
                 />
 
                 <FormToggleButton
@@ -101,18 +109,11 @@ const TopFilter = ({ onFilterChange }: TopFilterProps) => {
 
             </div>
 
-            <div className='sort-container'>
+            <div className='filter-top-section'>
 
-                <FormSelect
-                    name='sort'
-                    control={control}
-                    label='sort'
-                    options={sortOptions}
-                    placeholder='Padrão'
-                />
+                <Cart />
 
             </div>
-
 
         </div>
 
