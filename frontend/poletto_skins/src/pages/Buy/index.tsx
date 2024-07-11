@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from 'react'
 import TopFilter from '../..//components/TopFilter'
 import Catalog from '../../components/Catalog'
 import MainFilter from '../../components/MainFilter'
+import { useCart } from '../../hooks/useCart'
 
 //MOCKS
 const fetchedStickersFromApi: Sticker[] = [
@@ -264,6 +265,16 @@ type FilterData = {
 
 const Buy = () => {
 
+    const { addToCart, removeFromCart, isItemInCart } = useCart()
+
+    const handleAddCartButtonClick = (item: ItemType) => {
+        if (isItemInCart(item.id)) {
+            removeFromCart(item.id)
+        } else {
+            addToCart(item)
+        }
+    }
+
     const [items, setItems] = useState<ItemType[]>([])
 
     const [filterData, setFilterData] = useState<FilterData>()
@@ -311,7 +322,7 @@ const Buy = () => {
                 </div>
 
                 <div className='catalog-container'>
-                    <Catalog items={items} />
+                    <Catalog items={items} itemAction={handleAddCartButtonClick} />
                 </div>
 
             </div>

@@ -8,9 +8,10 @@ import ItemModal from '../ItemModal'
 
 type CatalogProps = {
     items: ItemType[]
+    itemAction: (item: ItemType) => void
 }
 
-const Catalog = ({ items }: CatalogProps) => {
+const Catalog = ({ items, itemAction }: CatalogProps) => {
 
     const [loading, setLoading] = useState(true)
 
@@ -43,12 +44,21 @@ const Catalog = ({ items }: CatalogProps) => {
                     {loading
                         ? Array.from(new Array(12)).map((_, index) => (
                             <Grid item xs={2} sm={4} md={4} lg={3} key={index} >
-                                <Skeleton variant='rounded' animation='wave' height='344px' />
+                                <Skeleton
+                                    variant='rounded'
+                                    animation='wave'
+                                    height='344px'
+                                />
                             </Grid>
                         ))
                         : items.map((item, index) => (
                             <Grid item xs={2} sm={4} md={4} lg={3} key={index}>
-                                <ItemCard itemProps={item} key={item.id} openModal={() => handleOpen(item)} />
+                                <ItemCard
+                                    itemProps={item}
+                                    key={item.id}
+                                    itemAction={() => itemAction(item)}
+                                    openModal={() => handleOpen(item)}
+                                />
                             </Grid>
                         ))}
                 </Grid>
@@ -57,6 +67,7 @@ const Catalog = ({ items }: CatalogProps) => {
             {selectedItem &&
                 <ItemModal
                     open={open}
+                    itemAction={() => itemAction(selectedItem)}
                     handleClose={handleClose}
                     item={selectedItem}
                 />

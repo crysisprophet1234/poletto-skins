@@ -24,8 +24,11 @@ const theme = createTheme({
             styleOverrides: {
                 root: {
                     height: '100%',
+                    minWidth: '380px',
+                    maxWidth: '380px',
                     backgroundColor: '#403D4D',
-                    borderRadius: '.25rem'
+                    borderRadius: '.25rem',
+                    paddingRight: '10px'
                 },
             }
         },
