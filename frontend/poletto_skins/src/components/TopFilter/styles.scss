@@ -1,26 +1,15 @@
 .filter-top-container {
     display: flex;
-    flex-direction: row;
-    height: 34px;
+    height: 38px;
     padding-right: 21px;
+    gap: 15px;
     justify-content: space-between;
 
-    .left-container {
+    .filter-top-section {
         display: flex;
         flex-direction: row;
         gap: 15px;
-        width: 30%;
-        min-width: 500px;
-        height: 100%;
-
-        input {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            padding: 6px;
-            border-radius: 0.25rem;
-            font-size: 14px;
-        }
+        min-width: 'min-content';
     }
+
 }
