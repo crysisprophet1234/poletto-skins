@@ -1,20 +1,24 @@
 import { Box, ClickAwayListener, Popper } from '@mui/material'
 import { useState } from 'react'
+import BuyModal from '../BuyModal'
 import ItemCartPopup from './ItemCartPopup'
 import ShowCartButton from './ShowCartButton'
 
 const Cart = () => {
 
     const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
-    const [open, setOpen] = useState(false)
+
+    const [isCartOpen, setIsCartOpen] = useState(false)
+
+    const [isBuyModalOpen, setIsBuyModalOpen] = useState(false)
 
     const handleOutsideClick = () => {
-        setOpen(false)
+        setIsCartOpen(false)
     }
 
-    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    const handleShowCartClick = (event: React.MouseEvent<HTMLButtonElement>) => {
         setAnchorEl(event.currentTarget)
-        setOpen(!open)
+        setIsCartOpen(!isCartOpen)
     }
 
     return (
@@ -23,16 +27,21 @@ const Cart = () => {
 
             <Box>
 
-                <ShowCartButton handleClick={handleClick} />
+                <ShowCartButton handleClick={handleShowCartClick} />
 
                 <Popper
                     id='cart-popper'
                     placement='bottom-end'
-                    open={open}
+                    open={isCartOpen}
                     anchorEl={anchorEl}
                 >
-                    <ItemCartPopup onClose={() => setOpen(false)} />
+                    <ItemCartPopup onClose={() => setIsCartOpen(false)} onCheckout={() => setIsBuyModalOpen(!isBuyModalOpen)} />
                 </Popper>
+
+                <BuyModal
+                    open={isBuyModalOpen}
+                    handleClose={() => setIsBuyModalOpen(!isBuyModalOpen)}
+                />
 
             </Box>
 
