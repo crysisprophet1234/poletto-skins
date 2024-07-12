@@ -5,11 +5,14 @@ import ItemCartMiniature from './ItemCartMiniature'
 
 type ItemCartPopupProps = {
     onClose: () => void
+    onCheckout: () => void
 }
 
-const ItemCartPopup = ({ onClose }: ItemCartPopupProps) => {
+const ItemCartPopup = ({ onClose, onCheckout }: ItemCartPopupProps) => {
 
-    const { cart, totalItems } = useCart()
+    const { cart, totalItems, totalPrice } = useCart()
+
+    const userBalanceMock = 12700.38
 
     return (
         <Paper
@@ -138,7 +141,12 @@ const ItemCartPopup = ({ onClose }: ItemCartPopupProps) => {
                         onClick={
                             totalItems == 0
                                 ? () => onClose()
-                                : () => alert('not implemented yet')
+                                : () => {
+                                    onClose()
+                                    totalPrice > userBalanceMock
+                                        ? alert('add funds not implemented yet')
+                                        : onCheckout()
+                                }
                         }
                         sx={{
                             color: '#FFF',
@@ -151,9 +159,9 @@ const ItemCartPopup = ({ onClose }: ItemCartPopupProps) => {
                         }}
                     >
                         {
-                            totalItems > 0
-                                ? 'Finalizar compra'
-                                : 'Ir para o Mercado'
+                            totalItems == 0
+                                ? 'Ir para o Mercado'
+                                : 'Finalizar compra'
                         }
                     </Button>
                 </Box>
