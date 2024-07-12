@@ -2,16 +2,16 @@ import { Close } from '@mui/icons-material'
 import { Box, Button, IconButton, Modal, Stack, Typography } from '@mui/material'
 import { useCart } from '../../hooks/useCart'
 
-type ItemModalProps = {
+type BuyModalProps = {
     open: boolean
     handleClose: () => void
 }
 
-const BuyModal = ({ open, handleClose }: ItemModalProps) => {
+const BuyModal = ({ open, handleClose }: BuyModalProps) => {
 
     const userBalanceMock = 12700.38
 
-    const { cart, totalItems, totalPrice } = useCart()
+    const { totalItems, totalPrice } = useCart()
 
     return (
 
@@ -74,28 +74,6 @@ const BuyModal = ({ open, handleClose }: ItemModalProps) => {
                         </IconButton>
 
                     </Box>
-
-                    {/* 
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            color: '#BCBCC2'
-                        }}
-                    >
-                        <Typography
-                            variant='body1'
-                        >
-                            Itens no carrinho: {totalItems}
-                        </Typography>
-
-                        <Typography
-                            variant='body1'
-                        >
-                            Valor total: R${totalPrice}
-                        </Typography>
-                    </Box>
-                    */}
 
                     <Box
                         sx={{
