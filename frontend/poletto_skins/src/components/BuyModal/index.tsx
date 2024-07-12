@@ -94,7 +94,7 @@ const BuyModal = ({ open, handleClose }: BuyModalProps) => {
                                 component='span'
                                 sx={{ color: '#806cf5' }}
                             >
-                                R${totalPrice}
+                                R${totalPrice.toFixed(2)}
                             </Box>
                         </Typography>
                         <Typography variant='h6'>
