@@ -29,7 +29,7 @@ const LoginButton = ({ mockLogoff }: LoginButtonProps) => {
                     style={{
                         marginBottom: '2px',
                         fontSize: '18px',
-                        fill: 'black'
+                        fill: 'white'
                     }}
                 />
                 <Typography variant='button' color={'#FFF'}>
