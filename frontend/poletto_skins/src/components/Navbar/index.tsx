@@ -1,5 +1,3 @@
-import './styles.scss'
-
 import { Link } from 'react-router-dom'
 
 import LogoUrl from '../../assets/images/polettoskins-logo.png'
