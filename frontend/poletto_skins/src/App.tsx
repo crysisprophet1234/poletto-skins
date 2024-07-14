@@ -9,41 +9,43 @@ import Root from './routes/root'
 
 const Buy = lazy(() => import('./pages/Buy'))
 
-const router = createBrowserRouter([
+const router = createBrowserRouter(
+  [
+    {
+      path: '/',
+      element: <Root />,
+      errorElement: <ErrorPage />,
+      children: [
+        {
+          path: '/',
+          element:
+            <Suspense fallback={<h1>Loading...</h1>}>
+              <Navigate to={'buy'} replace />
+            </Suspense>
+        },
+        {
+          path: '/buy',
+          element:
+            <Suspense fallback={<h1>Loading...</h1>}>
+              <CartProvider>
+                <Buy />
+              </CartProvider>
+            </Suspense>
+        },
+        {
+          path: '/sell',
+          element:
+            <Suspense fallback={<h1>Loading...</h1>}>
+              <Sell />
+            </Suspense>
+        }
+      ]
+    }
+  ],
   {
-    path: '/',
-    element: <Root />,
-    errorElement: <ErrorPage />,
-    children: [
-      {
-        path: '/',
-        element:
-          <Suspense
-            fallback={<h1>Loading...</h1>}>
-            <Navigate to={'buy'} replace />
-          </Suspense>
-      },
-      {
-        path: '/buy',
-        element:
-          <Suspense
-            fallback={<h1>Loading...</h1>}>
-            <CartProvider>
-              <Buy />
-            </CartProvider>
-          </Suspense>
-      },
-      {
-        path: '/sell',
-        element:
-          <Suspense
-            fallback={<h1>Loading...</h1>}>
-            <Sell />
-          </Suspense>
-      }
-    ]
+    basename: '/poletto-skins'
   }
-])
+)
 
 const App = () => {
 
