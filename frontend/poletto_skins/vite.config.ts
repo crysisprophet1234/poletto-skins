@@ -6,6 +6,9 @@ import svgr from "vite-plugin-svgr"
 // https://vitejs.dev/config/
 export default defineConfig({
   base: '/poletto-skins/',
+  server: {
+    open: true
+  },
   plugins: [
     react(),
     svgr()
