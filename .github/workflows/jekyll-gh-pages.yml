@@ -38,8 +38,9 @@ jobs:
           yarn install
       - name: Build project
         run: |
-          cd frontend/poletto_skins
+          cd ./frontend/poletto_skins
           yarn build
+          cp ./404.html ./dist
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Build with Jekyll
