@@ -19,6 +19,9 @@ target/
 *.iml
 *.ipr
 
+### Log ###
+*.log
+
 ### Env ###
 application*.yml
 
