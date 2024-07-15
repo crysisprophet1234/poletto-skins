@@ -7,7 +7,7 @@ const Login = () => {
 
     const { login } = useAuth()
 
-    const [searchParams, setSearchParams] = useSearchParams()
+    const [searchParams] = useSearchParams()
 
     useEffect(() => {
 
