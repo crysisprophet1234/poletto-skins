@@ -2,18 +2,21 @@ import { Link } from 'react-router-dom'
 
 import LogoUrl from '../../assets/images/polettoskins-logo.png'
 
+
 import { FavoriteBorder } from '@mui/icons-material'
 import { Box, Stack } from '@mui/material'
-import { useState } from 'react'
+import { useAuth } from '../../hooks/useAuth'
 import BalanceButton from './BalanceButton'
 import LoginButton from './LoginButton'
 import NavbarButton from './NavbarButton'
 import NotificationMenu from './NotificationMenu'
 import ProfileMenu from './ProfileMenu'
 
+
+
 const Navbar = () => {
 
-    const [isAuthenticated, setIsAuthenticated] = useState(false) //MOCKING
+    const { isAuthenticated } = useAuth()
 
     return (
 
@@ -54,13 +57,13 @@ const Navbar = () => {
 
                         <BalanceButton />
 
-                        <ProfileMenu mockLogoff={() => setIsAuthenticated(!isAuthenticated)} />
+                        <ProfileMenu />
 
                     </Stack>
 
                     :
 
-                    <LoginButton mockLogoff={() => setIsAuthenticated(!isAuthenticated)} />
+                    <LoginButton />
 
                 }
 
