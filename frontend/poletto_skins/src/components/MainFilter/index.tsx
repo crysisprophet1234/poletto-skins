@@ -1,17 +1,15 @@
-import { useEffect, useRef, useState } from 'react'
-import './styles.scss'
-
-import Slider from '@mui/material/Slider'
-
+import FormInputText from '@/components/FormComponents/FormInputText'
+import FormSingleCheckbox from '@/components/FormComponents/FormMultiCheckBox'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Category } from '@mui/icons-material'
 import { Box, Checkbox, FormControlLabel, Typography, debounce } from '@mui/material'
+import Slider from '@mui/material/Slider'
+import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { FaChevronUp } from 'react-icons/fa'
 import { GrPowerReset } from 'react-icons/gr'
 import { z } from 'zod'
-import FormInputText from '../FormComponents/FormInputText'
-import FormSingleCheckbox from '../FormComponents/FormMultiCheckBox'
+import './styles.scss'
 
 type FilterSections = 'price' | 'float' | 'category' | 'others'
 

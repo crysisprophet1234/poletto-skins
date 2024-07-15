@@ -1,12 +1,11 @@
-import './styles.scss'
-
+import Catalog from '@/components/Catalog'
+import MainFilter from '@/components/MainFilter'
+import TopFilter from '@/components/TopFilter'
+import { useCart } from '@/hooks/useCart'
 import { GloveSkin, ItemType, Sticker, WeaponSkin } from '@/types/entities/item'
 import axios from 'axios'
 import { useCallback, useEffect, useState } from 'react'
-import TopFilter from '../..//components/TopFilter'
-import Catalog from '../../components/Catalog'
-import MainFilter from '../../components/MainFilter'
-import { useCart } from '../../hooks/useCart'
+import './styles.scss'
 
 //MOCKS
 const fetchedStickersFromApi: Sticker[] = [

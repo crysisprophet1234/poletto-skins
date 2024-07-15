@@ -1,8 +1,8 @@
+import BuyModal from '@/components/BuyModal'
+import ItemCartPopup from '@/components/Cart/ItemCartPopup'
+import ShowCartButton from '@/components/Cart/ShowCartButton'
 import { Box, ClickAwayListener, Popper } from '@mui/material'
 import { useState } from 'react'
-import BuyModal from '../BuyModal'
-import ItemCartPopup from './ItemCartPopup'
-import ShowCartButton from './ShowCartButton'
 
 const Cart = () => {
 

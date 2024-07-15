@@ -1,6 +1,6 @@
+import { useAuth } from '@/hooks/useAuth'
 import { Box, Button, Typography } from '@mui/material'
 import { FaSteam } from 'react-icons/fa'
-import { useAuth } from '../../../hooks/useAuth'
 
 const LoginButton = () => {
 

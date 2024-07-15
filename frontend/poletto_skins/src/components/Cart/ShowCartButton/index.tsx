@@ -1,6 +1,6 @@
+import { useCart } from '@/hooks/useCart'
 import { ShoppingCart } from '@mui/icons-material'
 import { Badge, Button, Typography } from '@mui/material'
-import { useCart } from '../../../hooks/useCart'
 
 type ShowCartButtonProps = {
     handleClick: (e: React.MouseEvent<HTMLButtonElement>) => void

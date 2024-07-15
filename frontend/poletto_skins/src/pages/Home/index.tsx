@@ -1,7 +1,6 @@
-import './styles.scss'
-
+import SideNavbar from '@/components/SideNavbar'
 import { Outlet } from 'react-router-dom'
-import SideNavbar from '../../components/SideNavbar'
+import './styles.scss'
 
 const Home = () => {
 

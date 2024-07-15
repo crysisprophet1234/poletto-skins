@@ -1,11 +1,10 @@
-import './styles.scss'
-
+import AddCartButton from '@/components/AddCartButton'
+import { useCart } from '@/hooks/useCart'
 import { ItemType } from '@/types/entities/item'
 import { useEffect, useState } from 'react'
 import { FaSteam } from 'react-icons/fa6'
 import { MdFavorite } from 'react-icons/md'
-import { useCart } from '../../hooks/useCart'
-import AddCartButton from '../AddCartButton'
+import './styles.scss'
 
 type ItemCardProps = {
     itemProps: ItemType

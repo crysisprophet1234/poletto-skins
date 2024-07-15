@@ -1,7 +1,6 @@
+import { useAuth } from '@/hooks/useAuth'
 import { useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { useAuth } from '../../hooks/useAuth'
-
 
 const Login = () => {
 
