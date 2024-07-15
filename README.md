@@ -1,4 +1,5 @@
 [![Frontend CI](https://github.com/crysisprophet1234/poletto-skins/actions/workflows/frontend-ci.yml/badge.svg?event=pull_request)](https://github.com/crysisprophet1234/poletto-skins/actions/workflows/frontend-ci.yml)
+[![Frontend CD](https://github.com/crysisprophet1234/poletto-skins/actions/workflows/frontend-cd.yml/badge.svg)](https://github.com/crysisprophet1234/poletto-skins/actions/workflows/frontend-cd.yml)
 
 # Poletto Skins
                                                                               
