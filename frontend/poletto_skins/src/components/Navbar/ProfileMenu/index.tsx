@@ -1,7 +1,7 @@
+import { useAuth } from '@/hooks/useAuth'
 import { Edit, ExitToApp, Help, HistoryRounded, Sell } from '@mui/icons-material'
 import { Avatar, Box, ClickAwayListener, IconButton, ListItemIcon, MenuItem, Paper, Popper } from '@mui/material'
 import { useState } from 'react'
-import { useAuth } from '../../../hooks/useAuth'
 
 const ProfileMenu = () => {
 

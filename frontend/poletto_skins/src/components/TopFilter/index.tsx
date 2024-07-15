@@ -1,14 +1,14 @@
+import Cart from '@/components/Cart'
+import FormSearchQueryText from '@/components/FormComponents/FormQuerySearchText'
+import FormSelect from '@/components/FormComponents/FormSelect'
+import FormToggleButton from '@/components/FormComponents/FormToggleButton'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { DiscountRounded, NewReleasesRounded, SortRounded } from '@mui/icons-material'
 import { debounce } from '@mui/material'
 import { useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import Cart from '../Cart'
-import FormSearchQueryText from '../FormComponents/FormQuerySearchText'
-import FormToggleButton from '../FormComponents/FormToggleButton'
 import './styles.scss'
-import FormSelect from '../FormComponents/FormSelect'
 
 const sortOptions = [
     {

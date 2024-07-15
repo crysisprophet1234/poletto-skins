@@ -1,15 +1,14 @@
-import { Close } from '@mui/icons-material'
-import './styles.scss'
-
+import AddCartButton from '@/components/AddCartButton'
+import FloatBar from '@/components/FloatBar'
+import { useCart } from '@/hooks/useCart'
 import { ItemType } from '@/types/entities/item'
+import { Close } from '@mui/icons-material'
 import { Divider, Link, Stack, Tooltip } from '@mui/material'
 import Box from '@mui/material/Box'
 import Modal from '@mui/material/Modal'
 import Typography from '@mui/material/Typography'
 import { FaExternalLinkAlt } from 'react-icons/fa'
-import { useCart } from '../../hooks/useCart'
-import AddCartButton from '../AddCartButton'
-import FloatBar from '../FloatBar'
+import './styles.scss'
 
 type ItemModalProps = {
     item: ItemType

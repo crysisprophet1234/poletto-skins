@@ -1,10 +1,11 @@
 import './styles.scss'
 
+import ItemCard from '@/components/ItemCard'
+import ItemModal from '@/components/ItemModal'
 import { ItemType } from '@/types/entities/item'
 import { Box, Grid, Skeleton } from '@mui/material'
 import { useEffect, useState } from 'react'
-import ItemCard from '../ItemCard'
-import ItemModal from '../ItemModal'
+
 
 type CatalogProps = {
     items: ItemType[]

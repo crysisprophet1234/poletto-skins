@@ -1,9 +1,9 @@
 
+import { get } from '@/services/api'
+import { steamAuth } from '@/services/auth'
 import { SteamUser } from '@/types/vendor/steamUser'
 import { createContext, ReactNode, useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { get } from '../services/api'
-import { steamAuth } from '../services/auth'
 
 type AuthContextType = {
     isAuthenticated: boolean

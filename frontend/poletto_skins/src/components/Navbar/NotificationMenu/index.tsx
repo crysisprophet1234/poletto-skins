@@ -1,9 +1,9 @@
+import NavbarButton from '@/components/Navbar/NavbarButton'
 import { Notification } from '@/types/entities/notification'
 import { Close } from '@mui/icons-material'
 import { Badge, Box, ClickAwayListener, Divider, IconButton, Paper, Popper, Stack, Typography } from '@mui/material'
 import React, { useState } from 'react'
 import { IoNotificationsSharp } from 'react-icons/io5'
-import NavbarButton from '../NavbarButton'
 
 const NotificationMenu = () => {
 

@@ -1,6 +1,6 @@
+import { useCart } from '@/hooks/useCart'
 import { Close } from '@mui/icons-material'
 import { Box, Button, IconButton, Modal, Stack, Typography } from '@mui/material'
-import { useCart } from '../../hooks/useCart'
 
 type BuyModalProps = {
     open: boolean

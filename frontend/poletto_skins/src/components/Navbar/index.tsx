@@ -1,18 +1,13 @@
-import { Link } from 'react-router-dom'
-
-import LogoUrl from '../../assets/images/polettoskins-logo.png'
-
-
+import LogoUrl from '@/assets/images/polettoskins-logo.png'
+import BalanceButton from '@/components/Navbar/BalanceButton'
+import LoginButton from '@/components/Navbar/LoginButton'
+import NavbarButton from '@/components/Navbar/NavbarButton'
+import NotificationMenu from '@/components/Navbar/NotificationMenu'
+import ProfileMenu from '@/components/Navbar/ProfileMenu'
+import { useAuth } from '@/hooks/useAuth'
 import { FavoriteBorder } from '@mui/icons-material'
 import { Box, Stack } from '@mui/material'
-import { useAuth } from '../../hooks/useAuth'
-import BalanceButton from './BalanceButton'
-import LoginButton from './LoginButton'
-import NavbarButton from './NavbarButton'
-import NotificationMenu from './NotificationMenu'
-import ProfileMenu from './ProfileMenu'
-
-
+import { Link } from 'react-router-dom'
 
 const Navbar = () => {
 

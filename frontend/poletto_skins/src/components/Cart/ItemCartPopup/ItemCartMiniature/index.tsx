@@ -1,7 +1,7 @@
+import AddCartButton from '@/components/AddCartButton'
+import { useCart } from '@/hooks/useCart'
 import { ItemType } from '@/types/entities/item'
 import { Box, Paper, Stack, Tooltip, Typography } from '@mui/material'
-import { useCart } from '../../../../hooks/useCart'
-import AddCartButton from '../../../AddCartButton'
 
 type ItemCartMiniatureProps = {
     item: ItemType

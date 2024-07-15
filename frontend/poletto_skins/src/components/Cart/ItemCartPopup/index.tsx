@@ -1,7 +1,8 @@
+import ItemCartMiniature from '@/components/Cart/ItemCartPopup/ItemCartMiniature'
+import { useCart } from '@/hooks/useCart'
 import { AddShoppingCartRounded, Close } from '@mui/icons-material'
 import { Box, Button, Grid, IconButton, Paper, Stack, Typography } from '@mui/material'
-import { useCart } from '../../../hooks/useCart'
-import ItemCartMiniature from './ItemCartMiniature'
+
 
 type ItemCartPopupProps = {
     onClose: () => void
