@@ -1,14 +1,11 @@
 import { Edit, ExitToApp, Help, HistoryRounded, Sell } from '@mui/icons-material'
-import { Avatar, Box, ClickAwayListener, IconButton, ListItemIcon, MenuItem, Paper, Popper, Skeleton } from '@mui/material'
+import { Avatar, Box, ClickAwayListener, IconButton, ListItemIcon, MenuItem, Paper, Popper } from '@mui/material'
 import { useState } from 'react'
+import { useAuth } from '../../../hooks/useAuth'
 
-type ProfileMenuProps = {
-    mockLogoff: () => void
-}
+const ProfileMenu = () => {
 
-const ProfileMenu = ({ mockLogoff }: ProfileMenuProps) => {
-
-    const profilePictureUrl = 'https://loremflickr.com/250/250/dog'
+    const { steamUser, logout } = useAuth()
 
     const [imageLoading, setImageLoading] = useState(true)
 
@@ -48,25 +45,19 @@ const ProfileMenu = ({ mockLogoff }: ProfileMenuProps) => {
                         }
                     }}
                 >
-                    {true &&
-                        <Skeleton
-                            variant='circular'
-                            width='100%'
-                            height='100%'
-                            sx={{ bgcolor: 'grey.400' }}
+                    {steamUser && steamUser.avatarMedium
+                        ? <Avatar
+                            src={steamUser?.avatarMedium}
+                            alt={steamUser?.personaName}
+                            onLoad={() => setImageLoading(false)}
+                            sx={{
+                                width: '100%',
+                                height: '100%',
+                                display: imageLoading ? 'none' : 'block'
+                            }}
                         />
+                        : <Avatar sx={{ width: '100%', height: '100%' }} />
                     }
-                    <Avatar
-                        src={profilePictureUrl}
-                        alt={'username'}
-                        onLoad={() => setImageLoading(false)}
-                        sx={{
-                            width: '100%',
-                            height: '100%',
-                            display: imageLoading ? 'none' : 'block'
-                        }}
-                    />
-
                 </IconButton>
 
                 <Popper
@@ -118,7 +109,7 @@ const ProfileMenu = ({ mockLogoff }: ProfileMenuProps) => {
                             Ajuda
                         </MenuItem>
 
-                        <MenuItem onClick={mockLogoff}>
+                        <MenuItem onClick={logout}>
                             <ListItemIcon>
                                 <ExitToApp />
                             </ListItemIcon>

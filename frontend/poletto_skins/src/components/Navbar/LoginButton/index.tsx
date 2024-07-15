@@ -1,11 +1,11 @@
 import { Box, Button, Typography } from '@mui/material'
 import { FaSteam } from 'react-icons/fa'
+import { useAuth } from '../../../hooks/useAuth'
 
-type LoginButtonProps = {
-    mockLogoff: () => void
-}
+const LoginButton = () => {
 
-const LoginButton = ({ mockLogoff }: LoginButtonProps) => {
+    const { steamAuthRedirect } = useAuth()
+
     return (
         <Box
             sx={{
@@ -14,7 +14,7 @@ const LoginButton = ({ mockLogoff }: LoginButtonProps) => {
             }}
         >
             <Button
-                onClick={mockLogoff}
+                onClick={steamAuthRedirect}
                 sx={{
                     gap: '10px',
                     height: '75%',
