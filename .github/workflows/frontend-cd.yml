@@ -3,6 +3,7 @@ name: Frontend CD
 on:
   push:
     branches: ["main"]
+    paths-ignore: ["/backend"]
 
   workflow_dispatch:
 
