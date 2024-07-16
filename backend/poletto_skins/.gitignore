@@ -21,6 +21,7 @@ target/
 
 ### Log ###
 *.log
+*.log.*.gz
 
 ### Env ###
 application*.yml
