@@ -3,12 +3,10 @@ package com.poletto.polettoskins.entities;
 import java.io.Serializable;
 import java.util.Objects;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Entity
-@Table(name = "steam_user")
+@Document(collection = "steam_user")
 public class SteamUser implements Serializable {
 
 	private static final long serialVersionUID = 1L;
