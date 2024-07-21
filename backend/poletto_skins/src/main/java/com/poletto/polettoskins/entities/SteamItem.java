@@ -1,0 +1,339 @@
+package com.poletto.polettoskins.entities;
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.Objects;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Document(collection = "steam_item")
+public class SteamItem implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+	
+	@Id
+	private String assetId;
+	private String ownerSteamId;
+	private String d;
+	private String m;
+	private Integer origin;
+    private Integer quality;
+    private Integer rarity;
+    private Integer paintSeed;
+    private Integer defIndex;
+    private Integer paintIndex;
+    private String floatId;
+    private Integer lowRank;
+    private Integer highRank;
+    private Double floatValue;
+    private String imageUrl;
+    private String inspectUrl;
+    private Double min;
+    private Double max;
+    private String weaponType;
+    private String itemName;
+    private String rarityName;
+    private String qualityName;
+    private String originName;
+    private String wearName;
+    private String fullItemName;
+    private List<SteamSticker> stickers;
+    
+    public SteamItem() {}
+    
+	public SteamItem(
+		String assetId,
+		String ownerSteamId,
+		String d,
+		String m,
+		Integer origin,
+		Integer quality,
+		Integer rarity,	
+		Integer paintSeed,
+		Integer defIndex,
+		Integer paintIndex,
+		String floatId,
+		Integer lowRank,
+		Integer highRank,
+		Double floatValue,	
+		String imageUrl,
+		String inspectUrl,
+		Double min,
+		Double max,
+		String weaponType,
+		String itemName,
+		String rarityName,
+		String qualityName,
+		String originName,
+		String wearName,
+		String fullItemName,
+		List<SteamSticker> stickers
+	) {
+		this.assetId = assetId;
+		this.ownerSteamId = ownerSteamId;
+		this.m = m;
+		this.d = d;
+		this.origin = origin;
+		this.quality = quality;
+		this.rarity = rarity;
+		this.paintSeed = paintSeed;
+		this.defIndex = defIndex;
+		this.paintIndex = paintIndex;
+		this.floatId = floatId;
+		this.lowRank = lowRank;
+		this.highRank = highRank;
+		this.floatValue = floatValue;
+		this.imageUrl = imageUrl;
+		this.inspectUrl = inspectUrl;
+		this.min = min;
+		this.max = max;
+		this.weaponType = weaponType;
+		this.itemName = itemName;
+		this.rarityName = rarityName;
+		this.qualityName = qualityName;
+		this.originName = originName;
+		this.wearName = wearName;
+		this.fullItemName = fullItemName;
+		this.stickers = stickers;
+	}
+	
+	public String getAssetId() {
+		return assetId;
+	}
+
+	public void setAssetId(String assetId) {
+		this.assetId = assetId;
+	}
+	
+	public String getOwnerSteamId() {
+		return ownerSteamId;
+	}
+
+	public void setOwnerSteamId(String ownerSteamId) {
+		this.ownerSteamId = ownerSteamId;
+	}
+
+	public String getM() {
+		return m;
+	}
+
+	public void setM(String m) {
+		this.m = m;
+	}
+	
+
+	public String getD() {
+		return d;
+	}
+
+	public void setD(String d) {
+		this.d = d;
+	}
+
+	public Integer getOrigin() {
+		return origin;
+	}
+
+	public void setOrigin(Integer origin) {
+		this.origin = origin;
+	}
+
+	public Integer getQuality() {
+		return quality;
+	}
+
+	public void setQuality(Integer quality) {
+		this.quality = quality;
+	}
+
+	public Integer getRarity() {
+		return rarity;
+	}
+
+	public void setRarity(Integer rarity) {
+		this.rarity = rarity;
+	}
+
+	public Integer getPaintSeed() {
+		return paintSeed;
+	}
+
+	public void setPaintSeed(Integer paintSeed) {
+		this.paintSeed = paintSeed;
+	}
+
+	public Integer getDefIndex() {
+		return defIndex;
+	}
+
+	public void setDefIndex(Integer defIndex) {
+		this.defIndex = defIndex;
+	}
+
+	public Integer getPaintIndex() {
+		return paintIndex;
+	}
+
+	public void setPaintIndex(Integer paintIndex) {
+		this.paintIndex = paintIndex;
+	}
+
+	public String getFloatId() {
+		return floatId;
+	}
+
+	public void setFloatId(String floatId) {
+		this.floatId = floatId;
+	}
+
+	public Integer getLowRank() {
+		return lowRank;
+	}
+
+	public void setLowRank(Integer lowRank) {
+		this.lowRank = lowRank;
+	}
+
+	public Integer getHighRank() {
+		return highRank;
+	}
+
+	public void setHighRank(Integer highRank) {
+		this.highRank = highRank;
+	}
+
+	public Double getFloatValue() {
+		return floatValue;
+	}
+
+	public void setFloatValue(Double floatValue) {
+		this.floatValue = floatValue;
+	}
+
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
+
+	public String getInspectUrl() {
+		return inspectUrl;
+	}
+
+	public void setInspectUrl(String inspectUrl) {
+		this.inspectUrl = inspectUrl;
+	}
+
+	public Double getMin() {
+		return min;
+	}
+
+	public void setMin(Double min) {
+		this.min = min;
+	}
+
+	public Double getMax() {
+		return max;
+	}
+
+	public void setMax(Double max) {
+		this.max = max;
+	}
+
+	public String getWeaponType() {
+		return weaponType;
+	}
+
+	public void setWeaponType(String weaponType) {
+		this.weaponType = weaponType;
+	}
+
+	public String getItemName() {
+		return itemName;
+	}
+
+	public void setItemName(String itemName) {
+		this.itemName = itemName;
+	}
+
+	public String getRarityName() {
+		return rarityName;
+	}
+
+	public void setRarityName(String rarityName) {
+		this.rarityName = rarityName;
+	}
+
+	public String getQualityName() {
+		return qualityName;
+	}
+
+	public void setQualityName(String qualityName) {
+		this.qualityName = qualityName;
+	}
+
+	public String getOriginName() {
+		return originName;
+	}
+
+	public void setOriginName(String originName) {
+		this.originName = originName;
+	}
+
+	public String getWearName() {
+		return wearName;
+	}
+
+	public void setWearName(String wearName) {
+		this.wearName = wearName;
+	}
+
+	public String getFullItemName() {
+		return fullItemName;
+	}
+
+	public void setFullItemName(String fullItemName) {
+		this.fullItemName = fullItemName;
+	}
+
+	public List<SteamSticker> getStickers() {
+		return stickers;
+	}
+
+	public void setStickers(List<SteamSticker> stickers) {
+		this.stickers = stickers;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(assetId, d, m, ownerSteamId);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		SteamItem other = (SteamItem) obj;
+		return Objects.equals(assetId, other.assetId) && Objects.equals(d, other.d) && Objects.equals(m, other.m)
+				&& Objects.equals(ownerSteamId, other.ownerSteamId);
+	}
+
+	@Override
+	public String toString() {
+		return "SteamItem [a=" + assetId + ", s=" + ownerSteamId + ", d=" + d + ", m=" + m + ", origin=" + origin + ", quality="
+				+ quality + ", rarity=" + rarity + ", paintSeed=" + paintSeed + ", defIndex=" + defIndex
+				+ ", paintIndex=" + paintIndex + ", floatId=" + floatId + ", lowRank=" + lowRank + ", highRank="
+				+ highRank + ", floatValue=" + floatValue + ", imageUrl=" + imageUrl + ", inspectUrl=" + inspectUrl
+				+ ", min=" + min + ", max=" + max + ", weaponType=" + weaponType + ", itemName=" + itemName
+				+ ", rarityName=" + rarityName + ", qualityName=" + qualityName + ", originName=" + originName
+				+ ", wearName=" + wearName + ", fullItemName=" + fullItemName + ", stickers=" + stickers + "]";
+	}
+    
+}
