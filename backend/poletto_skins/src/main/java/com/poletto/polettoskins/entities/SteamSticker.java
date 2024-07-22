@@ -14,6 +14,7 @@ public class SteamSticker implements Serializable {
 	@Id
 	private Integer stickerId;
 	private Integer slot;
+	private String imageUrl;
     private Double wear;
     private Double scale;
     private Integer rotation;
@@ -26,6 +27,7 @@ public class SteamSticker implements Serializable {
 	public SteamSticker(
 		Integer stickerId,
 		Integer slot,
+		String imageUrl,
 		Double wear,
 		Double scale,
 		Integer rotation,
@@ -35,7 +37,8 @@ public class SteamSticker implements Serializable {
 	) {
 		this.stickerId = stickerId;
 		this.slot = slot;
-		this.wear = wear;
+		this.imageUrl = imageUrl;
+		this.wear = wear;	
 		this.scale = scale;
 		this.rotation = rotation;
 		this.codename = codename;
@@ -57,6 +60,14 @@ public class SteamSticker implements Serializable {
 
 	public void setSlot(Integer slot) {
 		this.slot = slot;
+	}
+
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
 	}
 
 	public Double getWear() {
@@ -126,9 +137,9 @@ public class SteamSticker implements Serializable {
 
 	@Override
 	public String toString() {
-		return "SteamSticker [stickerId=" + stickerId + ", slot=" + slot + ", wear=" + wear + ", scale=" + scale
-				+ ", rotation=" + rotation + ", codename=" + codename + ", material=" + material + ", name=" + name
-				+ "]";
+		return "SteamSticker [stickerId=" + stickerId + ", slot=" + slot + ", imageUrl=" + imageUrl + ", wear=" + wear
+				+ ", scale=" + scale + ", rotation=" + rotation + ", codename=" + codename + ", material=" + material
+				+ ", name=" + name + "]";
 	}
 
 }
