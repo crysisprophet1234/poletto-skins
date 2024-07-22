@@ -1,10 +1,12 @@
 import AddCartButton from '@/components/AddCartButton'
 import { useCart } from '@/hooks/useCart'
-import { ItemType } from '@/types/entities/item'
+import { MarketItem } from '@/types/entities/steam-item'
+import { extractStickerFinish } from '@/utils/extractStickerFinish'
+import { itemWearAbbreviator, WearName } from '@/utils/itemWearAbbreviator'
 import { Box, Paper, Stack, Tooltip, Typography } from '@mui/material'
 
 type ItemCartMiniatureProps = {
-    item: ItemType
+    item: MarketItem
 }
 
 const ItemCartMiniature = ({ item }: ItemCartMiniatureProps) => {
@@ -42,7 +44,7 @@ const ItemCartMiniature = ({ item }: ItemCartMiniatureProps) => {
                 >
                     <img
                         src={`${item.imageUrl}/${imageDimensions.width}fx${imageDimensions.height}f`}
-                        alt={item.name}
+                        alt={item.itemName}
                         loading='lazy'
                         style={{
                             width: '100%',
@@ -60,47 +62,53 @@ const ItemCartMiniature = ({ item }: ItemCartMiniatureProps) => {
                         arrow
                         title={
                             <Typography>
-                                {`${'subCategory' in item ? item.subCategory : item.category} | ${item.name}`}
+                                {item.fullItemName}
                             </Typography>
                         }
                     >
                         <Typography noWrap fontSize={'14px'}>
-                            {`${'subCategory' in item ? item.subCategory : ''} ${item.name}`}
+                            {item.weaponType.toLowerCase() == 'sticker'
+                                ? item.stickers[0].name
+                                : item.itemName
+                            }
                         </Typography>
                     </Tooltip>
 
-                    <Stack direction={'row'} justifyContent={'space-between'} fontSize={'14px'}>
+                    <Box>
 
-                        {'statTrak' in item &&
-                            <Typography color='#CF6A32' fontSize={'14px'}>
-                                ST
-                            </Typography>
-                        }
-
-                        {'floatShort' in item &&
+                        {item.weaponType.toLowerCase() == 'sticker'
+                            ?
                             <Typography fontSize={'14px'}>
-                                {item.floatShort}
+                                {extractStickerFinish(item.fullItemName)}
                             </Typography>
+                            :
+                            <Stack direction={'row'} justifyContent={'space-between'}>
+                                {item.quality == 9 &&
+                                    <Typography color='#CF6A32' fontSize={'14px'}>
+                                        ST
+                                    </Typography>
+                                }
+
+                                {item.wearName &&
+                                    <Typography fontSize={'14px'}>
+                                        {itemWearAbbreviator(item.wearName as WearName)}
+                                    </Typography>
+                                }
+
+                                {item.floatValue &&
+                                    <Typography fontSize={'14px'}>
+                                        {item.floatValue.toFixed(4)}
+                                    </Typography>
+                                }
+                            </Stack>
                         }
 
-                        {'floatFull' in item &&
-                            <Typography fontSize={'14px'}>
-                                {item.floatFull.toFixed(4)}
-                            </Typography>
-                        }
-
-                        {'finish' in item &&
-                            <Typography fontSize={'14px'}>
-                                {item.finish}
-                            </Typography>
-                        }
-
-                    </Stack>
+                    </Box>
 
                 </Box>
 
                 <Box height={'28px'}>
-                    <AddCartButton isItemInCart={true} onClick={() => removeFromCart(item.id)} />
+                    <AddCartButton isItemInCart={true} onClick={() => removeFromCart(item.assetId)} />
                 </Box>
 
             </Stack >

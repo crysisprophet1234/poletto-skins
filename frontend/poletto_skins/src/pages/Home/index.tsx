@@ -20,10 +20,6 @@ const Home = () => {
 
             </div>
 
-            <div className='operation-container'>
-
-            </div>
-
         </div>
 
     )

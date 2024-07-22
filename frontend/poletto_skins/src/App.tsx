@@ -46,7 +46,9 @@ const router = createBrowserRouter(
           path: '/sell',
           element:
             <Suspense fallback={<h1>Loading...</h1>}>
-              <Sell />
+              <CartProvider>
+                <Sell />
+              </CartProvider>
             </Suspense>
         }
       ]

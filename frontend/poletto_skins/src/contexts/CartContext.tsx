@@ -1,11 +1,11 @@
-import { ItemType } from '@/types/entities/item'
+import { MarketItem } from '@/types/entities/steam-item'
 import { createContext, ReactNode, useState } from 'react'
 
 type CartContextValue = {
-    cart: ItemType[]
-    isItemInCart: (itemId: ItemType['id']) => boolean
-    addToCart: (item: ItemType) => void
-    removeFromCart: (itemId: ItemType['id']) => void
+    cart: MarketItem[]
+    isItemInCart: (itemId: MarketItem['assetId']) => boolean
+    addToCart: (item: MarketItem) => void
+    removeFromCart: (itemId: MarketItem['assetId']) => void
     clearCart: () => void
     totalItems: number
     totalPrice: number
@@ -27,20 +27,20 @@ type CartProviderProps = {
 
 export const CartProvider = ({ children }: CartProviderProps) => {
 
-    const [cart, setCart] = useState<ItemType[]>([])
+    const [cart, setCart] = useState<MarketItem[]>([])
 
-    const isItemInCart = (itemId: ItemType['id']) => {
-        return cart.some((item) => item.id === itemId)
+    const isItemInCart = (itemId: MarketItem['assetId']) => {
+        return cart.some((item) => item.assetId === itemId)
     }
 
-    const addToCart = (item: ItemType) => {
-        if (!isItemInCart(item.id)) {
+    const addToCart = (item: MarketItem) => {
+        if (!isItemInCart(item.assetId)) {
             setCart([...cart, item])
         }
     }
 
-    const removeFromCart = (itemId: ItemType['id']) => {
-        setCart(cart.filter((item) => item.id !== itemId))
+    const removeFromCart = (itemId: MarketItem['assetId']) => {
+        setCart(cart.filter((item) => item.assetId !== itemId))
     }
 
     const clearCart = () => setCart([])

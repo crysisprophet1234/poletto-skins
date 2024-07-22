@@ -16,7 +16,7 @@ public class SteamItem implements Serializable {
 	private String assetId;
 	private String ownerSteamId;
 	private String d;
-	private String m;
+	private String marketId;
 	private Integer origin;
     private Integer quality;
     private Integer rarity;
@@ -45,8 +45,8 @@ public class SteamItem implements Serializable {
 	public SteamItem(
 		String assetId,
 		String ownerSteamId,
-		String d,
-		String m,
+		String marketId,
+		String d,		
 		Integer origin,
 		Integer quality,
 		Integer rarity,	
@@ -72,7 +72,7 @@ public class SteamItem implements Serializable {
 	) {
 		this.assetId = assetId;
 		this.ownerSteamId = ownerSteamId;
-		this.m = m;
+		this.marketId = marketId;
 		this.d = d;
 		this.origin = origin;
 		this.quality = quality;
@@ -114,12 +114,12 @@ public class SteamItem implements Serializable {
 		this.ownerSteamId = ownerSteamId;
 	}
 
-	public String getM() {
-		return m;
+	public String getMarketId() {
+		return marketId;
 	}
 
-	public void setM(String m) {
-		this.m = m;
+	public void setMarketId(String marketId) {
+		this.marketId = marketId;
 	}
 	
 
@@ -309,7 +309,7 @@ public class SteamItem implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(assetId, d, m, ownerSteamId);
+		return Objects.hash(assetId, d, marketId, ownerSteamId);
 	}
 
 	@Override
@@ -321,13 +321,13 @@ public class SteamItem implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		SteamItem other = (SteamItem) obj;
-		return Objects.equals(assetId, other.assetId) && Objects.equals(d, other.d) && Objects.equals(m, other.m)
+		return Objects.equals(assetId, other.assetId) && Objects.equals(d, other.d) && Objects.equals(marketId, other.marketId)
 				&& Objects.equals(ownerSteamId, other.ownerSteamId);
 	}
 
 	@Override
 	public String toString() {
-		return "SteamItem [a=" + assetId + ", s=" + ownerSteamId + ", d=" + d + ", m=" + m + ", origin=" + origin + ", quality="
+		return "SteamItem [a=" + assetId + ", s=" + ownerSteamId + ", d=" + d + ", marketId=" + marketId + ", origin=" + origin + ", quality="
 				+ quality + ", rarity=" + rarity + ", paintSeed=" + paintSeed + ", defIndex=" + defIndex
 				+ ", paintIndex=" + paintIndex + ", floatId=" + floatId + ", lowRank=" + lowRank + ", highRank="
 				+ highRank + ", floatValue=" + floatValue + ", imageUrl=" + imageUrl + ", inspectUrl=" + inspectUrl

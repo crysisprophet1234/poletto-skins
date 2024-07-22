@@ -1,7 +1,7 @@
 import AddCartButton from '@/components/AddCartButton'
 import FloatBar from '@/components/FloatBar'
 import { useCart } from '@/hooks/useCart'
-import { ItemType } from '@/types/entities/item'
+import { MarketItem } from '@/types/entities/steam-item'
 import { Close } from '@mui/icons-material'
 import { Divider, Link, Stack, Tooltip } from '@mui/material'
 import Box from '@mui/material/Box'
@@ -11,7 +11,7 @@ import { FaExternalLinkAlt } from 'react-icons/fa'
 import './styles.scss'
 
 type ItemModalProps = {
-    item: ItemType
+    item: MarketItem
     open: boolean
     handleClose: () => void
     itemAction: () => void
@@ -20,21 +20,6 @@ type ItemModalProps = {
 const ItemModal = ({ item, open, handleClose, itemAction }: ItemModalProps) => {
 
     const { isItemInCart } = useCart()
-
-    const fullFloatCategoryName = (floatShort: string) => {
-        switch (floatShort.toLocaleLowerCase()) {
-            case 'bs':
-                return 'Battle-Scared'
-            case 'ww':
-                return 'Well-Worn'
-            case 'ft':
-                return 'Field-Tested'
-            case 'mw':
-                return 'Minimal Wear'
-            case 'fn':
-                return 'Factory New'
-        }
-    }
 
     if (!item) return
 
@@ -64,36 +49,22 @@ const ItemModal = ({ item, open, handleClose, itemAction }: ItemModalProps) => {
 
                         <div className='item-title'>
 
-                            {'statTrak' in item && item.statTrak &&
+                            {item.quality == 9 &&
                                 <Typography
                                     variant='h5'
                                     fontWeight={600}
-                                    color={'#CF6A32'}>
-                                    StatTrak™
-                                </Typography>
-                            }
-
-                            {'subCategory' in item && item.subCategory &&
-                                <Typography
-                                    variant='h5'
-                                    fontWeight={600}>
-                                    {item.subCategory} |
+                                    color={'#CF6A32'}
+                                >
+                                    {item.qualityName}&nbsp;
                                 </Typography>
                             }
 
                             <Typography
                                 variant='h5'
-                                fontWeight={600}>
-                                {item.name}
+                                fontWeight={600}
+                            >
+                                {`${item.fullItemName.replace('StatTrak™', '')} ${item.itemName == '-' ? '| Vanilla' : ''}`}
                             </Typography>
-
-                            {'floatShort' in item && item.floatShort &&
-                                <Typography
-                                    variant='h5'
-                                    fontWeight={600}>
-                                    ({fullFloatCategoryName(item.floatShort)})
-                                </Typography>
-                            }
 
                         </div>
 
@@ -112,7 +83,7 @@ const ItemModal = ({ item, open, handleClose, itemAction }: ItemModalProps) => {
                             <div className='item-image'>
                                 <img
                                     src={item.imageUrl}
-                                    alt={item.name}
+                                    alt={item.fullItemName}
                                     loading='lazy'
                                 />
                             </div>
@@ -121,21 +92,23 @@ const ItemModal = ({ item, open, handleClose, itemAction }: ItemModalProps) => {
                                 <Stack direction='row' spacing={2} justifyContent='space-between'>
 
                                     <Link
-                                        href='#'
+                                        href={item.inspectUrl}
+                                        target='_blank'
                                         underline='none'
                                     >
                                         Inspecionar <FaExternalLinkAlt />
                                     </Link>
 
                                     <Link
-                                        href='#'
+                                        href={'https://steamcommunity.com/market/listings/730/' + item.fullItemName}
+                                        target='_blank'
                                         underline='none'
                                     >
                                         Ver na Steam <FaExternalLinkAlt />
                                     </Link>
 
                                     <Link
-                                        href={`https://youtube.com/results?search_query=CS2 ${'subCategory' in item && item.subCategory} ${item.name} - Skin Float And Wear Preview`}
+                                        href={`https://youtube.com/results?search_query=${item.weaponType} ${item.itemName == '-' ? 'Vanilla' : item.itemName} - Skin Float And Wear Preview`}
                                         target='_blank'
                                         underline='none'
                                     >
@@ -145,7 +118,7 @@ const ItemModal = ({ item, open, handleClose, itemAction }: ItemModalProps) => {
                                 </Stack>
                             </div>
 
-                            {'stickerArray' in item && (
+                            {item.weaponType.toLowerCase() !== 'sticker' && item.stickers.length > 0 &&
 
                                 <Stack
                                     direction='row'
@@ -155,15 +128,15 @@ const ItemModal = ({ item, open, handleClose, itemAction }: ItemModalProps) => {
                                     gridTemplateColumns={'repeat(4, 1fr)'}
                                     height={'90px'}
                                 >
-                                    {item.stickerArray.map((sticker) => {
+                                    {item.stickers.slice(0, 4).map((sticker, index) => { //TODO: slicing 4 stickers
                                         return (
                                             <Tooltip
-                                                key={sticker.id}
+                                                key={sticker.stickerId + '-' + index}
                                                 placement='top'
                                                 arrow
                                                 title={
                                                     <Typography noWrap minWidth='fit-content'>
-                                                        {sticker.category} | {sticker.name} | {sticker.eventOrCollection}
+                                                        {sticker.name}
                                                     </Typography>
                                                 }>
                                                 <div className='item-sticker'>
@@ -173,7 +146,7 @@ const ItemModal = ({ item, open, handleClose, itemAction }: ItemModalProps) => {
                                                         loading='lazy'
                                                     />
                                                     <Typography>
-                                                        R${sticker.price}
+                                                        R${9999 /*TODO: mocking*/}
                                                     </Typography>
                                                 </div>
                                             </Tooltip>
@@ -181,7 +154,7 @@ const ItemModal = ({ item, open, handleClose, itemAction }: ItemModalProps) => {
                                     })}
                                 </Stack>
 
-                            )}
+                            }
 
                         </div>
 
@@ -189,36 +162,28 @@ const ItemModal = ({ item, open, handleClose, itemAction }: ItemModalProps) => {
 
                             <div className='item-details-box float'>
 
-                                {'floatFull' in item && 'floatShort' &&
-
-                                    <>
-
-                                        <div className='float-container'>
-                                            <FloatBar floatValue={item.floatFull * 100} />
-                                        </div>
+                                <div className='float-container'>
+                                    <FloatBar floatValue={item.floatValue * 100} />
+                                </div>
 
 
-                                        <div className='item-info'>
+                                <div className='item-info'>
 
-                                            <div className='item-field'>
-                                                <Typography>
-                                                    Float
-                                                </Typography>
-                                            </div>
+                                    <div className='item-field'>
+                                        <Typography>
+                                            Float
+                                        </Typography>
+                                    </div>
 
-                                            <div className='item-value'>
-                                                <Typography>
-                                                    {item.floatFull}
-                                                </Typography>
-                                            </div>
+                                    <div className='item-value'>
+                                        <Typography>
+                                            {item.floatValue}
+                                        </Typography>
+                                    </div>
 
-                                        </div>
+                                </div>
 
-                                        <Divider sx={{ bgcolor: '#BCBCC2' }} />
-
-                                    </>
-
-                                }
+                                <Divider sx={{ bgcolor: '#BCBCC2' }} />
 
                                 <div className='item-info'>
 
@@ -234,18 +199,16 @@ const ItemModal = ({ item, open, handleClose, itemAction }: ItemModalProps) => {
 
                                     <div className='item-value'>
                                         <Typography>
-                                            Oculto {/*TODO: MOCKING*/}
+                                            {item.rarityName}
                                         </Typography>
                                         <Typography>
-                                            541 {/*TODO: MOCKING*/}
+                                            {item.paintSeed}
                                         </Typography>
                                     </div>
 
                                 </div>
 
                             </div>
-
-
 
                             <div className='item-details-box price'>
 
@@ -260,11 +223,9 @@ const ItemModal = ({ item, open, handleClose, itemAction }: ItemModalProps) => {
                                         </Typography>
                                     </div>
 
-
-
                                     <div className='item-value'>
                                         <Typography>
-                                            R$ {item.steamPrice}
+                                            R$ {item.steamPrice.toFixed(2)}
                                         </Typography>
                                         <Typography>
                                             R$ {(item.steamPrice / 100 * 85).toFixed(2)}
@@ -285,7 +246,7 @@ const ItemModal = ({ item, open, handleClose, itemAction }: ItemModalProps) => {
 
                                     <div className='item-value'>
                                         <Typography variant='h6'>
-                                            R$ {item.price}
+                                            R$ {item.price.toFixed(2)}
                                         </Typography>
                                     </div>
 
@@ -293,7 +254,7 @@ const ItemModal = ({ item, open, handleClose, itemAction }: ItemModalProps) => {
 
                                 <div className='add-cart-container'>
                                     <AddCartButton
-                                        isItemInCart={isItemInCart(item.id)}
+                                        isItemInCart={isItemInCart(item.assetId)}
                                         onClick={itemAction}
                                         isHovered={true}
                                     />
