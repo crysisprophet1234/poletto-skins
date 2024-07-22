@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,21 +48,22 @@ public class SteamServiceImpl implements SteamService {
 	    
 	    if (existingUser.isPresent()) {
 	        return existingUser.get();
-	    } else {
-	        String url = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/" 
-	                   + "?key=" + steamApiKey
-	                   + "&steamids=" + steamId;
-
-	        String responseJson = restTemplate.getForObject(url, String.class);
-	        
-	        SteamUser steamUser = extractPlayerFromResponse(responseJson);
-
-	        if (steamUser == null) {
-	            throw new ResourceNotFound("Steam ID provided not found");
-	        }
-	        
-	        return steamUserRepository.save(steamUser);
 	    }
+	   
+        String url = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/" 
+                   + "?key=" + steamApiKey
+                   + "&steamids=" + steamId;
+
+        String responseJson = restTemplate.getForObject(url, String.class);
+        
+        SteamUser steamUser = extractPlayerFromResponse(responseJson);
+
+        if (steamUser == null) {
+            throw new ResourceNotFound("Steam ID provided not found");
+        }
+        
+        return steamUserRepository.save(steamUser);
+	    
 	}
 	
 	@Override
@@ -70,19 +73,19 @@ public class SteamServiceImpl implements SteamService {
         
         String steamResponseJson = restTemplate.getForObject(steamUrl, String.class);
         
-        var itemsInspectUrlList = extractItemsInspectUrlFromResponse(steamResponseJson, steamId);
+        var itemsSteamData = extractSteamDataFromResponse(steamResponseJson, steamId);
 
-        if (itemsInspectUrlList == null) {
+        if (itemsSteamData == null) {
         	throw new ResourceNotFound("Steam ID provided not found");
         }
         	
-        String csfloatApiResponseJson = fetchBulkItemsFromCsfloatApi(itemsInspectUrlList);
+        String csfloatApiResponseJson = fetchBulkItemsFromCsfloatApi(itemsSteamData);
         
         if (csfloatApiResponseJson == null) {
         	throw new RuntimeException("Problem fetching items information");
         }
         
-        List<SteamItem> steamItems = extractsItemFromResponse(csfloatApiResponseJson);
+        List<SteamItem> steamItems = extractsItemFromResponse(csfloatApiResponseJson, itemsSteamData.get("links"));
         
         if (steamItems == null) {
         	throw new RuntimeException("Problem parsing items information");
@@ -93,14 +96,14 @@ public class SteamServiceImpl implements SteamService {
         return steamItems;
     }
 	
-	private String fetchBulkItemsFromCsfloatApi(Map<String, List<Map<String, String>>> inspectUrlListBody) {
+	private String fetchBulkItemsFromCsfloatApi(Map<String, List<Map<String, Object>>> inspectUrlListBody) {
 		
 		String csfloatApiUrl = "http://localhost:81/bulk";
         
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
         
-        HttpEntity<Map<String, List<Map<String, String>>>> requestEntity = new HttpEntity<>(inspectUrlListBody, headers);
+        HttpEntity<Map<String, List<Map<String, Object>>>> requestEntity = new HttpEntity<>(inspectUrlListBody, headers);
         
         ResponseEntity<String> csfloatApiResponse = restTemplate.exchange(csfloatApiUrl, HttpMethod.POST, requestEntity, String.class);
         
@@ -108,13 +111,13 @@ public class SteamServiceImpl implements SteamService {
 		
 	}
 	
-	private Map<String, List<Map<String, String>>> extractItemsInspectUrlFromResponse(String responseJson, String steamId) {
+	private Map<String, List<Map<String, Object>>> extractSteamDataFromResponse(String responseJson, String steamId) {
         try {
             Map<String, Object> responseMap = objectMapper.readValue(responseJson, Map.class);
             List<Map<String, Object>> assetsList = (List<Map<String, Object>>) responseMap.get("assets");
             List<Map<String, Object>> descriptionsList = (List<Map<String, Object>>) responseMap.get("descriptions");
 
-            List<Map<String, String>> links = new ArrayList<>();
+            List<Map<String, Object>> steamData = new ArrayList<>();
             
             for (Map<String, Object> asset : assetsList) {
                 String classid = (String) asset.get("classid");
@@ -127,24 +130,33 @@ public class SteamServiceImpl implements SteamService {
 
                 if (description != null) {
                 	
-                	boolean isGraffitti = categorizeItem(description);
+                	boolean isValid = categorizeItem(description);
                   
             		List<Map<String, String>> action = (List<Map<String, String>>) description.get("actions");
                 
-                    if (action != null && isGraffitti) {
-                    	Map<String, String> linkMap = new HashMap<>();
+                    if (action != null && isValid) {
+                    	Map<String, Object> steamDataMap = new HashMap<>();
                     	String link = action.get(0).get("link");
                     	link = link.replace("%owner_steamid%", steamId);
                     	link = link.replace("%assetid%", (String) asset.get("assetid"));
-                    	linkMap.put("link", link);
-                    	links.add(linkMap);
+                    	steamDataMap.put("link", link);
+                    	steamDataMap.put("marketName", (String) description.get("market_name"));
+                    	steamDataMap.put("imageUrl", (String) description.get("icon_url"));
+                    	steamDataMap.put("stickersImageUrl", extractStickersImageUrl(description));
+                    	steamData.add(steamDataMap);
                     }         	
 
                 }
             }
 
-            Map<String, List<Map<String, String>>> result = new HashMap<>();
-            result.put("links", links);
+            Map<String, List<Map<String, Object>>> result = new HashMap<>();
+            //result.put("links", links); TODO: workaround while there is no pagination
+            if (steamData.size() > 50) {
+            	result.put("links", steamData.subList(100, 150));
+            } else {
+            	result.put("links", steamData);
+            }
+            
             return result;
 
         } catch (Exception e) {
@@ -152,8 +164,30 @@ public class SteamServiceImpl implements SteamService {
             return null;
         }
     }
+	
+	private List<String> extractStickersImageUrl(Map<String, Object> descriptionJson) {
+		
+		List<String> stickerUrls = new ArrayList<>();
+		
+        List<Map<String, String>> descriptionValues = (List<Map<String, String>>) descriptionJson.get("descriptions");
+        
+        for (Map<String, String> desc : descriptionValues) {
+            if (desc.get("value").contains("sticker_info")) {
+                String stickersHtml = desc.get("value");
+                Pattern pattern = Pattern.compile("src=\"([^\"]+)\"");
+                Matcher matcher = pattern.matcher(stickersHtml);
+                while (matcher.find()) {
+                	stickerUrls.add(matcher.group(1));
+                }
+                break;
+            }
+        }
+        
+        return stickerUrls;
+		
+	}
 
-	private List<SteamItem> extractsItemFromResponse(String responseJson) {
+	private List<SteamItem> extractsItemFromResponse(String responseJson, List<Map<String, Object>> linkList) {
 	    try {
 	        Map<String, Object> responseMap = objectMapper.readValue(responseJson, Map.class);
 
@@ -173,7 +207,7 @@ public class SteamServiceImpl implements SteamService {
 	                steamItem.setD((String) itemMap.get("d"));
 	            }
 	            if (itemMap.containsKey("m")) {
-	                steamItem.setM((String) itemMap.get("m"));
+	                steamItem.setMarketId((String) itemMap.get("m"));
 	            }
 	            if (itemMap.containsKey("origin")) {
 	                steamItem.setOrigin((Integer) itemMap.get("origin"));
@@ -249,11 +283,56 @@ public class SteamServiceImpl implements SteamService {
 	            steamItems.add(steamItem);
 	        }
 	        
+	        for (int i = 0; i < linkList.size(); i++) {
+	        	Map<String, Object> link = linkList.get(i);
+	        	String steamImageUrl = "https://community.akamai.steamstatic.com/economy/image/" + (String) link.get("imageUrl");
+	        	steamItems.stream()
+                	.filter(item -> item.getFullItemName().equals(link.get("marketName")))
+                	.forEach(item -> item.setImageUrl(steamImageUrl));
+	        	
+	        	steamItems.stream()
+            	.filter(item -> item.getFullItemName().equals(link.get("marketName")))
+            	.forEach(item -> {
+            		item.setImageUrl(steamImageUrl);
+            		item.setStickers(addImageUrlToStickers(item.getStickers(), (List<String>) link.get("stickersImageUrl")));
+            	});      	
+	        	
+	        }       
+	        
 	        return steamItems;
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	        return null;
 	    }
+	}
+	
+	private List<SteamSticker> addImageUrlToStickers(List<SteamSticker> stickers, List<String> images) {
+		
+		if(stickers.size() == 0 || images.size() == 0) {
+			return stickers;
+		}
+		
+		try {
+		
+			Integer firstStickerId = stickers.get(0).getStickerId();
+	        boolean allSameStickerId = stickers.stream()
+	                .allMatch(sticker -> sticker.getStickerId().equals(firstStickerId));
+
+	        if (allSameStickerId) {
+	            String imageUrl = images.get(0);
+	            stickers.forEach(sticker -> sticker.setImageUrl(imageUrl));
+	        } else {
+	            for (int i = 0; i < stickers.size(); i++) {
+	                stickers.get(i).setImageUrl(images.get(i));
+	            }
+	        }
+		
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		
+		return stickers;
+		
 	}
 	
 	private List<SteamSticker> parseStickers(List<Map<String, Object>> stickersList) {
@@ -278,10 +357,12 @@ public class SteamServiceImpl implements SteamService {
 	            sticker.setMaterial((String) stickerMap.get("material"));
 	        }
 	        if (stickerMap.containsKey("wear")) {
-	            sticker.setWear((Double) stickerMap.get("wear"));
+	            //sticker.setWear((Double) stickerMap.get("wear"));
+	        	sticker.setWear(((Number) stickerMap.get("wear")).doubleValue());
 	        }
 	        if (stickerMap.containsKey("scale")) {
-	            sticker.setScale((Double) stickerMap.get("scale"));
+	           //sticker.setScale((Double) stickerMap.get("scale"));
+	        	sticker.setScale(((Number) stickerMap.get("scale")).doubleValue());
 	        }
 	        if (stickerMap.containsKey("rotation")) {
 	            sticker.setRotation((Integer) stickerMap.get("rotation"));
@@ -333,6 +414,10 @@ public class SteamServiceImpl implements SteamService {
 				.toLowerCase();
 		
 		if (type.contains("graffiti")) {
+			return false;
+		}
+		
+		if (type.contains("agent")) {
 			return false;
 		}
 		
