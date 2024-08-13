@@ -3,13 +3,14 @@ import { useCart } from '@/hooks/useCart'
 import { MarketItem } from '@/types/entities/steam-item'
 import { extractStickerFinish } from '@/utils/extractStickerFinish'
 import { itemWearAbbreviator, WearName } from '@/utils/itemWearAbbreviator'
-import { Box, Paper, Stack, Tooltip, Typography } from '@mui/material'
+import { Box, Paper, Stack, SxProps, Tooltip, Typography } from '@mui/material'
 
 type ItemCartMiniatureProps = {
     item: MarketItem
+    sx?: SxProps
 }
 
-const ItemCartMiniature = ({ item }: ItemCartMiniatureProps) => {
+const ItemCartMiniature = ({ item, sx }: ItemCartMiniatureProps) => {
 
     const { removeFromCart } = useCart()
 
@@ -26,7 +27,8 @@ const ItemCartMiniature = ({ item }: ItemCartMiniatureProps) => {
                 width: '100%',
                 bgcolor: '#1c1a24',
                 padding: 2,
-                color: '#FFF'
+                color: '#FFF',
+                ...sx
             }}
         >
             <Stack
