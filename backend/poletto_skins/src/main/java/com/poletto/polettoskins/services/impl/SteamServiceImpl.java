@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -79,7 +80,12 @@ public class SteamServiceImpl implements SteamService {
         	throw new ResourceNotFound("Steam ID provided not found");
         }
         	
-        String csfloatApiResponseJson = fetchBulkItemsFromCsfloatApi(itemsSteamData);
+        String csfloatApiResponseJson;
+		try {
+			csfloatApiResponseJson = fetchBulkItemsFromCsfloatApi(itemsSteamData);
+		} catch (Exception e) {
+			throw new RuntimeException(e.getMessage());
+		}
         
         if (csfloatApiResponseJson == null) {
         	throw new RuntimeException("Problem fetching items information");
@@ -96,7 +102,7 @@ public class SteamServiceImpl implements SteamService {
         return steamItems;
     }
 	
-	private String fetchBulkItemsFromCsfloatApi(Map<String, List<Map<String, Object>>> inspectUrlListBody) {
+	private String fetchBulkItemsFromCsfloatApi(Map<String, List<Map<String, Object>>> inspectUrlListBody) throws Exception {
 		
 		String csfloatApiUrl = "http://localhost:81/bulk";
         
@@ -107,7 +113,20 @@ public class SteamServiceImpl implements SteamService {
         
         ResponseEntity<String> csfloatApiResponse = restTemplate.exchange(csfloatApiUrl, HttpMethod.POST, requestEntity, String.class);
         
-        return csfloatApiResponse.getBody();
+        String responseBody = csfloatApiResponse.getBody();
+        if (responseBody != null) {
+            JSONObject responseJson = new JSONObject(responseBody);
+            for (String key : responseJson.keySet()) {
+                JSONObject item = responseJson.getJSONObject(key);
+                if (item.has("error")) {
+                    String errorMessage = item.getString("error");
+                    int errorCode = item.getInt("code");
+                    throw new Exception("Error from API: " + errorMessage + ". Code: " + errorCode);
+                }
+            }
+        }
+        
+        return responseBody;
 		
 	}
 	
@@ -152,7 +171,7 @@ public class SteamServiceImpl implements SteamService {
             Map<String, List<Map<String, Object>>> result = new HashMap<>();
             //result.put("links", links); TODO: workaround while there is no pagination
             if (steamData.size() > 50) {
-            	result.put("links", steamData.subList(100, 150));
+            	result.put("links", steamData.subList(0, 50));
             } else {
             	result.put("links", steamData);
             }
@@ -291,11 +310,12 @@ public class SteamServiceImpl implements SteamService {
                 	.forEach(item -> item.setImageUrl(steamImageUrl));
 	        	
 	        	steamItems.stream()
-            	.filter(item -> item.getFullItemName().equals(link.get("marketName")))
-            	.forEach(item -> {
-            		item.setImageUrl(steamImageUrl);
-            		item.setStickers(addImageUrlToStickers(item.getStickers(), (List<String>) link.get("stickersImageUrl")));
-            	});      	
+            		.filter(item -> item.getFullItemName().equals(link.get("marketName")))
+            		.forEach(item -> {
+            			item.setImageUrl(steamImageUrl);
+            			item.setStickers(addImageUrlToStickers(item.getStickers(), (List<String>) link.get("stickersImageUrl")));
+            		}
+            	);      	
 	        	
 	        }       
 	        
