@@ -1,10 +1,11 @@
 import Catalog from '@/components/Catalog'
+import SellList from '@/components/SellList'
 import TopFilter from '@/components/TopFilter'
 import { useAuth } from '@/hooks/useAuth'
 import { useCart } from '@/hooks/useCart'
 import { get } from '@/services/api'
 import { MarketItem, SteamItem } from '@/types/entities/steam-item'
-import { Box, Typography } from '@mui/material'
+import { Box } from '@mui/material'
 import { useCallback, useEffect, useState } from 'react'
 
 type FilterData = {
@@ -97,11 +98,7 @@ const Sell = () => {
 
             </Box>
 
-            <Box>
-                <Typography variant='body1'>
-                    Lista de Venda
-                </Typography>
-            </Box>
+            <SellList />
 
         </Box>
 
