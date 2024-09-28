@@ -68,7 +68,7 @@ type MainFilterProps = {
 
 const MainFilter = ({ onFilterChange }: MainFilterProps) => {
 
-    const maxPriceFromApi = '100000'
+    const maxPriceFromApi = '100000' //FIXME
 
     const {
         control,

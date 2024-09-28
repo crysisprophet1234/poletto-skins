@@ -2,7 +2,7 @@ import AddCartButton from '@/components/AddCartButton'
 import FloatBar from '@/components/FloatBar'
 import { useCart } from '@/hooks/useCart'
 import { MarketItem } from '@/types/entities/steam-item'
-import { Close } from '@mui/icons-material'
+import { AddShoppingCartRounded, Close, RemoveShoppingCartRounded } from '@mui/icons-material'
 import { Divider, Link, Stack, Tooltip } from '@mui/material'
 import Box from '@mui/material/Box'
 import Modal from '@mui/material/Modal'
@@ -257,7 +257,12 @@ const ItemModal = ({ item, open, handleClose, itemAction }: ItemModalProps) => {
                                         isItemInCart={isItemInCart(item.assetId)}
                                         onClick={itemAction}
                                         isHovered={true}
-                                    />
+                                    >
+                                        {isItemInCart(item.assetId)
+                                            ? <RemoveShoppingCartRounded />
+                                            : <AddShoppingCartRounded />
+                                        }
+                                    </AddCartButton>
                                 </div>
 
                             </div>

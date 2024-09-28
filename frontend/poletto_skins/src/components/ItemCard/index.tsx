@@ -2,6 +2,7 @@ import AddCartButton from '@/components/AddCartButton'
 import { useCart } from '@/hooks/useCart'
 import { MarketItem } from '@/types/entities/steam-item'
 import { itemWearAbbreviator, WearName } from '@/utils/itemWearAbbreviator'
+import { AddShoppingCartRounded, RemoveShoppingCartRounded } from '@mui/icons-material'
 import { Tooltip, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { FaSteam } from 'react-icons/fa6'
@@ -122,12 +123,12 @@ const ItemCard = ({ itemProps, openModal, itemAction }: ItemCardProps) => {
                     }
 
                     <div className='price'>
-                        <span>{`R$ ${item?.price.toFixed(2)}`}</span>
+                        <span>{item?.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
                     </div>
 
                     <div className='steam-price'>
                         <FaSteam />
-                        <span>{`R$ ${item?.steamPrice.toFixed(2)}`}</span>
+                        <span>{item?.steamPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
                     </div>
 
                 </div>
@@ -145,7 +146,12 @@ const ItemCard = ({ itemProps, openModal, itemAction }: ItemCardProps) => {
                         isItemInCart={isItemInCart(item.assetId)}
                         onClick={itemAction}
                         isHovered={isHovered}
-                    />
+                    >
+                        {isItemInCart(item.assetId)
+                            ? <RemoveShoppingCartRounded />
+                            : <AddShoppingCartRounded />
+                        }
+                    </AddCartButton>
                 </div>
 
             </div>

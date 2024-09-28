@@ -1,10 +1,13 @@
 import Catalog from '@/components/Catalog'
+import SellList from '@/components/SellList'
 import TopFilter from '@/components/TopFilter'
 import { useAuth } from '@/hooks/useAuth'
-import { useCart } from '@/hooks/useCart'
+import { useSell } from '@/hooks/useSell'
 import { get } from '@/services/api'
+import { SteamItemPrice } from '@/types/entities/item'
 import { MarketItem, SteamItem } from '@/types/entities/steam-item'
-import { Box, Typography } from '@mui/material'
+import { extractItemId } from '@/utils/extractItemId'
+import { Box } from '@mui/material'
 import { useCallback, useEffect, useState } from 'react'
 
 type FilterData = {
@@ -23,13 +26,13 @@ const Sell = () => {
 
     const { steamId } = useAuth()
 
-    const { addToCart, removeFromCart, isItemInCart } = useCart()
+    const { addToSellList, removeFromSellList, isItemInSellList } = useSell()
 
-    const handleAddCartButtonClick = (item: MarketItem) => {
-        if (isItemInCart(item.assetId)) {
-            removeFromCart(item.assetId)
+    const handleAddSellListButtonClick = (item: MarketItem) => {
+        if (isItemInSellList(item.assetId)) {
+            removeFromSellList(item.assetId)
         } else {
-            addToCart(item)
+            addToSellList(item)
         }
     }
 
@@ -45,16 +48,28 @@ const Sell = () => {
     }
 
     const getUserItems = useCallback(async (steamId: string) => {
-        try {
-            const steamItemsFromUser = await get<SteamItem[]>('/getPlayerInventory', { steamId })
 
-            // Mocking prices
-            const marketItems = steamItemsFromUser.map(item => ({
-                ...item,
-                price: Math.random() * 100,
-                steamPrice: Math.random() * 100,
-                discount: Math.random() > 0.5 ? Math.random() * 20 : undefined,
-            }))
+        try {
+
+            const steamItemsFromUser = await get<SteamItem[]>(`/users/steam/${steamId}/inventory`)
+
+            const marketItemsPromises = steamItemsFromUser.map(async (item) => {
+                try {
+
+                    const priceData = await get<SteamItemPrice>(`/items/${extractItemId(item as MarketItem)}/market-price`)
+
+                    return {
+                        ...item,
+                        price: priceData.lowestPrice,
+                        steamPrice: priceData.medianPrice
+                    }
+                } catch (error) {
+                    console.error(`Error fetching price for item ${item.assetId}: ${error}`)
+                    return item as MarketItem
+                }
+            })
+
+            const marketItems = await Promise.all(marketItemsPromises)
 
             setItems(marketItems)
         } catch (error) {
@@ -92,15 +107,13 @@ const Sell = () => {
                         overflowX: 'hidden'
                     }}
                 >
-                    <Catalog items={items} itemAction={handleAddCartButtonClick} />
+                    <Catalog items={items} itemAction={handleAddSellListButtonClick} catalogType='sell' />
                 </Box>
 
             </Box>
 
             <Box>
-                <Typography variant='body1'>
-                    Lista de Venda
-                </Typography>
+                <SellList />
             </Box>
 
         </Box>

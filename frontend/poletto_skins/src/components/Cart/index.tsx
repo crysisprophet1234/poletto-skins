@@ -1,10 +1,13 @@
 import BuyModal from '@/components/BuyModal'
 import ItemCartPopup from '@/components/Cart/ItemCartPopup'
 import ShowCartButton from '@/components/Cart/ShowCartButton'
+import { useAuth } from '@/hooks/useAuth'
 import { Box, ClickAwayListener, Popper } from '@mui/material'
 import { useState } from 'react'
 
 const Cart = () => {
+
+    const { isAuthenticated } = useAuth()
 
     const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
 
@@ -21,6 +24,22 @@ const Cart = () => {
         setIsCartOpen(!isCartOpen)
     }
 
+    const handleCheckout = () => {
+
+        if (!isAuthenticated) {
+            /* TODO:not working for some reason
+            toast.warn('Usuário dever estar logado para fazer checkout!', {
+                position: 'top-right',
+                autoClose: 5000,
+            })
+            */
+            alert('Usuário dever estar logado para fazer checkout!')
+            return
+        }
+        setIsBuyModalOpen(true)
+
+    }
+
     return (
 
         <ClickAwayListener onClickAway={handleOutsideClick}>
@@ -35,7 +54,7 @@ const Cart = () => {
                     open={isCartOpen}
                     anchorEl={anchorEl}
                 >
-                    <ItemCartPopup onClose={() => setIsCartOpen(false)} onCheckout={() => setIsBuyModalOpen(!isBuyModalOpen)} />
+                    <ItemCartPopup onClose={() => setIsCartOpen(false)} onCheckout={handleCheckout} />
                 </Popper>
 
                 <BuyModal
@@ -44,6 +63,8 @@ const Cart = () => {
                 />
 
             </Box>
+
+
 
         </ClickAwayListener >
 

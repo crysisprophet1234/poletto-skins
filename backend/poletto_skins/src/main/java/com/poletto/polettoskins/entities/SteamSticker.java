@@ -3,15 +3,10 @@ package com.poletto.polettoskins.entities;
 import java.io.Serializable;
 import java.util.Objects;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
-@Document(collection = "steam_sticker")
 public class SteamSticker implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
-	@Id
 	private Integer stickerId;
 	private Integer slot;
 	private String imageUrl;

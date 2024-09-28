@@ -1,13 +1,14 @@
-import { AddShoppingCartRounded, RemoveShoppingCartRounded } from '@mui/icons-material'
 import { Box, Button } from '@mui/material'
+import { ReactElement } from 'react'
 
 type AddCartButtonProps = {
     isItemInCart: boolean
     isHovered?: boolean
+    children: ReactElement
     onClick?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
 }
 
-const AddCartButton = ({ isItemInCart, onClick, isHovered }: AddCartButtonProps) => {
+const AddCartButton = ({ isItemInCart, onClick, children, isHovered }: AddCartButtonProps) => {
 
     return (
 
@@ -28,6 +29,7 @@ const AddCartButton = ({ isItemInCart, onClick, isHovered }: AddCartButtonProps)
             onClick={onClick}
         >
             <Button
+                disableRipple
                 sx={{
                     display: 'flex',
                     justifyContent: 'center',
@@ -42,7 +44,7 @@ const AddCartButton = ({ isItemInCart, onClick, isHovered }: AddCartButtonProps)
                     }
                 }}
             >
-                {isItemInCart ? <RemoveShoppingCartRounded /> : <AddShoppingCartRounded />}
+                {children}
             </Button>
         </Box>
 

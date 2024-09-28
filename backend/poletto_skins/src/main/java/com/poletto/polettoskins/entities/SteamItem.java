@@ -4,15 +4,10 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
-@Document(collection = "steam_item")
 public class SteamItem implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
-	@Id
 	private String assetId;
 	private String ownerSteamId;
 	private String d;

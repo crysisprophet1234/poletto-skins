@@ -1,4 +1,3 @@
-import Cart from '@/components/Cart'
 import FormSearchQueryText from '@/components/FormComponents/FormQuerySearchText'
 import FormSelect from '@/components/FormComponents/FormSelect'
 import FormToggleButton from '@/components/FormComponents/FormToggleButton'
@@ -106,12 +105,6 @@ const TopFilter = ({ onFilterChange }: TopFilterProps) => {
                     control={control}
                     label='favorite'
                 />
-
-            </div>
-
-            <div className='filter-top-section'>
-
-                <Cart />
 
             </div>
 

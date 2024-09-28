@@ -1,4 +1,11 @@
-export type SteamUser = {
+export type User = {
+    id: UUID,
+    email: string,
+    balance: string,
+    steamUser: SteamUser
+}
+
+type SteamUser = {
     steamId: string
     communityVisibilityState: number
     profileState: number

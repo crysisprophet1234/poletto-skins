@@ -1,5 +1,5 @@
 import { ThemeProvider } from '@emotion/react'
-import { createTheme } from '@mui/material'
+import { createTheme, SxProps } from '@mui/material'
 import TextField from '@mui/material/TextField'
 import { Control, Controller, FieldValues, Path, UseFormSetValue } from 'react-hook-form'
 
@@ -8,8 +8,10 @@ export interface FormInputProps<T extends FieldValues> {
     control: Control<T>
     label: string
     disabled?: boolean
+    type?: React.HTMLInputTypeAttribute
     placeholder?: string
     setValue?: UseFormSetValue<T>
+    sx?: SxProps
 }
 
 const theme = createTheme({
@@ -24,28 +26,34 @@ const theme = createTheme({
                 root: {
                     height: '30px',
                     backgroundColor: '#403D4D',
-                    borderRadius: '.25rem'
-                },
-            }
-        },
-        MuiInputBase: {
-            styleOverrides: {
-                root: {
-                    height: '30px',
-                },
-                input: {
-                    ':disabled': {
-                        color: '#FFFFFF',
-                        fontSize: '16px',
-                        WebkitTextFillColor: '#FFFFFF'
+                    borderRadius: '.25rem',
+                    '& .MuiInputBase-root': {
+                        height: '30px'
                     },
+                    '& .MuiInputBase-input': {
+                        padding: '0 8px',
+                        height: '30px',
+                        ':disabled': {
+                            color: '#FFFFFF',
+                            fontSize: '16px',
+                            WebkitTextFillColor: '#FFFFFF'
+                        }
+                    }
                 }
-            },
-        },
+            }
+        }
     }
 })
 
-const FormInputText = <T extends FieldValues>({ name, control, label, disabled, placeholder }: FormInputProps<T>) => {
+const FormInputText = <T extends FieldValues>({
+    name,
+    control,
+    label,
+    disabled,
+    type,
+    placeholder,
+    sx
+}: FormInputProps<T>) => {
     return (
         <Controller
             name={name}
@@ -58,11 +66,13 @@ const FormInputText = <T extends FieldValues>({ name, control, label, disabled, 
                     <TextField
                         error={!!error}
                         onChange={onChange}
-                        value={value}
+                        value={type == 'number' ? Number(value).toFixed(2) : value}
                         fullWidth
+                        type={type}
                         disabled={disabled}
                         placeholder={placeholder}
                         aria-label={label}
+                        sx={sx}
                     />
                 </ThemeProvider>
             )}
