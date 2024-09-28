@@ -2,6 +2,7 @@ import './styles.scss'
 
 import ItemCard from '@/components/ItemCard'
 import { MarketItem } from '@/types/entities/steam-item'
+import { SpringPage } from '@/types/vendor/spring-page'
 import { Box, Button, Grid, Skeleton } from '@mui/material'
 import { useEffect, useState } from 'react'
 import ItemModal from '../ItemModal'
@@ -9,7 +10,7 @@ import SellItemCard from '../SellItemCard'
 
 
 type CatalogProps = {
-    items: MarketItem[]
+    items: SpringPage<MarketItem>
     itemAction: (item: MarketItem) => void
     catalogType: 'buy' | 'sell' | 'trade'
 }
@@ -19,7 +20,7 @@ const Catalog = ({ items, itemAction, catalogType }: CatalogProps) => {
     const [loading, setLoading] = useState(true)
 
     useEffect(() => {
-        if (items && items.length > 0) {
+        if (items && items.content.length > 0) {
             setLoading(false)
         }
     }, [items])
@@ -61,7 +62,7 @@ const Catalog = ({ items, itemAction, catalogType }: CatalogProps) => {
                                 />
                             </Grid>
                         ))
-                        : items.map((item) => (
+                        : items.content.map((item) => (
                             <Grid item xs={2} sm={4} md={4} lg={3} key={item.assetId}>
 
                                 {(() => {

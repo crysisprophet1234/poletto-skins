@@ -6,6 +6,7 @@ import { useSell } from '@/hooks/useSell'
 import { get } from '@/services/api'
 import { SteamItemPrice } from '@/types/entities/item'
 import { MarketItem, SteamItem } from '@/types/entities/steam-item'
+import { SpringPage } from '@/types/vendor/spring-page'
 import { extractItemId } from '@/utils/extractItemId'
 import { Box } from '@mui/material'
 import { useCallback, useEffect, useState } from 'react'
@@ -36,7 +37,7 @@ const Sell = () => {
         }
     }
 
-    const [items, setItems] = useState<MarketItem[]>([])
+    const [items, setItems] = useState<SpringPage<MarketItem>>()
 
     const [/*filterData*/, setFilterData] = useState<FilterData>()
 
@@ -48,21 +49,18 @@ const Sell = () => {
     }
 
     const getUserItems = useCallback(async (steamId: string) => {
-
         try {
-
             const steamItemsFromUser = await get<SteamItem[]>(`/users/steam/${steamId}/inventory`)
 
             const marketItemsPromises = steamItemsFromUser.map(async (item) => {
                 try {
-
                     const priceData = await get<SteamItemPrice>(`/items/${extractItemId(item as MarketItem)}/market-price`)
 
                     return {
                         ...item,
                         price: priceData.lowestPrice,
                         steamPrice: priceData.medianPrice
-                    }
+                    } as MarketItem
                 } catch (error) {
                     console.error(`Error fetching price for item ${item.assetId}: ${error}`)
                     return item as MarketItem
@@ -71,7 +69,20 @@ const Sell = () => {
 
             const marketItems = await Promise.all(marketItemsPromises)
 
-            setItems(marketItems)
+            //FIXME: provisory solution
+            const marketItemsPage: SpringPage<MarketItem> = {
+                content: marketItems,
+                totalElements: marketItems.length,
+                numberOfElements: marketItems.length,
+                totalPages: 1,
+                size: marketItems.length,
+                number: 0,
+                first: true,
+                last: true,
+                empty: false
+            }
+
+            setItems(marketItemsPage)
         } catch (error) {
             console.error(`Error trying to fetch steam user data: ${error}`)
         }
@@ -107,7 +118,7 @@ const Sell = () => {
                         overflowX: 'hidden'
                     }}
                 >
-                    <Catalog items={items} itemAction={handleAddSellListButtonClick} catalogType='sell' />
+                    <Catalog items={items!} itemAction={handleAddSellListButtonClick} catalogType='sell' />
                 </Box>
 
             </Box>

@@ -4,10 +4,11 @@ import MainFilter from '@/components/MainFilter'
 import TopFilter from '@/components/TopFilter'
 import { useCart } from '@/hooks/useCart'
 import { get } from '@/services/api'
-import { MarketItem, SteamItem } from '@/types/entities/steam-item'
+import { MarketItem } from '@/types/entities/steam-item'
 import { Box, Stack } from '@mui/material'
 import { useCallback, useEffect, useState } from 'react'
 
+import { SpringPage } from '@/types/vendor/spring-page'
 import './styles.scss'
 
 type FilterData = {
@@ -34,9 +35,9 @@ const Buy = () => {
         }
     }
 
-    const [items, setItems] = useState<MarketItem[]>([])
+    const [items, setItems] = useState<SpringPage<MarketItem>>()
 
-    const [/*filterData*/, setFilterData] = useState<FilterData>()
+    const [filterData, setFilterData] = useState<FilterData>()
 
     const handleFilterChange = (data: FilterData) => {
         setFilterData(prevFilterData => ({
@@ -48,23 +49,24 @@ const Buy = () => {
     const getUserItems = useCallback(async () => {
         try {
 
-            const mockSteamId = '76561198191317871'
+            const steamItemsFromUser = await get<SpringPage<MarketItem>>('/items/search', { ...filterData })
 
-            const steamItemsFromUser = await get<SteamItem[]>(`/users/steam/${mockSteamId}/inventory`)
+            //TODO: Adicionando preços mock
+            const itemsWithPrices = {
+                ...steamItemsFromUser,
+                content: steamItemsFromUser.content.map(item => ({
+                    ...item,
+                    price: Math.random() * 100,
+                    steamPrice: Math.random() * 100,
+                    discount: Math.random() > 0.5 ? Math.random() * 20 : undefined
+                }))
+            }
 
-            // Mocking prices
-            const marketItems = steamItemsFromUser.map(item => ({
-                ...item,
-                price: Math.random() * 100,
-                steamPrice: Math.random() * 100,
-                discount: Math.random() > 0.5 ? Math.random() * 20 : undefined
-            }))
-
-            setItems(marketItems)
+            setItems(itemsWithPrices)
         } catch (error) {
             console.error(`Error trying to fetch steam user data: ${error}`)
         }
-    }, [])
+    }, [filterData])
 
     useEffect(() => {
         getUserItems()
@@ -103,7 +105,7 @@ const Buy = () => {
                         overflowX: 'hidden'
                     }}
                 >
-                    <Catalog items={items} itemAction={handleAddCartButtonClick} catalogType='buy' />
+                    <Catalog items={items!} itemAction={handleAddCartButtonClick} catalogType='buy' />
                 </Box>
 
             </Box>
