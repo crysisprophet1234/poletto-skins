@@ -2,13 +2,13 @@ import { ThemeProvider } from '@emotion/react'
 import { createTheme, SxProps } from '@mui/material'
 import TextField from '@mui/material/TextField'
 import { Control, Controller, FieldValues, Path, UseFormSetValue } from 'react-hook-form'
+import { NumericFormat } from 'react-number-format'
 
-export interface FormInputProps<T extends FieldValues> {
+export interface FormInputCurrencyProps<T extends FieldValues> {
     name: Path<T>
     control: Control<T>
     label: string
     disabled?: boolean
-    type?: React.HTMLInputTypeAttribute
     placeholder?: string
     setValue?: UseFormSetValue<T>
     sx?: SxProps
@@ -45,15 +45,14 @@ const theme = createTheme({
     }
 })
 
-const FormInputText = <T extends FieldValues>({
+const FormInputCurrency = <T extends FieldValues>({
     name,
     control,
     label,
     disabled,
-    type,
     placeholder,
     sx
-}: FormInputProps<T>) => {
+}: FormInputCurrencyProps<T>) => {
     return (
         <Controller
             name={name}
@@ -63,14 +62,26 @@ const FormInputText = <T extends FieldValues>({
                 fieldState: { error }
             }) => (
                 <ThemeProvider theme={theme}>
-                    <TextField
+                    <NumericFormat
+                        customInput={TextField}
                         error={!!error}
-                        onChange={onChange}
-                        value={type == 'number' ? Number(value).toFixed(2) : value}
+                        onValueChange={(values) => {
+                            onChange(values.floatValue)
+                        }}
+                        value={value}
+                        thousandSeparator='.'
+                        decimalSeparator=','
+                        prefix='R$ '
+                        decimalScale={2}
+                        fixedDecimalScale
+                        allowNegative={false}
+                        isAllowed={(values) => {
+                            const { floatValue } = values
+                            return floatValue === undefined || floatValue <= 999999999.99
+                        }}
                         fullWidth
-                        type={type}
                         disabled={disabled}
-                        placeholder={placeholder}
+                        placeholder={placeholder || 'R$ 0,00'}
                         aria-label={label}
                         sx={sx}
                     />
@@ -80,4 +91,4 @@ const FormInputText = <T extends FieldValues>({
     )
 }
 
-export default FormInputText
+export default FormInputCurrency

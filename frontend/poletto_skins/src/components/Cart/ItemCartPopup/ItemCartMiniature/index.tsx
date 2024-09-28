@@ -3,6 +3,7 @@ import { useCart } from '@/hooks/useCart'
 import { MarketItem } from '@/types/entities/steam-item'
 import { extractStickerFinish } from '@/utils/extractStickerFinish'
 import { itemWearAbbreviator, WearName } from '@/utils/itemWearAbbreviator'
+import { AddShoppingCartRounded, RemoveShoppingCartRounded } from '@mui/icons-material'
 import { Box, Paper, Stack, Tooltip, Typography } from '@mui/material'
 
 type ItemCartMiniatureProps = {
@@ -11,7 +12,7 @@ type ItemCartMiniatureProps = {
 
 const ItemCartMiniature = ({ item }: ItemCartMiniatureProps) => {
 
-    const { removeFromCart } = useCart()
+    const { removeFromCart, isItemInCart } = useCart()
 
     const imageDimensions = {
         width: 115,
@@ -108,7 +109,15 @@ const ItemCartMiniature = ({ item }: ItemCartMiniatureProps) => {
                 </Box>
 
                 <Box height={'28px'}>
-                    <AddCartButton isItemInCart={true} onClick={() => removeFromCart(item.assetId)} />
+                    <AddCartButton
+                        isItemInCart={true}
+                        onClick={() => removeFromCart(item.assetId)}
+                    >
+                        {isItemInCart(item.assetId)
+                            ? <RemoveShoppingCartRounded />
+                            : <AddShoppingCartRounded />
+                        }
+                    </AddCartButton>
                 </Box>
 
             </Stack >

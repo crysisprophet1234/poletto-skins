@@ -5,14 +5,16 @@ import { MarketItem } from '@/types/entities/steam-item'
 import { Box, Button, Grid, Skeleton } from '@mui/material'
 import { useEffect, useState } from 'react'
 import ItemModal from '../ItemModal'
+import SellItemCard from '../SellItemCard'
 
 
 type CatalogProps = {
     items: MarketItem[]
     itemAction: (item: MarketItem) => void
+    catalogType: 'buy' | 'sell' | 'trade'
 }
 
-const Catalog = ({ items, itemAction }: CatalogProps) => {
+const Catalog = ({ items, itemAction, catalogType }: CatalogProps) => {
 
     const [loading, setLoading] = useState(true)
 
@@ -48,7 +50,7 @@ const Catalog = ({ items, itemAction }: CatalogProps) => {
                     gap: 2
                 }}
             >
-                <Grid container justifyContent='space-between' spacing={1} columns={{ xs: 4, sm: 8, md: 12, lg: 12, xl: 16 }}>
+                <Grid container justifyContent='flex-start' spacing={1} columns={{ xs: 4, sm: 8, md: 12, lg: 12, xl: 16 }}>
                     {loading
                         ? Array.from(new Array(12)).map((_, index) => (
                             <Grid item xs={2} sm={4} md={4} lg={3} key={index} >
@@ -61,12 +63,34 @@ const Catalog = ({ items, itemAction }: CatalogProps) => {
                         ))
                         : items.map((item) => (
                             <Grid item xs={2} sm={4} md={4} lg={3} key={item.assetId}>
-                                <ItemCard
-                                    itemProps={item}
-                                    key={item.assetId}
-                                    itemAction={() => itemAction(item)}
-                                    openModal={() => handleOpen(item)}
-                                />
+
+                                {(() => {
+                                    switch (catalogType) {
+
+                                        case 'buy':
+                                            return (
+                                                <ItemCard
+                                                    itemProps={item}
+                                                    key={item.assetId}
+                                                    itemAction={() => itemAction(item)}
+                                                    openModal={() => handleOpen(item)}
+                                                />
+                                            )
+
+                                        case 'sell':
+                                            return (
+                                                <SellItemCard
+                                                    sellItemProps={item}
+                                                    key={item.assetId}
+                                                    sellItemAction={() => itemAction(item)}
+                                                    openModal={() => handleOpen(item)}
+                                                />
+                                            )
+                                        default:
+                                            return null
+                                    }
+                                })()}
+
                             </Grid>
                         ))}
                 </Grid>
@@ -88,13 +112,26 @@ const Catalog = ({ items, itemAction }: CatalogProps) => {
             </Box>
 
             {
-                selectedItem &&
-                <ItemModal
-                    open={open}
-                    itemAction={() => itemAction(selectedItem)}
-                    handleClose={handleClose}
-                    item={selectedItem}
-                />
+                selectedItem && (
+                    (() => {
+                        switch (catalogType) {
+                            case 'buy':
+                                return (
+                                    <ItemModal
+                                        open={open}
+                                        itemAction={() => itemAction(selectedItem)}
+                                        handleClose={handleClose}
+                                        item={selectedItem}
+                                    />
+                                )
+                            case 'sell':
+                                return null //TODO: create the sell modal  
+
+                            default:
+                                return null
+                        }
+                    })()
+                )
             }
 
         </div>

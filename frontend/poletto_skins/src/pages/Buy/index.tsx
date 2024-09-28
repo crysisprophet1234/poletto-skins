@@ -1,11 +1,13 @@
+import Cart from '@/components/Cart'
 import Catalog from '@/components/Catalog'
 import MainFilter from '@/components/MainFilter'
 import TopFilter from '@/components/TopFilter'
 import { useCart } from '@/hooks/useCart'
 import { get } from '@/services/api'
 import { MarketItem, SteamItem } from '@/types/entities/steam-item'
-import { Box } from '@mui/material'
+import { Box, Stack } from '@mui/material'
 import { useCallback, useEffect, useState } from 'react'
+
 import './styles.scss'
 
 type FilterData = {
@@ -48,7 +50,7 @@ const Buy = () => {
 
             const mockSteamId = '76561198191317871'
 
-            const steamItemsFromUser = await get<SteamItem[]>('/getPlayerInventory', { steamId: mockSteamId })
+            const steamItemsFromUser = await get<SteamItem[]>(`/users/steam/${mockSteamId}/inventory`)
 
             // Mocking prices
             const marketItems = steamItemsFromUser.map(item => ({
@@ -89,9 +91,11 @@ const Buy = () => {
                 width={'100%'}
                 flexDirection={'column'}
             >
-                <div className='top-filter'>
+                <Stack direction={'row'} justifyContent={'space-between'} pr={'20px'}>
                     <TopFilter onFilterChange={handleFilterChange} />
-                </div>
+
+                    <Cart />
+                </Stack>
 
                 <Box
                     sx={{
@@ -99,7 +103,7 @@ const Buy = () => {
                         overflowX: 'hidden'
                     }}
                 >
-                    <Catalog items={items} itemAction={handleAddCartButtonClick} />
+                    <Catalog items={items} itemAction={handleAddCartButtonClick} catalogType='buy' />
                 </Box>
 
             </Box>

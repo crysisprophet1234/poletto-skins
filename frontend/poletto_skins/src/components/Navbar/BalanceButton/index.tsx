@@ -1,9 +1,10 @@
+import { useAuth } from '@/hooks/useAuth'
 import { AddCircle, WalletRounded } from '@mui/icons-material'
-import { Box, IconButton, Stack, Typography } from '@mui/material'
+import { Box, IconButton, LinearProgress, Stack, Typography } from '@mui/material'
 
 const BalanceButton = () => {
 
-    const balanceValue = 37890.35
+    const { user } = useAuth()
 
     return (
 
@@ -21,13 +22,27 @@ const BalanceButton = () => {
                 direction={'row'}
                 spacing={1}
                 px={2}
-                justifyContent={'center'}
+                justifyContent={'space-between'}
                 alignItems={'center'}
+                minWidth={'190px'}
             >
                 <WalletRounded fontSize='medium' />
                 <Typography variant='h6' color='#FFF'>
-                    R${balanceValue.toFixed(2)}
+                    {user
+                        ? <>{Number(user?.balance).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</>
+                        : <LinearProgress
+                            sx={{
+                                minWidth: '100px',
+                                borderRadius: '5px',
+                                backgroundColor: '#C85CD1',
+                                '& .MuiLinearProgress-bar': {
+                                    backgroundColor: '#d475db'
+                                }
+                            }}
+                        />
+                    }
                 </Typography>
+
             </Stack>
 
             <IconButton

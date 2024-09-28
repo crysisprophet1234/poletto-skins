@@ -2,10 +2,13 @@ import { useAuth } from '@/hooks/useAuth'
 import { Edit, ExitToApp, Help, HistoryRounded, Sell } from '@mui/icons-material'
 import { Avatar, Box, ClickAwayListener, IconButton, ListItemIcon, MenuItem, Paper, Popper } from '@mui/material'
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 const ProfileMenu = () => {
 
-    const { steamUser, logout } = useAuth()
+    const navigate = useNavigate()
+
+    const { user, logout } = useAuth()
 
     const [imageLoading, setImageLoading] = useState(true)
 
@@ -45,10 +48,10 @@ const ProfileMenu = () => {
                         }
                     }}
                 >
-                    {steamUser && steamUser.avatarMedium
+                    {user && user.steamUser.avatarMedium
                         ? <Avatar
-                            src={steamUser?.avatarMedium}
-                            alt={steamUser?.personaName}
+                            src={user?.steamUser.avatarMedium}
+                            alt={user?.steamUser.personaName}
                             onLoad={() => setImageLoading(false)}
                             sx={{
                                 width: '100%',
@@ -81,21 +84,21 @@ const ProfileMenu = () => {
                         }}
                     >
 
-                        <MenuItem onClick={() => { }}>
+                        <MenuItem onClick={() => navigate('/user')}>
                             <ListItemIcon>
                                 <Edit />
                             </ListItemIcon>
                             Meu perfil
                         </MenuItem>
 
-                        <MenuItem onClick={() => { }}>
+                        <MenuItem onClick={() => navigate('/history')}>
                             <ListItemIcon>
                                 <HistoryRounded />
                             </ListItemIcon>
                             Histórico
                         </MenuItem>
 
-                        <MenuItem onClick={() => { }}>
+                        <MenuItem onClick={() => navigate('/buy')}>
                             <ListItemIcon>
                                 <Sell />
                             </ListItemIcon>

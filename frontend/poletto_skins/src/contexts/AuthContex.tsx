@@ -1,14 +1,16 @@
 
-import { get } from '@/services/api'
+import { get, put } from '@/services/api'
 import { steamAuth } from '@/services/auth'
-import { SteamUser } from '@/types/vendor/steamUser'
+import { User } from '@/types/entities/user'
 import { createContext, ReactNode, useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 type AuthContextType = {
     isAuthenticated: boolean
     steamId: string | null,
-    steamUser: SteamUser | null,
+    user: User | null,
+    refreshUser: () => void,
+    updateProfile: (property: 'email' | 'phoneNumber' | 'steamTradeUrl', value: string) => void,
     steamAuthRedirect: () => void,
     login: (steamId: string) => void
     logout: () => void
@@ -17,7 +19,9 @@ type AuthContextType = {
 export const AuthContext = createContext<AuthContextType>({
     isAuthenticated: false,
     steamId: null,
-    steamUser: null,
+    user: null,
+    refreshUser: () => { throw new Error('refreshUser function not implemented') },
+    updateProfile: () => { throw new Error('updateProfile function not implemented') },
     steamAuthRedirect: () => { throw new Error('steamAuthRedirect function not implemented') },
     login: () => { throw new Error('login function not implemented') },
     logout: () => { throw new Error('logout function not implemented') }
@@ -35,7 +39,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     const [steamId, setSteamId] = useState<string | null>(null)
 
-    const [steamUser, setSteamUser] = useState<SteamUser | null>(null)
+    const [user, setUser] = useState<User | null>(null)
 
     const steamAuthRedirect = () => steamAuth()
 
@@ -43,6 +47,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         localStorage.setItem('steamId', steamId)
         setIsAuthenticated(true)
         navigate('/')
+    }
+
+    const refreshUser = () => {
+        if (isAuthenticated && steamId) {
+            fetchSteamProfile(steamId)
+        }
     }
 
     const logout = () => {
@@ -53,13 +63,22 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const fetchSteamProfile = useCallback(async (steamId: string) => {
 
         try {
-            const response = await get<SteamUser>('/getPlayerInfo', { steamId })
-            setSteamUser(response)
+            const response = await get<User>(`/users/steam/${steamId}`)
+            setUser(response)
         } catch (error) {
             console.error(`Error trying to fetch steam user data: ${error}`)
         }
 
     }, [])
+
+    const updateProfile = useCallback(async (property: 'email' | 'phoneNumber' | 'steamTradeUrl', value: string) => {
+        try {
+            const response = await put<User>(`/users/${user?.id}/${property}`, { [property]: value })
+            setUser(response)
+        } catch (error) {
+            console.error(`Error trying to update user profile data: ${error}`)
+        }
+    }, [user])
 
     useEffect(() => {
         if (isAuthenticated && steamId) {
@@ -80,7 +99,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             value={{
                 isAuthenticated,
                 steamId,
-                steamUser,
+                user,
+                refreshUser,
+                updateProfile,
                 steamAuthRedirect,
                 login,
                 logout

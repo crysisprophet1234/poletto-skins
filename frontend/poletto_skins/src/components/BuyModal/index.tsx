@@ -1,6 +1,9 @@
+import { useAuth } from '@/hooks/useAuth'
 import { useCart } from '@/hooks/useCart'
 import { Close } from '@mui/icons-material'
-import { Box, Button, IconButton, Modal, Stack, Typography } from '@mui/material'
+import { Box, IconButton, Modal, Stack, Typography } from '@mui/material'
+import { useState } from 'react'
+import BuyModalButton from './BuyModalButton'
 
 type BuyModalProps = {
     open: boolean
@@ -9,9 +12,32 @@ type BuyModalProps = {
 
 const BuyModal = ({ open, handleClose }: BuyModalProps) => {
 
-    const userBalanceMock = 12700.38
+    const { totalItems, totalPrice, checkout } = useCart()
 
-    const { totalItems, totalPrice } = useCart()
+    const { user, refreshUser } = useAuth()
+
+    const [loading, setLoading] = useState(false)
+
+    const userHasEnoughBalance = user && Number(user.balance) > totalPrice
+
+    const handleConfirm = async () => {
+        if (!user) {
+            //setError('User not authenticated.')
+            return
+        }
+
+        setLoading(true)
+
+        try {
+            checkout(user.id)
+            refreshUser()
+            handleClose()
+        } catch (err) {
+            console.error(err)
+        } finally {
+            setLoading(false)
+        }
+    }
 
     return (
 
@@ -97,21 +123,41 @@ const BuyModal = ({ open, handleClose }: BuyModalProps) => {
                                 R${totalPrice.toFixed(2)}
                             </Box>
                         </Typography>
-                        <Typography variant='h6'>
-                            Seu saldo após essa compra será de {' '}
-                            <Box
-                                component='span'
-                                sx={{ color: '#806cf5' }}
-                            >
-                                R${(userBalanceMock - totalPrice).toFixed(2)}
-                            </Box>
-                        </Typography>
+                        {userHasEnoughBalance ? (
+                            <Typography variant='h6'>
+                                Seu saldo após essa compra será de {' '}
+                                <Box
+                                    component='span'
+                                    sx={{ color: '#806cf5' }}
+                                >
+                                    R${(Number(user?.balance) - totalPrice).toFixed(2)}
+                                </Box>
+                            </Typography>
+                        ) : (
+                            <Typography variant='h6'>
+                                Você precisa adicionar {' '}
+                                <Box
+                                    component='span'
+                                    sx={{ color: '#806cf5' }}
+                                >
+                                    R${(totalPrice - Number(user?.balance)).toFixed(2)}
+                                </Box>
+                                {' '} de saldo para finalizar essa compra.
+                            </Typography>
+                        )}
+
 
                     </Box>
 
-                    <Typography variant='h6' fontWeight={'600'} textAlign={'center'}>
-                        Confirmar compra?
-                    </Typography>
+                    {userHasEnoughBalance ? (
+                        <Typography variant='h6' fontWeight={'600'} textAlign={'center'}>
+                            Confirmar compra?
+                        </Typography>
+                    ) : (
+                        <Typography variant='h6' fontWeight={'600'} textAlign={'center'}>
+                            Adicionar saldo?
+                        </Typography>
+                    )}
 
                 </Stack>
 
@@ -121,34 +167,20 @@ const BuyModal = ({ open, handleClose }: BuyModalProps) => {
                     flexDirection: 'row',
                     gap: '15px'
                 }}>
-                    <Button
+                    <BuyModalButton
                         onClick={handleClose}
-                        sx={{
-                            color: '#FFF',
-                            fontWeight: 'bold',
-                            backgroundColor: '#f05f75',
-                            width: 'calc(100% - 16px)',
-                            '&:hover': {
-                                backgroundColor: '#ff8095'
-                            }
-                        }}
-                    >
-                        RETORNAR
-                    </Button>
-                    <Button
-                        onClick={() => alert('checkout not implemented yet')}
-                        sx={{
-                            color: '#FFF',
-                            fontWeight: 'bold',
-                            backgroundColor: '#806cf5',
-                            width: 'calc(100% - 16px)',
-                            '&:hover': {
-                                backgroundColor: '#9F8FFF'
-                            }
-                        }}
-                    >
-                        CONFIRMAR
-                    </Button>
+                        loading={loading}
+                        text='RETORNAR'
+                        color='#f05f75'
+                        hoverColor='#ff8095'
+                    />
+                    <BuyModalButton
+                        onClick={userHasEnoughBalance ? handleConfirm : () => alert('not implemented yet')}
+                        loading={loading}
+                        text={userHasEnoughBalance ? 'CONFIRMAR' : 'ADICIONAR'}
+                        color='#806cf5'
+                        hoverColor='#9F8FFF'
+                    />
                 </Box>
 
             </Box >
