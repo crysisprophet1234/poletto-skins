@@ -1,6 +1,5 @@
 package com.poletto.polettoskins.controllers;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,15 +19,17 @@ import jakarta.servlet.http.HttpServletResponse;
 @Controller
 public class OpenIDController {
 
+	
+	
     @Autowired
     private ConsumerManager consumerManager;
     
     //TODO: this will be refactored in the future...
     
-    private static final Map<String, String> providers = new HashMap<String, String>() {{
-        put("steam", "https://steamcommunity.com/openid");
-        put("github", "not implemented yet");
-    }};
+    private static final Map<String, String> providers = Map.of(
+    	    "steam", "https://steamcommunity.com/openid",
+    	    "github", "not implemented yet"
+    );
 
     @GetMapping("/login")
     public void login(

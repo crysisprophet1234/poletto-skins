@@ -1,9 +1,9 @@
-package com.poletto.polettoskins.entities;
+package com.poletto.polettoskins.dto;
 
 import java.io.Serializable;
 import java.util.Objects;
 
-public class SteamUser implements Serializable {
+public class SteamUserDto implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -25,29 +25,28 @@ public class SteamUser implements Serializable {
     private String locStateCode;
     private int locCityId;
     
-    public SteamUser() {
-    	
+    public SteamUserDto() {
     }
 
-	public SteamUser(
-			String steamId,
-			int communityVisibilityState,
-			int profileState,
-			String personaName,
-			String profileUrl,
-			String avatar,
-			String avatarMedium,
-			String avatarFull,
-			long lastLogoff,
-			int personaState,
-			String realName,
-			String primaryClanId,
-			long timeCreated,
-			int personaStateFlags,
-			String locCountryCode,
-			String locStateCode,
-			int locCityId
-		) {
+	public SteamUserDto(
+		String steamId,
+		int communityVisibilityState,
+		int profileState,
+		String personaName,
+		String profileUrl,
+		String avatar,
+		String avatarMedium,
+		String avatarFull,
+		long lastLogoff,
+		int personaState,
+		String realName,
+		String primaryClanId,
+		long timeCreated,
+		int personaStateFlags,
+		String locCountryCode,
+		String locStateCode,
+		int locCityId
+	) {
 		this.steamId = steamId;
 		this.communityVisibilityState = communityVisibilityState;
 		this.profileState = profileState;
@@ -216,13 +215,13 @@ public class SteamUser implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		SteamUser other = (SteamUser) obj;
+		SteamUserDto other = (SteamUserDto) obj;
 		return Objects.equals(steamId, other.steamId);
 	}
 
 	@Override
 	public String toString() {
-		return "SteamUser [steamId=" + steamId + ", communityVisibilityState=" + communityVisibilityState
+		return "SteamUserDto [steamId=" + steamId + ", communityVisibilityState=" + communityVisibilityState
 				+ ", profileState=" + profileState + ", personaName=" + personaName + ", profileUrl=" + profileUrl
 				+ ", avatar=" + avatar + ", avatarMedium=" + avatarMedium + ", avatarFull=" + avatarFull
 				+ ", lastLogoff=" + lastLogoff + ", personaState=" + personaState + ", realName=" + realName
@@ -230,5 +229,5 @@ public class SteamUser implements Serializable {
 				+ personaStateFlags + ", locCountryCode=" + locCountryCode + ", locStateCode=" + locStateCode
 				+ ", locCityId=" + locCityId + "]";
 	}
-
-	}
+	
+}
