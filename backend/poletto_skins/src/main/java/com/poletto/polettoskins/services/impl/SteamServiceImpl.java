@@ -12,6 +12,8 @@ import java.util.regex.Pattern;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -27,6 +29,7 @@ import com.poletto.polettoskins.entities.SteamItemPrice;
 import com.poletto.polettoskins.entities.SteamSticker;
 import com.poletto.polettoskins.entities.SteamUser;
 import com.poletto.polettoskins.exceptions.response.ResourceNotFoundException;
+import com.poletto.polettoskins.repositories.SteamItemRepository;
 import com.poletto.polettoskins.services.SteamService;
 
 @Service
@@ -40,6 +43,9 @@ public class SteamServiceImpl implements SteamService {
 	
 	@Autowired
 	private ObjectMapper objectMapper;
+	
+	@Autowired
+	private SteamItemRepository steamItemRepository;
 
 	@Override
 	public SteamUser getUserInfo(String steamId) {
@@ -58,6 +64,34 @@ public class SteamServiceImpl implements SteamService {
         
         return steamUser;
 	    
+	}
+	
+	@Override
+	public void syncItems(String steamUserId) {
+		
+		List<SteamItem> itemsFromSteamUser = getUserInventory(steamUserId);
+		
+		for (SteamItem item : itemsFromSteamUser) {
+			
+			String itemIdPrefix = item.getOwnerSteamId() != null
+					? "S" + item.getOwnerSteamId()
+					: "M" + item.getMarketId();
+			
+			String fullItemId = itemIdPrefix + "A" + item.getAssetId() + "D" + item.getD();
+			
+			item.setItemId(fullItemId);
+			
+		}
+		
+		steamItemRepository.saveAll(itemsFromSteamUser);
+		
+	}
+	
+	@Override
+	public Page<SteamItem> getItemsPaged(Pageable pageable, String query) {
+		//var page = steamItemRepository.findAll(pageable);
+		var page = steamItemRepository.findByFullItemName(query, pageable);
+		return page;
 	}
 	
 	@Override
@@ -149,7 +183,7 @@ public class SteamServiceImpl implements SteamService {
 
         return steamItemPrice;
 	}
-	
+
 	private BigDecimal parsePrice(String priceStr) {
 
 	    Pattern pattern = Pattern.compile("R\\$\\s*([0-9\\.]+,[0-9]{2})");
@@ -215,12 +249,16 @@ public class SteamServiceImpl implements SteamService {
             }
 
             Map<String, List<Map<String, Object>>> result = new HashMap<>();
-            //result.put("links", links); TODO: workaround while there is no pagination
+            //result.put("links", steamData); 
+            
+            
+            //TODO: workaround while there is no pagination
             if (steamData.size() > 50) {
-            	result.put("links", steamData.subList(100, 150));
+            	result.put("links", steamData.subList(0, 100));
             } else {
             	result.put("links", steamData);
             }
+            
             
             return result;
 
@@ -463,4 +501,5 @@ public class SteamServiceImpl implements SteamService {
         return steamItem;
     }
 
+	
 }
