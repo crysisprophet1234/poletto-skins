@@ -4,10 +4,14 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Document(collection = "steam_item")
 public class SteamItem implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
+	private String itemId;
 	private String assetId;
 	private String ownerSteamId;
 	private String d;
@@ -38,6 +42,7 @@ public class SteamItem implements Serializable {
     public SteamItem() {}
     
 	public SteamItem(
+	    String itemId,
 		String assetId,
 		String ownerSteamId,
 		String marketId,
@@ -65,6 +70,7 @@ public class SteamItem implements Serializable {
 		String fullItemName,
 		List<SteamSticker> stickers
 	) {
+		this.itemId = itemId;
 		this.assetId = assetId;
 		this.ownerSteamId = ownerSteamId;
 		this.marketId = marketId;
@@ -93,6 +99,14 @@ public class SteamItem implements Serializable {
 		this.stickers = stickers;
 	}
 	
+	public String getItemId() {
+		return itemId;
+	}
+
+	public void setItemId(String itemId) {
+		this.itemId = itemId;
+	}
+
 	public String getAssetId() {
 		return assetId;
 	}
@@ -304,7 +318,7 @@ public class SteamItem implements Serializable {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(assetId, d, marketId, ownerSteamId);
+		return Objects.hash(assetId, d, itemId, marketId);
 	}
 
 	@Override
@@ -316,19 +330,20 @@ public class SteamItem implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		SteamItem other = (SteamItem) obj;
-		return Objects.equals(assetId, other.assetId) && Objects.equals(d, other.d) && Objects.equals(marketId, other.marketId)
-				&& Objects.equals(ownerSteamId, other.ownerSteamId);
+		return Objects.equals(assetId, other.assetId) && Objects.equals(d, other.d)
+				&& Objects.equals(itemId, other.itemId) && Objects.equals(marketId, other.marketId);
 	}
 
 	@Override
 	public String toString() {
-		return "SteamItem [a=" + assetId + ", s=" + ownerSteamId + ", d=" + d + ", marketId=" + marketId + ", origin=" + origin + ", quality="
-				+ quality + ", rarity=" + rarity + ", paintSeed=" + paintSeed + ", defIndex=" + defIndex
-				+ ", paintIndex=" + paintIndex + ", floatId=" + floatId + ", lowRank=" + lowRank + ", highRank="
-				+ highRank + ", floatValue=" + floatValue + ", imageUrl=" + imageUrl + ", inspectUrl=" + inspectUrl
-				+ ", min=" + min + ", max=" + max + ", weaponType=" + weaponType + ", itemName=" + itemName
-				+ ", rarityName=" + rarityName + ", qualityName=" + qualityName + ", originName=" + originName
-				+ ", wearName=" + wearName + ", fullItemName=" + fullItemName + ", stickers=" + stickers + "]";
+		return "SteamItem [itemId=" + itemId + ", assetId=" + assetId + ", ownerSteamId=" + ownerSteamId + ", d=" + d
+				+ ", marketId=" + marketId + ", origin=" + origin + ", quality=" + quality + ", rarity=" + rarity
+				+ ", paintSeed=" + paintSeed + ", defIndex=" + defIndex + ", paintIndex=" + paintIndex + ", floatId="
+				+ floatId + ", lowRank=" + lowRank + ", highRank=" + highRank + ", floatValue=" + floatValue
+				+ ", imageUrl=" + imageUrl + ", inspectUrl=" + inspectUrl + ", min=" + min + ", max=" + max
+				+ ", weaponType=" + weaponType + ", itemName=" + itemName + ", rarityName=" + rarityName
+				+ ", qualityName=" + qualityName + ", originName=" + originName + ", wearName=" + wearName
+				+ ", fullItemName=" + fullItemName + ", stickers=" + stickers + "]";
 	}
     
 }
