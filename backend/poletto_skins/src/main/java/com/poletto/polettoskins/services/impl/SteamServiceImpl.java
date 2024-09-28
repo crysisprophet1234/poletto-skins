@@ -1,14 +1,15 @@
 package com.poletto.polettoskins.services.impl;
 
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -18,12 +19,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.poletto.polettoskins.entities.SteamItem;
+import com.poletto.polettoskins.entities.SteamItemPrice;
 import com.poletto.polettoskins.entities.SteamSticker;
 import com.poletto.polettoskins.entities.SteamUser;
-import com.poletto.polettoskins.exceptions.handler.response.ResourceNotFound;
-import com.poletto.polettoskins.repositories.SteamUserRepository;
+import com.poletto.polettoskins.exceptions.response.ResourceNotFoundException;
 import com.poletto.polettoskins.services.SteamService;
 
 @Service
@@ -31,9 +34,6 @@ public class SteamServiceImpl implements SteamService {
 
 	@Value("${steam.api.key}")
 	private String steamApiKey;
-	
-	@Autowired
-	private SteamUserRepository steamUserRepository;
 
 	@Autowired
 	private RestTemplate restTemplate;
@@ -43,13 +43,7 @@ public class SteamServiceImpl implements SteamService {
 
 	@Override
 	public SteamUser getUserInfo(String steamId) {
-		
-	    Optional<SteamUser> existingUser = steamUserRepository.findById(steamId);
-	    
-	    if (existingUser.isPresent()) {
-	        return existingUser.get();
-	    }
-	   
+		   
         String url = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/" 
                    + "?key=" + steamApiKey
                    + "&steamids=" + steamId;
@@ -59,10 +53,10 @@ public class SteamServiceImpl implements SteamService {
         SteamUser steamUser = extractPlayerFromResponse(responseJson);
 
         if (steamUser == null) {
-            throw new ResourceNotFound("Steam ID provided not found");
+            throw new ResourceNotFoundException("Steam ID provided not found");
         }
         
-        return steamUserRepository.save(steamUser);
+        return steamUser;
 	    
 	}
 	
@@ -76,7 +70,7 @@ public class SteamServiceImpl implements SteamService {
         var itemsSteamData = extractSteamDataFromResponse(steamResponseJson, steamId);
 
         if (itemsSteamData == null) {
-        	throw new ResourceNotFound("Steam ID provided not found");
+        	throw new ResourceNotFoundException("Steam ID provided not found");
         }
         	
         String csfloatApiResponseJson = fetchBulkItemsFromCsfloatApi(itemsSteamData);
@@ -95,6 +89,77 @@ public class SteamServiceImpl implements SteamService {
         
         return steamItems;
     }
+	
+	@Override
+	public SteamItem getItemBySteamId(String itemSteamId) {
+
+	    String csfloatApiUrl = "http://localhost:81"
+	        + "?url=steam://rungame/730/76561202255233023/+csgo_econ_action_preview%20"
+	        + itemSteamId;
+
+	    String responseJson = restTemplate.getForObject(csfloatApiUrl, String.class);
+
+	    Map<String, Object> itemMap = null;
+
+	    try {
+	        Map<String, Object> responseMap = objectMapper.readValue(responseJson, new TypeReference<Map<String, Object>>() {});
+	        itemMap = (Map<String, Object>) responseMap.get("iteminfo");
+	    } catch (JsonProcessingException e) {
+	        e.printStackTrace();
+	    }
+
+	    return extractSteamItem(itemMap);
+	}
+	
+	@Override
+	public SteamItemPrice getItemPriceBySteamId(String itemSteamId) {
+		
+		SteamItem steamItem = getItemBySteamId(itemSteamId);
+		
+		if (steamItem == null || steamItem.getFullItemName() == null) {
+            throw new IllegalArgumentException("Invalid item or item name not found.");
+        }
+		
+		String itemHashName = steamItem.getFullItemName();
+		
+		String url = "https://steamcommunity.com/market/priceoverview/"
+				   + "?currency=7"
+				   + "&appid=730"
+				   + "&market_hash_name=" + itemHashName;
+		
+		String response = restTemplate.getForObject(url, String.class);
+		
+		JSONObject jsonResponse = new JSONObject(response);
+
+        if (!jsonResponse.getBoolean("success")) {
+            throw new RuntimeException("Failed to fetch price data from Steam Market");
+        }
+
+        String lowestPriceStr = jsonResponse.optString("lowest_price", "R$ 0,00");
+        String medianPriceStr = jsonResponse.optString("median_price", "R$ 0,00");
+        Integer quantitySoldLast24Hours = Integer.parseInt(jsonResponse.optString("volume", "0"));
+
+        BigDecimal lowestPrice = parsePrice(lowestPriceStr);
+        BigDecimal medianPrice = parsePrice(medianPriceStr);
+
+        SteamItemPrice steamItemPrice = new SteamItemPrice();
+        steamItemPrice.setLowestPrice(lowestPrice);
+        steamItemPrice.setMedianPrice(medianPrice);
+        steamItemPrice.setQuantitySoldLast24Hours(quantitySoldLast24Hours);
+
+        return steamItemPrice;
+	}
+	
+	private BigDecimal parsePrice(String priceStr) {
+
+	    Pattern pattern = Pattern.compile("R\\$\\s*([0-9\\.]+,[0-9]{2})");
+	    Matcher matcher = pattern.matcher(priceStr);
+	    if (matcher.find()) {
+	        String numericValue = matcher.group(1).replace(".", "").replace(",", ".");
+	        return new BigDecimal(numericValue);
+	    }
+	    return BigDecimal.ZERO;
+	}
 	
 	private String fetchBulkItemsFromCsfloatApi(Map<String, List<Map<String, Object>>> inspectUrlListBody) {
 		
@@ -195,90 +260,7 @@ public class SteamServiceImpl implements SteamService {
 	        for (Map.Entry<String, Object> entry : responseMap.entrySet()) {
 	            Map<String, Object> itemMap = (Map<String, Object>) entry.getValue();
 	            
-	            SteamItem steamItem = new SteamItem();
-
-	            if (itemMap.containsKey("a")) {
-	                steamItem.setAssetId((String) itemMap.get("a"));
-	            }
-	            if (itemMap.containsKey("s")) {
-	                steamItem.setOwnerSteamId((String) itemMap.get("s"));
-	            }
-	            if (itemMap.containsKey("d")) {
-	                steamItem.setD((String) itemMap.get("d"));
-	            }
-	            if (itemMap.containsKey("m")) {
-	                steamItem.setMarketId((String) itemMap.get("m"));
-	            }
-	            if (itemMap.containsKey("origin")) {
-	                steamItem.setOrigin((Integer) itemMap.get("origin"));
-	            }
-	            if (itemMap.containsKey("quality")) {
-	                steamItem.setQuality((Integer) itemMap.get("quality"));
-	            }
-	            if (itemMap.containsKey("rarity")) {
-	                steamItem.setRarity((Integer) itemMap.get("rarity"));
-	            }
-	            if (itemMap.containsKey("paintseed")) {
-	                steamItem.setPaintSeed((Integer) itemMap.get("paintseed"));
-	            }
-	            if (itemMap.containsKey("defindex")) {
-	                steamItem.setDefIndex((Integer) itemMap.get("defindex"));
-	            }
-	            if (itemMap.containsKey("paintindex")) {
-	                steamItem.setPaintIndex((Integer) itemMap.get("paintindex"));
-	            }
-	            if (itemMap.containsKey("min")) {
-	                steamItem.setMin(((Number) itemMap.get("min")).doubleValue());
-	            }
-	            if (itemMap.containsKey("max")) {
-	                steamItem.setMax(((Number) itemMap.get("max")).doubleValue());
-	            }
-	            if (itemMap.containsKey("weapon_type")) {
-	                steamItem.setWeaponType((String) itemMap.get("weapon_type"));
-	            }
-	            if (itemMap.containsKey("item_name")) {
-	                steamItem.setItemName((String) itemMap.get("item_name"));
-	            }
-	            if (itemMap.containsKey("rarity_name")) {
-	                steamItem.setRarityName((String) itemMap.get("rarity_name"));
-	            }
-	            if (itemMap.containsKey("quality_name")) {
-	                steamItem.setQualityName((String) itemMap.get("quality_name"));
-	            }
-	            if (itemMap.containsKey("origin_name")) {
-	                steamItem.setOriginName((String) itemMap.get("origin_name"));
-	            }
-	            if (itemMap.containsKey("full_item_name")) {
-	                steamItem.setFullItemName((String) itemMap.get("full_item_name"));
-	            }	            
-	            if (itemMap.containsKey("low_rank")) {
-	            	steamItem.setLowRank((Integer) itemMap.get("low_rank"));
-	            }	 
-	            if (itemMap.containsKey("high_rank")) {
-	            	steamItem.setHighRank((Integer) itemMap.get("high_rank"));
-	            }	
-	            if (itemMap.containsKey("floatvalue")) {
-	                steamItem.setFloatValue(((Number) itemMap.get("floatvalue")).doubleValue());
-	            }	            
-	            if (itemMap.containsKey("floatid")) {
-	            	steamItem.setFloatId((String) itemMap.get("floatid"));
-	            }	            
-	            if (itemMap.containsKey("wear_name")) {
-	                steamItem.setWearName((String) itemMap.get("wear_name"));
-	            }	            
-	            if (itemMap.containsKey("imageurl")) {
-	            	steamItem.setImageUrl((String) itemMap.get("imageurl"));
-	            }	            
-	            if (itemMap.containsKey("stickers")) {
-	            	steamItem.setStickers(parseStickers((List<Map<String, Object>>) itemMap.getOrDefault("stickers", new ArrayList<>())));
-	            }                  
-	            
-	            steamItem.setInspectUrl(
-	            		"steam://rungame/730/76561202255233023/+csgo_econ_action_preview%20" 
-	            	  + "S" + steamItem.getOwnerSteamId()
-	            	  + "A" + steamItem.getAssetId() 
-	            	  + "D" + steamItem.getD()
-	            );
+	            SteamItem steamItem = extractSteamItem(itemMap);
 	            
 	            steamItems.add(steamItem);
 	        }
@@ -428,4 +410,57 @@ public class SteamServiceImpl implements SteamService {
 		return true;		
 		
     }
+
+	private SteamItem extractSteamItem(Map<String, Object> itemMap) {
+        SteamItem steamItem = new SteamItem();
+
+        steamItem.setAssetId((String) itemMap.getOrDefault("a", null));
+        steamItem.setOwnerSteamId((String) itemMap.getOrDefault("s", null));
+        steamItem.setD((String) itemMap.getOrDefault("d", null));
+        steamItem.setMarketId((String) itemMap.getOrDefault("m", null));
+        steamItem.setOrigin((Integer) itemMap.getOrDefault("origin", null));
+        steamItem.setQuality((Integer) itemMap.getOrDefault("quality", null));
+        steamItem.setRarity((Integer) itemMap.getOrDefault("rarity", null));
+        steamItem.setPaintSeed((Integer) itemMap.getOrDefault("paintseed", null));
+        steamItem.setDefIndex((Integer) itemMap.getOrDefault("defindex", null));
+        steamItem.setPaintIndex((Integer) itemMap.getOrDefault("paintindex", null));
+        
+        if (itemMap.containsKey("min")) {
+            steamItem.setMin(((Number) itemMap.get("min")).doubleValue());
+        }
+        if (itemMap.containsKey("max")) {
+            steamItem.setMax(((Number) itemMap.get("max")).doubleValue());
+        }
+
+        steamItem.setWeaponType((String) itemMap.getOrDefault("weapon_type", null));
+        steamItem.setItemName((String) itemMap.getOrDefault("item_name", null));
+        steamItem.setRarityName((String) itemMap.getOrDefault("rarity_name", null));
+        steamItem.setQualityName((String) itemMap.getOrDefault("quality_name", null));
+        steamItem.setOriginName((String) itemMap.getOrDefault("origin_name", null));
+        steamItem.setFullItemName((String) itemMap.getOrDefault("full_item_name", null));
+        steamItem.setLowRank((Integer) itemMap.getOrDefault("low_rank", null));
+        steamItem.setHighRank((Integer) itemMap.getOrDefault("high_rank", null));
+        
+        if (itemMap.containsKey("floatvalue")) {
+            steamItem.setFloatValue(((Number) itemMap.get("floatvalue")).doubleValue());
+        }
+
+        steamItem.setFloatId((String) itemMap.getOrDefault("floatid", null));
+        steamItem.setWearName((String) itemMap.getOrDefault("wear_name", null));
+        steamItem.setImageUrl((String) itemMap.getOrDefault("imageurl", null));
+
+        if (itemMap.containsKey("stickers")) {
+            steamItem.setStickers(parseStickers((List<Map<String, Object>>) itemMap.get("stickers")));
+        }
+
+        steamItem.setInspectUrl(
+            "steam://rungame/730/76561202255233023/+csgo_econ_action_preview%20" 
+            + "S" + steamItem.getOwnerSteamId()
+            + "A" + steamItem.getAssetId() 
+            + "D" + steamItem.getD()
+        );
+
+        return steamItem;
+    }
+
 }
