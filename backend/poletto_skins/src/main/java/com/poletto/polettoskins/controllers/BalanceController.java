@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.poletto.polettoskins.dto.BalanceChangeDto;
+import com.poletto.polettoskins.dto.BalanceChangeDTO;
 import com.poletto.polettoskins.services.BalanceService;
 
 @RestController
@@ -17,7 +17,7 @@ public class BalanceController {
 	private BalanceService balanceService;
 
 	@PostMapping("/deposit")
-	public BalanceChangeDto deposit(@RequestBody BalanceChangeDto balanceChange) {
+	public BalanceChangeDTO deposit(@RequestBody BalanceChangeDTO balanceChange) {
 		return balanceService.deposit(balanceChange);
 	}
 	

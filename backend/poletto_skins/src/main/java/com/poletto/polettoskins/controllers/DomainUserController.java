@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.poletto.polettoskins.dto.DomainUserDto;
-import com.poletto.polettoskins.dto.TransactionDto;
+import com.poletto.polettoskins.dto.DomainUserDTO;
+import com.poletto.polettoskins.dto.TransactionDTO;
 import com.poletto.polettoskins.entities.SteamItem;
 import com.poletto.polettoskins.services.DomainUserService;
 import com.poletto.polettoskins.services.SteamService;
@@ -34,12 +34,12 @@ public class DomainUserController {
 	private TransactionService transactionService;
 
 	@GetMapping("/{userId}")
-	public DomainUserDto getUserById(@PathVariable String userId) {
+	public DomainUserDTO getUserById(@PathVariable String userId) {
 		return domainUserService.findUserById(userId);
 	}
 
 	@GetMapping("/steam/{steamId}")
-	public DomainUserDto getUserBySteamId(@PathVariable String steamId) {
+	public DomainUserDTO getUserBySteamId(@PathVariable String steamId) {
 		return domainUserService.findOrRegisterUserBySteamId(steamId);
 	}
 
@@ -49,13 +49,13 @@ public class DomainUserController {
 	}
 	
 	@GetMapping("/{userId}/transactions")
-	public List<TransactionDto> getUserTransactions(@PathVariable String userId) {
+	public List<TransactionDTO> getUserTransactions(@PathVariable String userId) {
 		return transactionService.getUserTransactions(userId);
 	}
 	
 	//TODO: obviously in the future this should send an actual email for validation
 	@PutMapping("/{userId}/email")
-	public ResponseEntity<DomainUserDto> updateEmail(@PathVariable String userId, @RequestBody @Valid DomainUserDto domainUserDto) {
+	public ResponseEntity<DomainUserDTO> updateEmail(@PathVariable String userId, @RequestBody @Valid DomainUserDTO domainUserDto) {
 		domainUserDto = domainUserService.updateEmail(userId, domainUserDto);
 		return ResponseEntity.ok(domainUserDto);
 	}
