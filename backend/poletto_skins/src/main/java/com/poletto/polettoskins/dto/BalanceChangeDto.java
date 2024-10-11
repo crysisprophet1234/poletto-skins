@@ -7,7 +7,7 @@ import java.util.Objects;
 
 import com.poletto.polettoskins.entities.enums.BalanceChangeType;
 
-public class BalanceChangeDto implements Serializable {
+public class BalanceChangeDTO implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -18,10 +18,10 @@ public class BalanceChangeDto implements Serializable {
     private String description;
     private String userId;
 
-    public BalanceChangeDto() {
+    public BalanceChangeDTO() {
     }
 
-    public BalanceChangeDto(
+    public BalanceChangeDTO(
 		String id,
 		BigDecimal amount,
 		BalanceChangeType type,
@@ -98,7 +98,7 @@ public class BalanceChangeDto implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		BalanceChangeDto other = (BalanceChangeDto) obj;
+		BalanceChangeDTO other = (BalanceChangeDTO) obj;
 		return Objects.equals(id, other.id);
 	}
 

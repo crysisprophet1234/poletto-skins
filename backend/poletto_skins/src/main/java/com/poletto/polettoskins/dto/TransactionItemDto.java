@@ -4,16 +4,16 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Objects;
 
-public class TransactionItemDto implements Serializable {
+public class TransactionItemDTO implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
     private String itemId;
     private BigDecimal value;
 
-    public TransactionItemDto() {}
+    public TransactionItemDTO() {}
 
-    public TransactionItemDto(String itemId, BigDecimal value) {
+    public TransactionItemDTO(String itemId, BigDecimal value) {
         this.itemId = itemId;
         this.value = value;
     }
@@ -47,7 +47,7 @@ public class TransactionItemDto implements Serializable {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        TransactionItemDto other = (TransactionItemDto) obj;
+        TransactionItemDTO other = (TransactionItemDTO) obj;
         return Objects.equals(itemId, other.itemId) && Objects.equals(value, other.value);
     }
 

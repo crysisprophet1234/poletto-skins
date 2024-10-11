@@ -3,7 +3,7 @@ package com.poletto.polettoskins.dto;
 import java.io.Serializable;
 import java.util.Objects;
 
-public class SteamUserDto implements Serializable {
+public class SteamUserDTO implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -25,10 +25,10 @@ public class SteamUserDto implements Serializable {
     private String locStateCode;
     private int locCityId;
     
-    public SteamUserDto() {
+    public SteamUserDTO() {
     }
 
-	public SteamUserDto(
+	public SteamUserDTO(
 		String steamId,
 		int communityVisibilityState,
 		int profileState,
@@ -215,7 +215,7 @@ public class SteamUserDto implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		SteamUserDto other = (SteamUserDto) obj;
+		SteamUserDTO other = (SteamUserDTO) obj;
 		return Objects.equals(steamId, other.steamId);
 	}
 
