@@ -9,7 +9,8 @@ type SellContextValue = {
     isItemInSellList: (itemId: MarketItem['assetId']) => boolean
     addToSellList: (item: MarketItem) => void
     updateItemValue: (itemId: MarketItem['assetId'], value: number) => void
-    confirmSelling: (userId: string) => Promise<void>
+    instantSell: (userId: string) => Promise<void>
+    createListing: (userId: string) => Promise<void>
     removeFromSellList: (itemId: MarketItem['assetId']) => void
     clearSellList: () => void
     totalItems: number
@@ -21,7 +22,8 @@ export const SellContext = createContext<SellContextValue>({
     isItemInSellList: () => { throw new Error('isItemInSellList function not implemented') },
     addToSellList: () => { throw new Error('addToSellList function not implemented') },
     updateItemValue: () => { throw new Error('updateItemValue function not implemented') },
-    confirmSelling: () => { throw new Error('confirmSelling function not implemented') },
+    instantSell: () => { throw new Error('instantSell function not implemented') },
+    createListing: () => { throw new Error('createListing function not implemented') },
     removeFromSellList: () => { throw new Error('removeFromSellList function not implemented') },
     clearSellList: () => { throw new Error('clearSellList function not implemented') },
     totalItems: 0,
@@ -58,7 +60,7 @@ export const SellProvider = ({ children }: SellProviderProps) => {
 
     const clearSellList = () => setSellList([])
 
-    const confirmSelling = async (userId: string) => {
+    const instantSell = async (userId: string) => {
         try {
             const items = sellList.map(item => ({
                 itemId: extractItemId(item),
@@ -77,7 +79,34 @@ export const SellProvider = ({ children }: SellProviderProps) => {
             clearSellList()
 
         } catch (error) {
-            console.error('Confirming selling failed:', error)
+            console.error('Instant selling failed:', error)
+        }
+    }
+
+    const createListing = async (userId: string) => {
+
+        try {
+            const items = sellList.map(item => ({
+                itemId: extractItemId(item),
+                value: parseFloat(item.price.toFixed(2))
+            }))
+
+            const requests = items.map(item => {
+                const requestData = {
+                    userId: userId,
+                    listingPrice: item.value,
+                    item: {
+                        itemId: item.itemId
+                    }
+                }
+                return post('/listings', requestData)
+            })
+
+            await Promise.all(requests)
+
+            clearSellList()
+        } catch (error) {
+            console.error('Create listing failed:', error)
         }
     }
 
@@ -90,7 +119,8 @@ export const SellProvider = ({ children }: SellProviderProps) => {
                 sellList,
                 isItemInSellList,
                 addToSellList,
-                confirmSelling,
+                instantSell,
+                createListing,
                 updateItemValue,
                 removeFromSellList,
                 clearSellList,
