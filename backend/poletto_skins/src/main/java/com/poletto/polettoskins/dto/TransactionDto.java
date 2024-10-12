@@ -12,7 +12,7 @@ import com.poletto.polettoskins.entities.enums.TransactionType;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
-public class TransactionDto implements Serializable {
+public class TransactionDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
     
@@ -25,18 +25,18 @@ public class TransactionDto implements Serializable {
     
     @NotEmpty
     @NotNull
-    private List<TransactionItemDto> items = new ArrayList<>();
+    private List<ListingDTO> listings = new ArrayList<>();
     
-    public TransactionDto() {}
+    public TransactionDTO() {}
 
-    public TransactionDto(
+    public TransactionDTO(
         String id,
         LocalDateTime date,
         BigDecimal totalValue,
         TransactionType transactionType,
         Double tax,
         String userId,
-        List<TransactionItemDto> items
+        List<ListingDTO> listings
     ) {
         this.id = id;
         this.date = date;
@@ -44,7 +44,7 @@ public class TransactionDto implements Serializable {
         this.transactionType = transactionType;
         this.tax = tax;
         this.userId = userId;
-        this.items = items;
+        this.listings = listings;
     }
 
     public String getId() {
@@ -95,12 +95,12 @@ public class TransactionDto implements Serializable {
         this.userId = userId;
     }
 
-    public List<TransactionItemDto> getItems() {
-		return items;
+    public List<ListingDTO> getListings() {
+		return listings;
 	}
 
-	public void setItems(List<TransactionItemDto> items) {
-		this.items = items;
+	public void setListings(List<ListingDTO> listings) {
+		this.listings = listings;
 	}
 
 	@Override
@@ -116,14 +116,14 @@ public class TransactionDto implements Serializable {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        TransactionDto other = (TransactionDto) obj;
+        TransactionDTO other = (TransactionDTO) obj;
         return Objects.equals(id, other.id);
     }
 
 	@Override
 	public String toString() {
 		return "TransactionDto [id=" + id + ", date=" + date + ", totalValue=" + totalValue + ", transactionType="
-				+ transactionType + ", tax=" + tax + ", userId=" + userId + ", items=" + items + "]";
+				+ transactionType + ", tax=" + tax + ", userId=" + userId + ", items=" + listings + "]";
 	}
 
 }
