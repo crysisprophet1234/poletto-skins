@@ -1,48 +1,61 @@
-import './styles.scss'
-
-import ItemCard from '@/components/ItemCard'
-import { MarketItem } from '@/types/entities/steam-item'
 import { SpringPage } from '@/types/vendor/spring-page'
 import { Box, Button, Grid, Skeleton } from '@mui/material'
 import { useEffect, useState } from 'react'
-import ItemModal from '../ItemModal'
-import SellItemCard from '../SellItemCard'
-
+import { Listing } from '@/types/entities/listing'
+import ListingCard from '@/components/ListingCard'
+import ListingModal from '../ListingModal'
 
 type CatalogProps = {
-    items: SpringPage<MarketItem>
-    itemAction: (item: MarketItem) => void
-    catalogType: 'buy' | 'sell' | 'trade'
+    listings: SpringPage<Listing>
+    listingAction: (listing: Listing) => void
 }
 
-const Catalog = ({ items, itemAction, catalogType }: CatalogProps) => {
+const Catalog = ({ listings, listingAction }: CatalogProps) => {
 
     const [loading, setLoading] = useState(true)
 
-    useEffect(() => {
-        if (items && items.content.length > 0) {
-            setLoading(false)
-        }
-    }, [items])
-
-    const [selectedItem, setSelectedItem] = useState<MarketItem>()
+    const [selectedListing, setSelectedListing] = useState<Listing>()
 
     const [open, setOpen] = useState(false)
 
-    const handleOpen = (item: MarketItem) => {
-        setSelectedItem(item)
+    const handleOpen = (listing: Listing) => {
+        setSelectedListing(listing)
         setOpen(true)
     }
 
     const handleClose = () => {
-        setSelectedItem(undefined)
+        setSelectedListing(undefined)
         setOpen(false)
     }
 
+    useEffect(() => {
+        if (listings && listings.content.length > 0) {
+            setLoading(false)
+        }
+    }, [listings])
+
     return (
 
-        <div className='catalog-main-container'>
-
+        <Box
+            sx={{
+                display: 'flex',
+                flexDirection: 'row',
+                overflow: 'auto',
+                height: '100%',
+                width: '100%',
+                paddingRight: '16px',
+                scrollbarGutter: 'stable',
+                '&::-webkit-scrollbar': {
+                    backgroundColor: '#555261',
+                    borderRadius: '5px',
+                    width: '5px',
+                },
+                '&::-webkit-scrollbar-thumb': {
+                    backgroundColor: '#C85CD1',
+                    borderRadius: '5px',
+                },
+            }}
+        >
             <Box
                 sx={{
                     flexGrow: 1,
@@ -62,36 +75,14 @@ const Catalog = ({ items, itemAction, catalogType }: CatalogProps) => {
                                 />
                             </Grid>
                         ))
-                        : items.content.map((item) => (
-                            <Grid item xs={2} sm={4} md={4} lg={3} key={item.assetId}>
-
-                                {(() => {
-                                    switch (catalogType) {
-
-                                        case 'buy':
-                                            return (
-                                                <ItemCard
-                                                    itemProps={item}
-                                                    key={item.assetId}
-                                                    itemAction={() => itemAction(item)}
-                                                    openModal={() => handleOpen(item)}
-                                                />
-                                            )
-
-                                        case 'sell':
-                                            return (
-                                                <SellItemCard
-                                                    sellItemProps={item}
-                                                    key={item.assetId}
-                                                    sellItemAction={() => itemAction(item)}
-                                                    openModal={() => handleOpen(item)}
-                                                />
-                                            )
-                                        default:
-                                            return null
-                                    }
-                                })()}
-
+                        : listings.content.map((listing) => (
+                            <Grid item xs={2} sm={4} md={4} lg={3} key={listing.id}>
+                                <ListingCard
+                                    listingProps={listing}
+                                    key={listing.id}
+                                    listingAction={() => listingAction(listing)}
+                                    openModal={() => handleOpen(listing)}
+                                />
                             </Grid>
                         ))}
                 </Grid>
@@ -104,38 +95,24 @@ const Catalog = ({ items, itemAction, catalogType }: CatalogProps) => {
                         borderRadius: '0.25rem',
                         transition: 'background-color 0.3s ease-in-out',
                         '&:hover': {
-                            backgroundColor: '#9F8FFF'
-                        }
+                            backgroundColor: '#9F8FFF',
+                        },
                     }}
                 >
                     Carregar mais {/*TODO*/}
                 </Button>
             </Box>
 
-            {
-                selectedItem && (
-                    (() => {
-                        switch (catalogType) {
-                            case 'buy':
-                                return (
-                                    <ItemModal
-                                        open={open}
-                                        itemAction={() => itemAction(selectedItem)}
-                                        handleClose={handleClose}
-                                        item={selectedItem}
-                                    />
-                                )
-                            case 'sell':
-                                return null //TODO: create the sell modal  
-
-                            default:
-                                return null
-                        }
-                    })()
-                )
+            {selectedListing && 
+                <ListingModal
+                    open={open}
+                    itemAction={() => listingAction(selectedListing)}
+                    handleClose={handleClose}
+                    listing={selectedListing}
+                />                        
             }
 
-        </div>
+        </Box>
 
     )
 
