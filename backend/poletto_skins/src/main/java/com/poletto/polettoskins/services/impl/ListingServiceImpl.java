@@ -76,9 +76,8 @@ public class ListingServiceImpl implements ListingService {
 	        BigDecimal discountPercentage = calculateDiscountPercentage(steamItemPrice.getMedianPrice(), listingDTO.getListingPrice());
 	        listingDTO.setDiscount(discountPercentage.intValue());
 	    } catch (IllegalArgumentException e) {
-	        // Handle the exception - you might want to log it, set a default discount, or throw a custom exception
 	        listingDTO.setDiscount(0);
-	        // Optionally: throw new CustomException("Invalid pricing: " + e.getMessage());
+	        //TODO custom exception here
 	    }
 		
 		listingDTO.setViewsCount(0);
