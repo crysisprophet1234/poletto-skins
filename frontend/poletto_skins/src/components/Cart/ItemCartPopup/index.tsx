@@ -1,8 +1,8 @@
 import ItemCartMiniature from '@/components/Cart/ItemCartPopup/ItemCartMiniature'
+import { useAuth } from '@/hooks/useAuth'
 import { useCart } from '@/hooks/useCart'
 import { AddShoppingCartRounded, Close } from '@mui/icons-material'
 import { Box, Button, Grid, IconButton, Paper, Stack, Typography } from '@mui/material'
-
 
 type ItemCartPopupProps = {
     onClose: () => void
@@ -11,9 +11,9 @@ type ItemCartPopupProps = {
 
 const ItemCartPopup = ({ onClose, onCheckout }: ItemCartPopupProps) => {
 
-    const { cart, totalItems, totalPrice } = useCart()
+    const { cart, totalListings, totalPrice } = useCart()
 
-    const userBalanceMock = 12700.38
+    const { user } = useAuth()
 
     return (
         <Paper
@@ -51,7 +51,7 @@ const ItemCartPopup = ({ onClose, onCheckout }: ItemCartPopupProps) => {
                             variant='body2'
                             color={'#BCBCC2'}
                         >
-                            Total items: {totalItems}
+                            Total items: {totalListings}
                         </Typography>
                     </Box>
 
@@ -73,7 +73,7 @@ const ItemCartPopup = ({ onClose, onCheckout }: ItemCartPopupProps) => {
 
                 <Box>
 
-                    {totalItems == 0
+                    {totalListings == 0
                         ? (
                             <Stack
                                 gap={1}
@@ -124,9 +124,9 @@ const ItemCartPopup = ({ onClose, onCheckout }: ItemCartPopupProps) => {
                             >
                                 <Grid container spacing={1} columns={3} >
 
-                                    {cart.map((item, index) => (
-                                        <Grid item key={index} sm={1}>
-                                            <ItemCartMiniature item={item} />
+                                    {cart.map((listing) => (
+                                        <Grid item key={listing.id} sm={1}>
+                                            <ItemCartMiniature listing={listing} />
                                         </Grid>
                                     ))}
 
@@ -140,11 +140,11 @@ const ItemCartPopup = ({ onClose, onCheckout }: ItemCartPopupProps) => {
                 <Box mt={1}>
                     <Button
                         onClick={
-                            totalItems == 0
+                            totalListings == 0
                                 ? () => onClose()
                                 : () => {
                                     onClose()
-                                    totalPrice > userBalanceMock
+                                    totalPrice > Number(user?.balance)
                                         ? alert('add funds not implemented yet')
                                         : onCheckout()
                                 }
@@ -160,7 +160,7 @@ const ItemCartPopup = ({ onClose, onCheckout }: ItemCartPopupProps) => {
                         }}
                     >
                         {
-                            totalItems == 0
+                            totalListings == 0
                                 ? 'Ir para o Mercado'
                                 : 'Finalizar compra'
                         }

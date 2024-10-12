@@ -8,7 +8,7 @@ type ShowCartButtonProps = {
 
 const ShowCartButton = ({ handleClick }: ShowCartButtonProps) => {
 
-    const { totalItems, totalPrice } = useCart()
+    const { totalListings, totalPrice } = useCart()
 
     return (
 
@@ -27,27 +27,31 @@ const ShowCartButton = ({ handleClick }: ShowCartButtonProps) => {
                 cursor: 'pointer',
                 paddingX: '16px',
                 paddingY: '6px',
-                backgroundColor: totalItems > 0 ? '#806cf5' : '#403D4D',
+                backgroundColor: totalListings > 0 ? '#806cf5' : '#403D4D',
                 '&:hover': {
-                    backgroundColor: totalItems > 0 ? '#9f8fff' : '#5A5565'
+                    backgroundColor: totalListings > 0 ? '#9f8fff' : '#5A5565'
                 }
             }}
         >
             <>
                 <Typography lineHeight={1} fontWeight={500}>
-                    R$ {totalPrice.toFixed(2)}
+                    {totalPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                 </Typography>
-                <Badge badgeContent={totalItems} max={9} sx={{
-                    '& .MuiBadge-badge': {
-                        top: '5.5px',
-                        right: '-3px',
-                        fontSize: '12px',
-                        backgroundColor: '#5f2cff',
-                        padding: .5,
-                        minWidth: '16px', // Adjust width as needed
-                        height: '16px'
-                    }
-                }}>
+                <Badge 
+                    badgeContent={totalListings} 
+                    max={9} 
+                    sx={{
+                        '& .MuiBadge-badge': {
+                            top: '5.5px',
+                            right: '-3px',
+                            fontSize: '12px',
+                            backgroundColor: '#5f2cff',
+                            padding: .5,
+                            minWidth: '16px',
+                            height: '16px'
+                        }
+                    }}
+                >
                     <ShoppingCart />
                 </Badge>
             </>

@@ -1,18 +1,18 @@
 import AddCartButton from '@/components/AddCartButton'
 import { useCart } from '@/hooks/useCart'
-import { MarketItem } from '@/types/entities/steam-item'
+import { Listing } from '@/types/entities/listing'
 import { extractStickerFinish } from '@/utils/extractStickerFinish'
 import { itemWearAbbreviator, WearName } from '@/utils/itemWearAbbreviator'
 import { AddShoppingCartRounded, RemoveShoppingCartRounded } from '@mui/icons-material'
 import { Box, Paper, Stack, Tooltip, Typography } from '@mui/material'
 
-type ItemCartMiniatureProps = {
-    item: MarketItem
+type ListingCartMiniatureProps = {
+    listing: Listing
 }
 
-const ItemCartMiniature = ({ item }: ItemCartMiniatureProps) => {
+const ItemCartMiniature = ({ listing }: ListingCartMiniatureProps) => {
 
-    const { removeFromCart, isItemInCart } = useCart()
+    const { removeFromCart, isListingInCart } = useCart()
 
     const imageDimensions = {
         width: 115,
@@ -44,8 +44,8 @@ const ItemCartMiniature = ({ item }: ItemCartMiniatureProps) => {
                     }}
                 >
                     <img
-                        src={`${item.imageUrl}/${imageDimensions.width}fx${imageDimensions.height}f`}
-                        alt={item.itemName}
+                        src={`${listing.item.imageUrl}/${imageDimensions.width}fx${imageDimensions.height}f`}
+                        alt={listing.item.itemName}
                         loading='lazy'
                         style={{
                             width: '100%',
@@ -63,42 +63,42 @@ const ItemCartMiniature = ({ item }: ItemCartMiniatureProps) => {
                         arrow
                         title={
                             <Typography>
-                                {item.fullItemName}
+                                {listing.item.fullItemName}
                             </Typography>
                         }
                     >
                         <Typography noWrap fontSize={'14px'}>
-                            {item.weaponType.toLowerCase() == 'sticker'
-                                ? item.stickers[0].name
-                                : item.itemName
+                            {listing.item.weaponType.toLowerCase() == 'sticker'
+                                ? listing.item.stickers[0].name
+                                : listing.item.itemName
                             }
                         </Typography>
                     </Tooltip>
 
                     <Box>
 
-                        {item.weaponType.toLowerCase() == 'sticker'
+                        {listing.item.weaponType.toLowerCase() == 'sticker'
                             ?
                             <Typography fontSize={'14px'}>
-                                {extractStickerFinish(item.fullItemName)}
+                                {extractStickerFinish(listing.item.fullItemName)}
                             </Typography>
                             :
                             <Stack direction={'row'} justifyContent={'space-between'}>
-                                {item.quality == 9 &&
+                                {listing.item.quality == 9 &&
                                     <Typography color='#CF6A32' fontSize={'14px'}>
                                         ST
                                     </Typography>
                                 }
 
-                                {item.wearName &&
+                                {listing.item.wearName &&
                                     <Typography fontSize={'14px'}>
-                                        {itemWearAbbreviator(item.wearName as WearName)}
+                                        {itemWearAbbreviator(listing.item.wearName as WearName)}
                                     </Typography>
                                 }
 
-                                {item.floatValue &&
+                                {listing.item.floatValue &&
                                     <Typography fontSize={'14px'}>
-                                        {item.floatValue.toFixed(4)}
+                                        {listing.item.floatValue.toFixed(4)}
                                     </Typography>
                                 }
                             </Stack>
@@ -111,9 +111,9 @@ const ItemCartMiniature = ({ item }: ItemCartMiniatureProps) => {
                 <Box height={'28px'}>
                     <AddCartButton
                         isItemInCart={true}
-                        onClick={() => removeFromCart(item.assetId)}
+                        onClick={() => removeFromCart(listing.id)}
                     >
-                        {isItemInCart(item.assetId)
+                        {isListingInCart(listing.id)
                             ? <RemoveShoppingCartRounded />
                             : <AddShoppingCartRounded />
                         }
