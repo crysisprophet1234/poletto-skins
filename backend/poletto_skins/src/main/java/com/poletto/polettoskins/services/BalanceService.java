@@ -3,12 +3,12 @@ package com.poletto.polettoskins.services;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.poletto.polettoskins.dto.BalanceChangeDto;
+import com.poletto.polettoskins.dto.BalanceChangeDTO;
 
 @Service
 public interface BalanceService {
 	
 	@Transactional
-	BalanceChangeDto deposit(BalanceChangeDto balanceChange);
+	BalanceChangeDTO deposit(BalanceChangeDTO balanceChange);
 
 }

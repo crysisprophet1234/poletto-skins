@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.poletto.polettoskins.dto.DomainUserDto;
+import com.poletto.polettoskins.dto.DomainUserDTO;
 import com.poletto.polettoskins.entities.DomainUser;
 import com.poletto.polettoskins.entities.SteamUser;
 import com.poletto.polettoskins.exceptions.response.EmailAlreadyInUseException;
@@ -25,7 +25,7 @@ public class DomainUserServiceImpl implements DomainUserService {
 	private SteamService steamService;
 
 	@Override
-	public DomainUserDto findUserById(String userId) {
+	public DomainUserDTO findUserById(String userId) {
 		
 		var user = domainUserRepository
 				.findById(userId)
@@ -35,7 +35,7 @@ public class DomainUserServiceImpl implements DomainUserService {
 	}
 	
 	@Override
-	public DomainUserDto findOrRegisterUserBySteamId(String steamId) {	
+	public DomainUserDTO findOrRegisterUserBySteamId(String steamId) {	
 		
 		var steamUser = steamService.getUserInfo(steamId);
 		
@@ -53,7 +53,7 @@ public class DomainUserServiceImpl implements DomainUserService {
 	}
 
 	@Override
-	public DomainUserDto createUser(SteamUser steamUser) {
+	public DomainUserDTO createUser(SteamUser steamUser) {
 		
 		var optionalUser = domainUserRepository.findBySteamUserId(steamUser.getSteamId());
 		
@@ -71,7 +71,7 @@ public class DomainUserServiceImpl implements DomainUserService {
 	}
 	
 	@Override
-	public DomainUserDto updateEmail(String userId, DomainUserDto domainUserDto) {
+	public DomainUserDTO updateEmail(String userId, DomainUserDTO domainUserDto) {
 		
 		String newEmail = domainUserDto.getEmail();
 		

@@ -7,7 +7,7 @@ import java.util.Objects;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
-public class DomainUserDto implements Serializable {
+public class DomainUserDTO implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -18,16 +18,16 @@ public class DomainUserDto implements Serializable {
     private String email;
 	
     private BigDecimal balance;
-    private SteamUserDto steamUser;
+    private SteamUserDTO steamUser;
     
-    public DomainUserDto() {
+    public DomainUserDTO() {
     }
 
-	public DomainUserDto(
+	public DomainUserDTO(
 		String id,
 		String email,
 		BigDecimal balance,
-		SteamUserDto steamUser
+		SteamUserDTO steamUser
 	) {
 		this.id = id;
 		this.email = email;
@@ -59,11 +59,11 @@ public class DomainUserDto implements Serializable {
 		this.balance = balance;
 	}
 
-	public SteamUserDto getSteamUser() {
+	public SteamUserDTO getSteamUser() {
 		return steamUser;
 	}
 
-	public void setSteamUser(SteamUserDto steamUser) {
+	public void setSteamUser(SteamUserDTO steamUser) {
 		this.steamUser = steamUser;
 	}
 
@@ -80,7 +80,7 @@ public class DomainUserDto implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		DomainUserDto other = (DomainUserDto) obj;
+		DomainUserDTO other = (DomainUserDTO) obj;
 		return Objects.equals(id, other.id);
 	}
 

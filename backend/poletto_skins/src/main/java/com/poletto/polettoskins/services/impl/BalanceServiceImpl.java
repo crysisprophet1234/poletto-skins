@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.poletto.polettoskins.dto.BalanceChangeDto;
+import com.poletto.polettoskins.dto.BalanceChangeDTO;
 import com.poletto.polettoskins.entities.BalanceChange;
 import com.poletto.polettoskins.entities.DomainUser;
 import com.poletto.polettoskins.entities.enums.BalanceChangeType;
@@ -25,7 +25,7 @@ public class BalanceServiceImpl implements BalanceService {
     private DomainUserRepository domainUserRepository;
 
 	@Override
-	public BalanceChangeDto deposit(BalanceChangeDto balanceChangeDto) {
+	public BalanceChangeDTO deposit(BalanceChangeDTO balanceChangeDto) {
 		
 		DomainUser user = domainUserRepository.findById(balanceChangeDto.getUserId())
 	            .orElseThrow(() -> new ResourceNotFoundException("User id provided not found"));
