@@ -12,20 +12,23 @@ type SellModalProps = {
 
 const SellModal = ({ open, handleClose }: SellModalProps) => {
 
-    const { totalItems, totalPrice, confirmSelling } = useSell()
+    const { totalItems, totalPrice, instantSell, createListing } = useSell()
 
     const { user, refreshUser } = useAuth()
 
     const [loading, setLoading] = useState(false)
 
-    const handleAnnunciate = async () => { //TODO: 
+    const handleAnnunciate = async () => {
+
         setLoading(true)
+
         try {
-            alert('Not implemented yet')
+            await createListing(user?.id)
         } catch (error) {
             console.error('Failed to announce:', error)
         } finally {
             setLoading(false)
+            refreshUser()
             handleClose()
         }
     }
@@ -35,7 +38,7 @@ const SellModal = ({ open, handleClose }: SellModalProps) => {
         setLoading(true)
 
         try {
-            await confirmSelling(user?.id)
+            await instantSell(user?.id)
         } catch (error) {
             console.error('Failed to sell instantly:', error)
         } finally {
