@@ -12,7 +12,7 @@ type BuyModalProps = {
 
 const BuyModal = ({ open, handleClose }: BuyModalProps) => {
 
-    const { totalItems, totalPrice, checkout } = useCart()
+    const { totalListings, totalPrice, checkout } = useCart()
 
     const { user, refreshUser } = useAuth()
 
@@ -21,15 +21,11 @@ const BuyModal = ({ open, handleClose }: BuyModalProps) => {
     const userHasEnoughBalance = user && Number(user.balance) > totalPrice
 
     const handleConfirm = async () => {
-        if (!user) {
-            //setError('User not authenticated.')
-            return
-        }
 
         setLoading(true)
 
         try {
-            checkout(user.id)
+            checkout(user?.id)
             refreshUser()
             handleClose()
         } catch (err) {
@@ -113,14 +109,14 @@ const BuyModal = ({ open, handleClose }: BuyModalProps) => {
                                 component='span'
                                 sx={{ color: '#806cf5' }}
                             >
-                                {totalItems}
+                                {totalListings}
                             </Box>{' '}
-                            {totalItems === 1 ? 'item' : 'itens'} no carrinho, somando o valor de{' '}
+                            {totalListings === 1 ? 'item' : 'itens'} no carrinho, somando o valor de{' '}
                             <Box
                                 component='span'
                                 sx={{ color: '#806cf5' }}
                             >
-                                R${totalPrice.toFixed(2)}
+                                {totalPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                             </Box>
                         </Typography>
                         {userHasEnoughBalance ? (
@@ -130,7 +126,7 @@ const BuyModal = ({ open, handleClose }: BuyModalProps) => {
                                     component='span'
                                     sx={{ color: '#806cf5' }}
                                 >
-                                    R${(Number(user?.balance) - totalPrice).toFixed(2)}
+                                    {(Number(user?.balance) - totalPrice).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                                 </Box>
                             </Typography>
                         ) : (
@@ -140,7 +136,7 @@ const BuyModal = ({ open, handleClose }: BuyModalProps) => {
                                     component='span'
                                     sx={{ color: '#806cf5' }}
                                 >
-                                    R${(totalPrice - Number(user?.balance)).toFixed(2)}
+                                    {(totalPrice - Number(user?.balance)).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                                 </Box>
                                 {' '} de saldo para finalizar essa compra.
                             </Typography>
@@ -170,7 +166,7 @@ const BuyModal = ({ open, handleClose }: BuyModalProps) => {
                     <BuyModalButton
                         onClick={handleClose}
                         loading={loading}
-                        text='RETORNAR'
+                        text='CANCELAR'
                         color='#f05f75'
                         hoverColor='#ff8095'
                     />
