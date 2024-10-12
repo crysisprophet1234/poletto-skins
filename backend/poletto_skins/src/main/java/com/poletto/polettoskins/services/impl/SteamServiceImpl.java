@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -125,34 +126,33 @@ public class SteamServiceImpl implements SteamService {
     }
 	
 	@Override
-	public SteamItem getItemBySteamId(String itemSteamId) {
-
+	public Optional<SteamItem> getItemBySteamId(String itemSteamId) {
 	    String csfloatApiUrl = "http://localhost:81"
 	        + "?url=steam://rungame/730/76561202255233023/+csgo_econ_action_preview%20"
 	        + itemSteamId;
 
-	    String responseJson = restTemplate.getForObject(csfloatApiUrl, String.class);
-
-	    Map<String, Object> itemMap = null;
-
 	    try {
+	        String responseJson = restTemplate.getForObject(csfloatApiUrl, String.class);
 	        Map<String, Object> responseMap = objectMapper.readValue(responseJson, new TypeReference<Map<String, Object>>() {});
-	        itemMap = (Map<String, Object>) responseMap.get("iteminfo");
+	        Map<String, Object> itemMap = (Map<String, Object>) responseMap.get("iteminfo");
+	        
+	        SteamItem item = extractSteamItem(itemMap);
+	        
+	        item.setItemId(itemSteamId);
+	        
+	        return Optional.ofNullable(item);
 	    } catch (JsonProcessingException e) {
 	        e.printStackTrace();
 	    }
 
-	    return extractSteamItem(itemMap);
+	    return Optional.empty();
 	}
 	
 	@Override
 	public SteamItemPrice getItemPriceBySteamId(String itemSteamId) {
 		
-		SteamItem steamItem = getItemBySteamId(itemSteamId);
-		
-		if (steamItem == null || steamItem.getFullItemName() == null) {
-            throw new IllegalArgumentException("Invalid item or item name not found.");
-        }
+		SteamItem steamItem = getItemBySteamId(itemSteamId)
+				.orElseThrow(() -> new ResourceNotFoundException("Invalid item or item name not found."));
 		
 		String itemHashName = steamItem.getFullItemName();
 		
