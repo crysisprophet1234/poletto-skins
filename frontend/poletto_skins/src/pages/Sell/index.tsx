@@ -1,4 +1,4 @@
-import Catalog from '@/components/Catalog'
+import SellCatalog from '@/components/SellCatalog'
 import SellList from '@/components/SellList'
 import TopFilter from '@/components/TopFilter'
 import { useAuth } from '@/hooks/useAuth'
@@ -118,7 +118,7 @@ const Sell = () => {
                         overflowX: 'hidden'
                     }}
                 >
-                    <Catalog items={items!} itemAction={handleAddSellListButtonClick} catalogType='sell' />
+                    <SellCatalog items={items!} itemAction={handleAddSellListButtonClick} />
                 </Box>
 
             </Box>
