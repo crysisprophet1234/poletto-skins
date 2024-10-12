@@ -11,9 +11,9 @@ const User = () => {
 
     const { control, handleSubmit, reset, getValues } = useForm({
         defaultValues: {
-            whatsapp: '(51) 91234-5678' || '-/-',
+            whatsapp: '(51) 91234-5678',
             email: user?.email || '',
-            steamTradeUrl: 'https://steamcommunity.com/tradeoffer/new/?partner=391810592&token=XmWSIIo6' || '',
+            steamTradeUrl: 'https://steamcommunity.com/tradeoffer/new/?partner=391810592&token=XmWSIIo6',
         }
     })
 

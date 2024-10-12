@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.poletto.polettoskins.entities.SteamItem;
 import com.poletto.polettoskins.entities.SteamItemPrice;
+import com.poletto.polettoskins.exceptions.response.ResourceNotFoundException;
 import com.poletto.polettoskins.services.impl.SteamServiceImpl;
 
 @RestController
@@ -35,7 +36,8 @@ public class ItemController {
 	
 	@GetMapping("/{itemSteamId}")
 	public SteamItem getItemBySteamId(@PathVariable String itemSteamId) {
-		return steamService.getItemBySteamId(itemSteamId);
+		return steamService.getItemBySteamId(itemSteamId)
+				.orElseThrow(() -> new ResourceNotFoundException("Invalid item or item name not found."));
 	}
 	
 	@GetMapping("/{itemSteamId}/market-price")

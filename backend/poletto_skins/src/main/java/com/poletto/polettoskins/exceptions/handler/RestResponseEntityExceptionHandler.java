@@ -18,6 +18,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.poletto.polettoskins.exceptions.response.EmailAlreadyInUseException;
 import com.poletto.polettoskins.exceptions.response.InsufficientCreditException;
+import com.poletto.polettoskins.exceptions.response.ListingNoLongerActiveException;
 import com.poletto.polettoskins.exceptions.response.ResourceNotFoundException;
 import com.poletto.polettoskins.exceptions.response.model.ExceptionResponse;
 
@@ -53,6 +54,18 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     	
     	ExceptionResponse exResponse = new ExceptionResponse(
 			HttpStatus.CONFLICT,
+			ex.getMessage(),
+			request.getDescription(false).replace("uri=", "")
+		);
+    	
+    	return new ResponseEntity<>(exResponse, exResponse.getStatus());
+    }
+    
+    @ExceptionHandler(ListingNoLongerActiveException.class)
+    protected ResponseEntity<ExceptionResponse> handleListingNoLongerActiveException(RuntimeException ex, WebRequest request) {
+    	
+    	ExceptionResponse exResponse = new ExceptionResponse(
+			HttpStatus.UNPROCESSABLE_ENTITY,
 			ex.getMessage(),
 			request.getDescription(false).replace("uri=", "")
 		);

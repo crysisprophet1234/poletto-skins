@@ -1,41 +1,38 @@
 import { SpringPage } from '@/types/vendor/spring-page'
 import { Box, Button, Grid, Skeleton } from '@mui/material'
 import { useEffect, useState } from 'react'
-import { Listing } from '@/types/entities/listing'
-import ListingCard from '@/components/ListingCard'
-import ListingModal from '../ListingModal'
 
-type CatalogProps = {
-    listings: SpringPage<Listing>
-    listingAction: (listing: Listing) => void
+import SellItemCard from '../SellItemCard'
+import { MarketItem } from '@/types/entities/steam-item'
+import SellItemModal from '../SellItemModal'
+
+type SellCatalogProps = {
+    items: SpringPage<MarketItem>
+    itemAction: (item: MarketItem) => void
 }
 
-const Catalog = ({ listings, listingAction }: CatalogProps) => {
-
+const SellCatalog = ({ items, itemAction }: SellCatalogProps) => {
     const [loading, setLoading] = useState(true)
-
-    const [selectedListing, setSelectedListing] = useState<Listing>()
-
+    const [selectedItem, setSelectedItem] = useState<MarketItem>()
     const [open, setOpen] = useState(false)
 
-    const handleOpen = (listing: Listing) => {
-        setSelectedListing(listing)
+    const handleOpen = (item: MarketItem) => {
+        setSelectedItem(item)
         setOpen(true)
     }
 
     const handleClose = () => {
-        setSelectedListing(undefined)
+        setSelectedItem(undefined)
         setOpen(false)
     }
 
     useEffect(() => {
-        if (listings && listings.content.length > 0) {
+        if (items && items.content.length > 0) {
             setLoading(false)
         }
-    }, [listings])
+    }, [items])
 
     return (
-
         <Box
             sx={{
                 display: 'flex',
@@ -61,13 +58,13 @@ const Catalog = ({ listings, listingAction }: CatalogProps) => {
                     flexGrow: 1,
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: 2
+                    gap: 2,
                 }}
             >
                 <Grid container justifyContent='flex-start' spacing={1} columns={{ xs: 4, sm: 8, md: 12, lg: 12, xl: 16 }}>
                     {loading
                         ? Array.from(new Array(12)).map((_, index) => (
-                            <Grid item xs={2} sm={4} md={4} lg={3} key={index} >
+                            <Grid item xs={2} sm={4} md={4} lg={3} key={index}>
                                 <Skeleton
                                     variant='rounded'
                                     animation='wave'
@@ -75,13 +72,13 @@ const Catalog = ({ listings, listingAction }: CatalogProps) => {
                                 />
                             </Grid>
                         ))
-                        : listings.content.map((listing) => (
-                            <Grid item xs={2} sm={4} md={4} lg={3} key={listing.id}>
-                                <ListingCard
-                                    listingProps={listing}
-                                    key={listing.id}
-                                    listingAction={() => listingAction(listing)}
-                                    openModal={() => handleOpen(listing)}
+                        : items.content.map((item) => (
+                            <Grid item xs={2} sm={4} md={4} lg={3} key={item.assetId}>
+                                <SellItemCard
+                                    sellItemProps={item}
+                                    key={item.assetId}
+                                    sellItemAction={() => itemAction(item)}
+                                    openModal={() => handleOpen(item)}
                                 />
                             </Grid>
                         ))}
@@ -103,19 +100,18 @@ const Catalog = ({ listings, listingAction }: CatalogProps) => {
                 </Button>
             </Box>
 
-            {selectedListing && 
-                <ListingModal
-                    open={open}
-                    itemAction={() => listingAction(selectedListing)}
-                    handleClose={handleClose}
-                    listing={selectedListing}
-                />                        
+            {
+                selectedItem && 
+
+                    <SellItemModal
+                        open={open}
+                        itemAction={() => itemAction(selectedItem)}
+                        handleClose={handleClose}
+                        item={selectedItem}
+                    />
             }
-
         </Box>
-
     )
-
 }
 
-export default Catalog
+export default SellCatalog

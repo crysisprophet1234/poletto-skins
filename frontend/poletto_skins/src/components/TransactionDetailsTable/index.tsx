@@ -1,50 +1,13 @@
-import { get } from '@/services/api'
-import { SteamItem } from '@/types/entities/steam-item'
-import { TransactionItem, Transaction } from '@/types/entities/transaction'
+import { Sticker } from '@/types/entities/item'
+import { Listing } from '@/types/entities/listing'
+import { Transaction } from '@/types/entities/transaction'
 import { Skeleton, Stack, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material'
-import { useEffect, useState } from 'react'
-
-/*
-interface PurchaseDetailsTableProps {
-    itemDetails: SteamItem[]
-}
-*/
-
-type CombinedItem = SteamItem & Pick<TransactionItem, 'value'>
 
 interface TransactionDetailsTableProps {
     transaction: Transaction
 }
 
 const TransactionDetailsTable = ({ transaction }: TransactionDetailsTableProps) => {
-
-    const [itemDetails, setItemsDetails] = useState<CombinedItem[]>([])
-
-    const fetchItemDetails = async (items: TransactionItem[]) => {
-        console.log(items)
-        const itemDetailsPromises = items.map(item => get<SteamItem>(`/items/${item.itemId}`))
-        const itemDetails = await Promise.all(itemDetailsPromises)
-        return itemDetails
-    }
-
-    useEffect(() => {
-        const fetchAndCombineDetails = async () => {
-
-            const combinedDetails: CombinedItem[] = []
-            const steamItems = await fetchItemDetails(transaction.items)
-            const combinedItems = steamItems.map((steamItem, index) => ({
-                ...steamItem,
-                ...transaction.items[index],
-            }))
-            combinedDetails.push(...combinedItems)
-
-            setItemsDetails(combinedDetails)
-        }
-
-        if (transaction.items.length > 0) {
-            fetchAndCombineDetails()
-        }
-    }, [transaction])
 
     return (
         <Table
@@ -78,7 +41,7 @@ const TransactionDetailsTable = ({ transaction }: TransactionDetailsTableProps) 
                 </TableRow>
             </TableHead>
             <TableBody>
-                {!itemDetails ? (
+                {!transaction.listings ? (
                     <Stack spacing={1}>
                         <Skeleton variant='text' height={60} sx={{ fontSize: '1rem' }} />
                         <Skeleton variant='rectangular' height={60} />
@@ -87,16 +50,16 @@ const TransactionDetailsTable = ({ transaction }: TransactionDetailsTableProps) 
                         <Skeleton variant='rectangular' height={60} />
                     </Stack>
                 ) : (
-                    itemDetails.map((item) => (
-                        <TableRow key={item.assetId}>
+                    transaction.listings.map((listing: Listing) => (
+                        <TableRow key={listing.id}>
                             <TableCell component='th' scope='row'>
-                                {item.assetId}
+                                {listing.item.assetId}
                             </TableCell>
-                            <TableCell>{item.fullItemName}</TableCell>
-                            <TableCell>{item.floatValue}</TableCell>
-                            <TableCell>{item.value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</TableCell>
+                            <TableCell>{listing.item.fullItemName}</TableCell>
+                            <TableCell>{listing.item.floatValue}</TableCell>
+                            <TableCell>{listing.listingPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</TableCell>
                             <TableCell>
-                                {item.stickers.map((sticker, index) => (
+                                {listing.item.stickers.map((sticker: Sticker, index: number) => (
                                     <Stack key={index} direction={'column'}>
                                         {sticker.name}
                                     </Stack>

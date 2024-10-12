@@ -11,22 +11,22 @@ import './styles.scss'
 
 const sortOptions = [
     {
-        value: 'priceAsc',
+        value: 'listingPrice,asc',
         label: 'Menor preço',
         icon: <SortRounded />
     },
     {
-        value: 'priceDesc',
+        value: 'listingPrice,desc',
         label: 'Maior preço',
         icon: <SortRounded style={{ transform: 'scaleY(-1)' }} />
     },
     {
-        value: 'floatAsc',
+        value: 'item.floatValue,asc',
         label: 'Menor float',
         icon: <SortRounded />
     },
     {
-        value: 'floatDesc',
+        value: 'item.floatValue,desc',
         label: 'Maior float',
         icon: <SortRounded style={{ transform: 'scaleY(-1)' }} />
     },
@@ -36,14 +36,14 @@ const sortOptions = [
         icon: <DiscountRounded />
     },
     {
-        value: 'newest',
+        value: 'createdOn,desc',
         label: 'Itens novos',
         icon: <NewReleasesRounded />
     }
 ]
 
 const filterSchema = z.object({
-    query: z.string().min(3).optional().or(z.literal('')),
+    query: z.string().min(2).optional().or(z.literal('')),
     sort: z.string().optional(),
     favorite: z.boolean().optional()
 })

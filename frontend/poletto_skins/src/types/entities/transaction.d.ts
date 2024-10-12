@@ -1,3 +1,5 @@
+import { Listing } from '@/types/entities/listing'
+
 export type Transaction = {
     id: string
     date: Date
@@ -5,10 +7,5 @@ export type Transaction = {
     transactionType: 'PURCHASE' | 'SELLING' | 'INSTANT_SELL'
     tax: number
     userId: string
-    items: TransactionItem[]
-}
-
-export type TransactionItem = {
-    itemId: string
-    value: number
+    listings: Listing[]
 }

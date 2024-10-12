@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.poletto.polettoskins.dto.TransactionDto;
+import com.poletto.polettoskins.dto.TransactionDTO;
 import com.poletto.polettoskins.services.TransactionService;
 
 @RestController
@@ -17,11 +17,11 @@ public class TransactionController {
 	
 	@Autowired
 	private TransactionService transactionService;
-
-	@PostMapping
+	
+	@PostMapping("checkout-cart")
 	@ResponseStatus(HttpStatus.CREATED)
-	public TransactionDto createTransaction(@RequestBody TransactionDto transactionDto) {
-		return transactionService.createTransaction(transactionDto);
+	public TransactionDTO checkoutCart(@RequestBody TransactionDTO transactionDTO) {
+		return transactionService.checkoutCart(transactionDTO);
 	}
 	
 }

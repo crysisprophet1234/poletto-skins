@@ -1,0 +1,140 @@
+$primary-color: #C85CD1;
+$secondary-color: #9F8FFF;
+$background-color: #1c1a24;
+$accent-color: rgba(200, 92, 209, 0.8);
+$primary-box-shadow-hover: 0 0 10px $accent-color, 0 0 15px rgba($accent-color, 0.6), 0 0 20px rgba($accent-color, 0.4);
+
+$close-button-color: #817e8f;
+$close-button-color-hover: #bbb9c7;
+
+$item-value-text-color: #BCBCC2;
+
+.item-modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.item-modal-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    .item-title {
+        display: flex;
+        flex-direction: row;
+        gap: 5px;
+    }
+}
+
+.close-button {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: $close-button-color;
+    cursor: pointer;
+
+    svg {
+        height: 100%;
+        width: auto;
+        transform: translate(-100%);
+    }
+
+    &:hover svg {
+        fill: $close-button-color-hover;
+    }
+}
+
+.item-modal-body {
+    display: flex;
+    gap: 16px;
+}
+
+.item-modal-left-side {
+    display: flex;
+    flex: 0.6;
+    flex-direction: column;
+    gap: 10px;
+
+    .item-image {
+        display: flex;
+        height: 100%;
+        justify-content: center;
+        align-items: center;
+        padding: 0 12px;
+        border-radius: 0.5rem;
+        background-color: $background-color;
+        overflow: hidden;
+
+    }
+
+    .item-actions a {
+        color: $item-value-text-color;
+        cursor: pointer;
+
+        &:hover {
+            color: white;
+        }
+    }
+
+    .item-sticker {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+
+        img {
+            max-height: 60px;
+            transition: transform 0.2s ease-in-out;
+            margin-bottom: 5px;
+
+            &:hover {
+                transform: scale(1.1);
+            }
+        }
+
+        p {
+            font-size: 14px;
+        }
+    }
+
+}
+
+.item-modal-right-side {
+    display: flex;
+    flex: 0.4;
+    flex-direction: column;
+    gap: 10px;
+
+    .item-details-box {
+        display: flex;
+        flex-direction: column;
+        background-color: $background-color;
+        border-radius: 0.5rem;
+        padding: 20px;
+        flex: .5;
+        min-height: 260px;
+        justify-content: space-between;
+    }
+
+    .float-container {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .item-info {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        font-size: 14px;
+
+        .item-field {
+            color: $item-value-text-color;
+        }
+
+        .item-value {
+            text-align: end;
+        }
+    }
+}

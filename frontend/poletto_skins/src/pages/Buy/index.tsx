@@ -4,12 +4,12 @@ import MainFilter from '@/components/MainFilter'
 import TopFilter from '@/components/TopFilter'
 import { useCart } from '@/hooks/useCart'
 import { get } from '@/services/api'
-import { MarketItem } from '@/types/entities/steam-item'
 import { Box, Stack } from '@mui/material'
 import { useCallback, useEffect, useState } from 'react'
 
 import { SpringPage } from '@/types/vendor/spring-page'
 import './styles.scss'
+import { Listing } from '@/types/entities/listing'
 
 type FilterData = {
     minPrice?: string,
@@ -25,17 +25,17 @@ type FilterData = {
 
 const Buy = () => {
 
-    const { addToCart, removeFromCart, isItemInCart } = useCart()
+    const { addToCart, removeFromCart, isListingInCart } = useCart()
 
-    const handleAddCartButtonClick = (item: MarketItem) => {
-        if (isItemInCart(item.assetId)) {
-            removeFromCart(item.assetId)
+    const handleAddCartButtonClick = (listing: Listing) => {
+        if (isListingInCart(listing.id)) {
+            removeFromCart(listing.id)
         } else {
-            addToCart(item)
+            addToCart(listing)
         }
     }
 
-    const [items, setItems] = useState<SpringPage<MarketItem>>()
+    const [listings, setListings] = useState<SpringPage<Listing>>()
 
     const [filterData, setFilterData] = useState<FilterData>()
 
@@ -46,31 +46,20 @@ const Buy = () => {
         }))
     }
 
-    const getUserItems = useCallback(async () => {
+    const fetchListings = useCallback(async () => {
         try {
 
-            const steamItemsFromUser = await get<SpringPage<MarketItem>>('/items/search', { ...filterData })
+            const listingsPage = await get<SpringPage<Listing>>('/listings', { ...filterData })
+            setListings(listingsPage)
 
-            //TODO: Adicionando preços mock
-            const itemsWithPrices = {
-                ...steamItemsFromUser,
-                content: steamItemsFromUser.content.map(item => ({
-                    ...item,
-                    price: Math.random() * 100,
-                    steamPrice: Math.random() * 100,
-                    discount: Math.random() > 0.5 ? Math.random() * 20 : undefined
-                }))
-            }
-
-            setItems(itemsWithPrices)
         } catch (error) {
-            console.error(`Error trying to fetch steam user data: ${error}`)
+            console.error(`Error trying to fetch listings: ${error}`)
         }
     }, [filterData])
 
     useEffect(() => {
-        getUserItems()
-    }, [getUserItems])
+        fetchListings()
+    }, [fetchListings])
 
     return (
 
@@ -94,9 +83,11 @@ const Buy = () => {
                 flexDirection={'column'}
             >
                 <Stack direction={'row'} justifyContent={'space-between'} pr={'20px'}>
+
                     <TopFilter onFilterChange={handleFilterChange} />
 
                     <Cart />
+                    
                 </Stack>
 
                 <Box
@@ -105,7 +96,7 @@ const Buy = () => {
                         overflowX: 'hidden'
                     }}
                 >
-                    <Catalog items={items!} itemAction={handleAddCartButtonClick} catalogType='buy' />
+                    <Catalog listings={listings!} listingAction={handleAddCartButtonClick} />
                 </Box>
 
             </Box>

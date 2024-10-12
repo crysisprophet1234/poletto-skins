@@ -21,7 +21,7 @@ public class Transaction {
     private TransactionType transactionType;
     private Double tax;
     private String userId;
-    private List<TransactionItem> items = new ArrayList<>();
+    private List<Listing> listings = new ArrayList<>();
     
     public Transaction() {}
 
@@ -32,7 +32,7 @@ public class Transaction {
 		TransactionType transactionType,
 		Double tax,
 		String userId,
-		List<TransactionItem> items
+		List<Listing> listings
 	) {
 		this.id = id;
 		this.date = date;
@@ -40,7 +40,7 @@ public class Transaction {
 		this.transactionType = transactionType;
 		this.tax = tax;
 		this.userId = userId;
-		this.items = items;
+		this.listings = listings;
 	}
 
 	public String getId() {
@@ -91,12 +91,12 @@ public class Transaction {
 		this.userId = userId;
 	}
 
-	public List<TransactionItem> getItems() {
-		return items;
+	public List<Listing> getListings() {
+		return listings;
 	}
 
-	public void setItems(List<TransactionItem> items) {
-		this.items = items;
+	public void setListings(List<Listing> listings) {
+		this.listings = listings;
 	}
 
 	@Override
@@ -119,7 +119,7 @@ public class Transaction {
 	@Override
 	public String toString() {
 		return "Transaction [id=" + id + ", date=" + date + ", totalValue=" + totalValue + ", transactionType="
-				+ transactionType + ", tax=" + tax + ", userId=" + userId + ", items=" + items + "]";
+				+ transactionType + ", tax=" + tax + ", userId=" + userId + ", listings=" + listings + "]";
 	}
 
 }

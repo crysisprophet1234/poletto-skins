@@ -1,7 +1,7 @@
 import AddCartButton from '@/components/AddCartButton'
 import FloatBar from '@/components/FloatBar'
 import { useCart } from '@/hooks/useCart'
-import { MarketItem } from '@/types/entities/steam-item'
+import { SteamSticker } from '@/types/entities/steam-item'
 import { AddShoppingCartRounded, Close, RemoveShoppingCartRounded } from '@mui/icons-material'
 import { Divider, Link, Stack, Tooltip } from '@mui/material'
 import Box from '@mui/material/Box'
@@ -9,19 +9,18 @@ import Modal from '@mui/material/Modal'
 import Typography from '@mui/material/Typography'
 import { FaExternalLinkAlt } from 'react-icons/fa'
 import './styles.scss'
+import { Listing } from '@/types/entities/listing'
 
-type ItemModalProps = {
-    item: MarketItem
+type ListingModalProps = {
+    listing: Listing
     open: boolean
     handleClose: () => void
     itemAction: () => void
 }
 
-const ItemModal = ({ item, open, handleClose, itemAction }: ItemModalProps) => {
+const ListingModal = ({ listing, open, handleClose, itemAction }: ListingModalProps) => {
 
-    const { isItemInCart } = useCart()
-
-    if (!item) return
+    const { isListingInCart } = useCart()
 
     return (
 
@@ -49,13 +48,13 @@ const ItemModal = ({ item, open, handleClose, itemAction }: ItemModalProps) => {
 
                         <div className='item-title'>
 
-                            {item.quality == 9 &&
+                            {listing?.item.quality == 9 &&
                                 <Typography
                                     variant='h5'
                                     fontWeight={600}
                                     color={'#CF6A32'}
                                 >
-                                    {item.qualityName}&nbsp;
+                                    {listing?.item.qualityName}&nbsp;
                                 </Typography>
                             }
 
@@ -63,7 +62,7 @@ const ItemModal = ({ item, open, handleClose, itemAction }: ItemModalProps) => {
                                 variant='h5'
                                 fontWeight={600}
                             >
-                                {`${item.fullItemName.replace('StatTrak™', '')} ${item.itemName == '-' ? '| Vanilla' : ''}`}
+                                {`${listing?.item.fullItemName.replace('StatTrak™', '')} ${listing?.item.itemName == '-' ? '| Vanilla' : ''}`}
                             </Typography>
 
                         </div>
@@ -82,8 +81,8 @@ const ItemModal = ({ item, open, handleClose, itemAction }: ItemModalProps) => {
 
                             <div className='item-image'>
                                 <img
-                                    src={item.imageUrl}
-                                    alt={item.fullItemName}
+                                    src={listing?.item.imageUrl}
+                                    alt={listing?.item.fullItemName}
                                     loading='lazy'
                                 />
                             </div>
@@ -92,7 +91,7 @@ const ItemModal = ({ item, open, handleClose, itemAction }: ItemModalProps) => {
                                 <Stack direction='row' spacing={2} justifyContent='space-between'>
 
                                     <Link
-                                        href={item.inspectUrl}
+                                        href={listing?.item.inspectUrl}
                                         target='_blank'
                                         underline='none'
                                     >
@@ -100,7 +99,7 @@ const ItemModal = ({ item, open, handleClose, itemAction }: ItemModalProps) => {
                                     </Link>
 
                                     <Link
-                                        href={'https://steamcommunity.com/market/listings/730/' + item.fullItemName}
+                                        href={'https://steamcommunity.com/market/listings/730/' + listing?.item.fullItemName}
                                         target='_blank'
                                         underline='none'
                                     >
@@ -108,7 +107,7 @@ const ItemModal = ({ item, open, handleClose, itemAction }: ItemModalProps) => {
                                     </Link>
 
                                     <Link
-                                        href={`https://youtube.com/results?search_query=${item.weaponType} ${item.itemName == '-' ? 'Vanilla' : item.itemName} - Skin Float And Wear Preview`}
+                                        href={`https://youtube.com/results?search_query=${listing?.item.weaponType} ${listing?.item.itemName == '-' ? 'Vanilla' : listing?.item.itemName} - Skin Float And Wear Preview`}
                                         target='_blank'
                                         underline='none'
                                     >
@@ -118,7 +117,7 @@ const ItemModal = ({ item, open, handleClose, itemAction }: ItemModalProps) => {
                                 </Stack>
                             </div>
 
-                            {item.weaponType.toLowerCase() !== 'sticker' && item.stickers.length > 0 &&
+                            {listing?.item.weaponType.toLowerCase() !== 'sticker' && listing?.item.stickers.length > 0 &&
 
                                 <Stack
                                     direction='row'
@@ -128,7 +127,7 @@ const ItemModal = ({ item, open, handleClose, itemAction }: ItemModalProps) => {
                                     gridTemplateColumns={'repeat(4, 1fr)'}
                                     height={'90px'}
                                 >
-                                    {item.stickers.slice(0, 4).map((sticker, index) => { //TODO: slicing 4 stickers
+                                    {listing?.item.stickers.slice(0, 4).map((sticker: SteamSticker, index: number) => { //TODO: slicing 4 stickers
                                         return (
                                             <Tooltip
                                                 key={sticker.stickerId + '-' + index}
@@ -163,7 +162,7 @@ const ItemModal = ({ item, open, handleClose, itemAction }: ItemModalProps) => {
                             <div className='item-details-box float'>
 
                                 <div className='float-container'>
-                                    <FloatBar floatValue={item.floatValue * 100} />
+                                    <FloatBar floatValue={listing?.item.floatValue * 100} />
                                 </div>
 
 
@@ -177,7 +176,7 @@ const ItemModal = ({ item, open, handleClose, itemAction }: ItemModalProps) => {
 
                                     <div className='item-value'>
                                         <Typography>
-                                            {item.floatValue}
+                                            {listing?.item.floatValue}
                                         </Typography>
                                     </div>
 
@@ -199,10 +198,10 @@ const ItemModal = ({ item, open, handleClose, itemAction }: ItemModalProps) => {
 
                                     <div className='item-value'>
                                         <Typography>
-                                            {item.rarityName}
+                                            {listing?.item.rarityName}
                                         </Typography>
                                         <Typography>
-                                            {item.paintSeed}
+                                            {listing?.item.paintSeed}
                                         </Typography>
                                     </div>
 
@@ -225,10 +224,11 @@ const ItemModal = ({ item, open, handleClose, itemAction }: ItemModalProps) => {
 
                                     <div className='item-value'>
                                         <Typography>
-                                            R$ {item.steamPrice.toFixed(2)}
+                                            {listing?.listingPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                                         </Typography>
                                         <Typography>
-                                            R$ {(item.steamPrice / 100 * 85).toFixed(2)}
+                                            {/* TODO: same price && mocked recommended price */}
+                                            {(listing?.listingPrice / 100 * 85).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                                         </Typography>
                                     </div>
 
@@ -246,7 +246,7 @@ const ItemModal = ({ item, open, handleClose, itemAction }: ItemModalProps) => {
 
                                     <div className='item-value'>
                                         <Typography variant='h6'>
-                                            R$ {item.price.toFixed(2)}
+                                        {listing?.listingPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                                         </Typography>
                                     </div>
 
@@ -254,11 +254,11 @@ const ItemModal = ({ item, open, handleClose, itemAction }: ItemModalProps) => {
 
                                 <div className='add-cart-container'>
                                     <AddCartButton
-                                        isItemInCart={isItemInCart(item.assetId)}
+                                        isItemInCart={isListingInCart(listing.id)}
                                         onClick={itemAction}
                                         isHovered={true}
                                     >
-                                        {isItemInCart(item.assetId)
+                                        {isListingInCart(listing.id)
                                             ? <RemoveShoppingCartRounded />
                                             : <AddShoppingCartRounded />
                                         }
@@ -279,4 +279,4 @@ const ItemModal = ({ item, open, handleClose, itemAction }: ItemModalProps) => {
     )
 }
 
-export default ItemModal
+export default ListingModal

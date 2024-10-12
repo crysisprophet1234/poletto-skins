@@ -4,9 +4,6 @@ export type Item = {
     id: number | UUID
     name: string
     imageUrl: string
-    price: number
-    steamPrice: number
-    discount?: number
 }
 
 export type WeaponSkin = Item & {

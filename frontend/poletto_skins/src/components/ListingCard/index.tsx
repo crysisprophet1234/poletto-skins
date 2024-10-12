@@ -1,6 +1,5 @@
 import AddCartButton from '@/components/AddCartButton'
 import { useCart } from '@/hooks/useCart'
-import { MarketItem } from '@/types/entities/steam-item'
 import { itemWearAbbreviator, WearName } from '@/utils/itemWearAbbreviator'
 import { AddShoppingCartRounded, RemoveShoppingCartRounded } from '@mui/icons-material'
 import { Tooltip, Typography } from '@mui/material'
@@ -8,28 +7,28 @@ import { useEffect, useState } from 'react'
 import { FaSteam } from 'react-icons/fa6'
 import { MdFavorite } from 'react-icons/md'
 import './styles.scss'
+import { Listing } from '@/types/entities/listing'
+import { SteamSticker } from '@/types/entities/steam-item'
 
-type ItemCardProps = {
-    itemProps: MarketItem
+type ListingCardProps = {
+    listingProps: Listing
     openModal: () => void
-    itemAction: () => void
+    listingAction: () => void
 }
 
-const ItemCard = ({ itemProps, openModal, itemAction }: ItemCardProps) => {
+const ListingCard = ({ listingProps, openModal, listingAction }: ListingCardProps) => {
 
-    const { isItemInCart } = useCart()
+    const { isListingInCart } = useCart()
 
-    const [item, setItem] = useState<MarketItem | null>(null)
+    const [listing, setListing] = useState<Listing>()
 
     const [isHovered, setIsHovered] = useState(false)
 
     useEffect(() => {
-        setItem(itemProps)
-    }, [itemProps])
+        setListing(listingProps)
+    }, [listingProps])
 
-    if (!item) {
-        return
-    }
+    if (!listing) return
 
     return (
 
@@ -42,44 +41,44 @@ const ItemCard = ({ itemProps, openModal, itemAction }: ItemCardProps) => {
 
             <div className='item-info-container'>
 
-                {item.weaponType.toLowerCase() == 'sticker'
+                {listing?.item.weaponType.toLowerCase() == 'sticker'
                     ? (
                         <>
                             <span className='skin-name'>
-                                {item.stickers[0].name}
+                                {listing?.item.stickers[0].name}
                             </span>
 
                             <span className='category'>
-                                {item.weaponType}
+                                {listing?.item.weaponType}
                             </span>
                         </>
                     ) : (
                         <>
                             <span className='skin-name'>
-                                {item.itemName == '-' ? 'Vanilla' : item.itemName}
+                                {listing?.item.itemName == '-' ? 'Vanilla' : listing?.item.itemName}
                             </span>
 
                             <span className='category'>
-                                {item.weaponType /*TODO: subcategory?*/}
+                                {listing?.item.weaponType /*TODO: subcategory?*/}
                             </span>
 
                             <div className='additional-info'>
 
-                                {item.qualityName.toLowerCase().includes('stattrak') && (
+                                {listing?.item.qualityName.toLowerCase().includes('stattrak') && (
                                     <span className='stat-trak'>ST</span>
                                 )}
 
                                 <span className='float-short'>
-                                    {itemWearAbbreviator(item.wearName as WearName)}
+                                    {itemWearAbbreviator(listing?.item.wearName as WearName)}
                                 </span>
 
                                 <Tooltip title={
                                     <Typography noWrap minWidth='fit-content'>
-                                        {item.floatValue}
+                                        {listing?.item.floatValue}
                                     </Typography>
                                 }>
                                     <span className='float-full'>
-                                        {item.floatValue.toFixed(4)}
+                                        {listing?.item.floatValue.toFixed(4)}
                                     </span>
                                 </Tooltip>
 
@@ -93,19 +92,19 @@ const ItemCard = ({ itemProps, openModal, itemAction }: ItemCardProps) => {
             <div className='item-picture-container'>
 
                 <div className='skin-image'>
-                    <img src={item?.imageUrl} alt='skin-image' loading='lazy' />
+                    <img src={listing?.item?.imageUrl} alt='skin-image' loading='lazy' />
                 </div>
 
-                {item.weaponType.toLowerCase() !== 'sticker' && (
+                {listing?.item.weaponType.toLowerCase() !== 'sticker' && (
                     <div className='sticker-stack'>
 
-                        {item.stickers.slice(0, 4).map((sticker, index) => { //TODO: slicing 4 stickers
-                            return (
-                                <div className='sticker' key={sticker.stickerId + '-' + index}>
-                                    <img src={sticker.imageUrl} alt={sticker.name} loading='lazy' />
-                                </div>
-                            )
-                        })}
+                    {listing?.item.stickers.slice(0, 4).map((sticker: SteamSticker, index: number) => {
+                        return (
+                            <div className='sticker' key={sticker.stickerId + '-' + index}>
+                                <img src={sticker.imageUrl} alt={sticker.name} loading='lazy' />
+                            </div>
+                        )
+                    })}
 
                     </div>
                 )}
@@ -116,19 +115,20 @@ const ItemCard = ({ itemProps, openModal, itemAction }: ItemCardProps) => {
 
                 <div className='price-container'>
 
-                    {item?.discount && item.discount > 0 &&
+                    {listing?.discount > 0 &&
                         <div className='discount'>
-                            <span>{`-${item.discount.toFixed(2)}%`}</span>
+                            <span>{`-${listing.discount}%`}</span>
                         </div>
                     }
 
                     <div className='price'>
-                        <span>{item?.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+                        <span>{listing?.listingPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
                     </div>
 
                     <div className='steam-price'>
                         <FaSteam />
-                        <span>{item?.steamPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+                        {/*TODO: same price */}
+                        <span>{listing?.steamPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
                     </div>
 
                 </div>
@@ -143,11 +143,11 @@ const ItemCard = ({ itemProps, openModal, itemAction }: ItemCardProps) => {
 
                 <div className='add-cart-container' onClick={(e) => e.stopPropagation()}>
                     <AddCartButton
-                        isItemInCart={isItemInCart(item.assetId)}
-                        onClick={itemAction}
+                        isItemInCart={isListingInCart(listing!.id)}
+                        onClick={listingAction}
                         isHovered={isHovered}
                     >
-                        {isItemInCart(item.assetId)
+                        {isListingInCart(listing!.id)
                             ? <RemoveShoppingCartRounded />
                             : <AddShoppingCartRounded />
                         }
@@ -161,4 +161,4 @@ const ItemCard = ({ itemProps, openModal, itemAction }: ItemCardProps) => {
     )
 }
 
-export default ItemCard
+export default ListingCard

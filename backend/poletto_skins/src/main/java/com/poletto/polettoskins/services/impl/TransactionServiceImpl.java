@@ -2,21 +2,26 @@ package com.poletto.polettoskins.services.impl;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.poletto.polettoskins.dto.TransactionDto;
-import com.poletto.polettoskins.dto.TransactionItemDto;
+import com.poletto.polettoskins.dto.ListingDTO;
+import com.poletto.polettoskins.dto.TransactionDTO;
 import com.poletto.polettoskins.entities.DomainUser;
+import com.poletto.polettoskins.entities.Listing;
 import com.poletto.polettoskins.entities.Transaction;
+import com.poletto.polettoskins.entities.enums.ListingStatus;
 import com.poletto.polettoskins.entities.enums.TransactionType;
 import com.poletto.polettoskins.exceptions.response.InsufficientCreditException;
+import com.poletto.polettoskins.exceptions.response.ListingNoLongerActiveException;
 import com.poletto.polettoskins.exceptions.response.ResourceNotFoundException;
 import com.poletto.polettoskins.mappers.TransactionMapper;
 import com.poletto.polettoskins.repositories.DomainUserRepository;
+import com.poletto.polettoskins.repositories.ListingRepository;
 import com.poletto.polettoskins.repositories.TransactionRepository;
 import com.poletto.polettoskins.services.TransactionService;
 
@@ -25,12 +30,15 @@ public class TransactionServiceImpl implements TransactionService {
 	
 	@Autowired
     private TransactionRepository transactionRepository;
+	
+	@Autowired
+	private ListingRepository listingRepository;
 
     @Autowired
     private DomainUserRepository domainUserRepository;
     
     @Override
-	public List<TransactionDto> getUserTransactions(String userId) {
+	public List<TransactionDTO> getUserTransactions(String userId) {
     	
     	 List<Transaction> transactions = transactionRepository.findByUserId(userId);
     	 
@@ -40,37 +48,75 @@ public class TransactionServiceImpl implements TransactionService {
 	}
 
     @Override
-    public TransactionDto createTransaction(TransactionDto transactionDto) {
+    public TransactionDTO checkoutCart(TransactionDTO transactionDTO) {
+    	
+    	DomainUser buyer = domainUserRepository.findById(transactionDTO.getUserId())
+    			.orElseThrow(() -> new ResourceNotFoundException("Buyer user not found."));
+    	
+    	List<Listing> listings = new ArrayList<>();
+    	
+    	for (ListingDTO listingDTO : transactionDTO.getListings()) {
+    		
+    		Listing listing = listingRepository.findById(listingDTO.getId())
+    		        .orElseThrow(() -> new ResourceNotFoundException("Listing not found."));
+    		
+    		//TODO: create customized exception
+    		if (!listing.getStatus().equals(ListingStatus.ACTIVE)) {
+    			throw new ListingNoLongerActiveException("Listing is no longer available.");
+    		}
+    		
+    		listing.setStatus(ListingStatus.SOLD);
+    		
+    		listings.add(listing);
+    	}
+    	
+    	Transaction buyerTransaction = new Transaction();
+        buyerTransaction.setUserId(buyer.getId());
+        buyerTransaction.setTransactionType(TransactionType.PURCHASE);
+        buyerTransaction.setDate(LocalDateTime.now());
+        
+        buyerTransaction.setListings(listings);
+        
+        buyerTransaction.setTotalValue(
+        	listings
+	    		.stream()
+	    		.map(Listing::getListingPrice)
+	    		.reduce(BigDecimal.ZERO, BigDecimal::add)
+    	);
+        
+        validateUserBalance(buyerTransaction, buyer);
+        
+        buyerTransaction = transactionRepository.save(buyerTransaction);
+        
+        updateUserBalance(buyer, buyerTransaction.getTotalValue(), TransactionType.PURCHASE);
+    	
+    	for (Listing listing : listings) {
+    		
+    		DomainUser seller = domainUserRepository.findById(listing.getUserId())
+        	        .orElseThrow(() -> new ResourceNotFoundException("Seller user not found."));
+    		
+    		listing = listingRepository.save(listing);
+    		
+    		Transaction sellerTransaction = new Transaction();
+    	    sellerTransaction.setUserId(seller.getId());
+    	    sellerTransaction.setTransactionType(TransactionType.SELLING);
+    	    sellerTransaction.setTotalValue(listing.getListingPrice());
+    	    sellerTransaction.setDate(LocalDateTime.now());
+    	    sellerTransaction.setListings(List.of(listing));
+    	    
+    	    transactionRepository.save(sellerTransaction);
+    	    
+    	    updateUserBalance(seller, listing.getListingPrice(), TransactionType.SELLING);
+	
+    	}
 
-        transactionDto.setDate(LocalDateTime.now());
-
-        DomainUser user = domainUserRepository.findById(transactionDto.getUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("User id provided doesn't exist: " + transactionDto.getUserId()));
-
-        BigDecimal transactionTotal = calculateTransactionTotal(transactionDto);
-
-        transactionDto.setTotalValue(transactionTotal);
-
-        validateUserBalance(transactionDto, user);
-
-        Transaction createdTransaction = transactionRepository.save(TransactionMapper.INSTANCE.toTransaction(transactionDto));
-
-        updateUserBalance(user, transactionTotal, transactionDto.getTransactionType());
-
-        return TransactionMapper.INSTANCE.toTransactionDto(createdTransaction);
+		return TransactionMapper.INSTANCE.toTransactionDto(buyerTransaction); 	
     }
 
-    private BigDecimal calculateTransactionTotal(TransactionDto transactionDto) {
+    private void validateUserBalance(Transaction transaction, DomainUser user) {
     	
-        return transactionDto.getItems().stream()
-                .map(TransactionItemDto::getValue)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
-
-    private void validateUserBalance(TransactionDto transactionDto, DomainUser user) {
-    	
-        if (transactionDto.getTransactionType() == TransactionType.PURCHASE 
-         && user.getBalance().compareTo(transactionDto.getTotalValue()) < 0
+        if (transaction.getTransactionType() == TransactionType.PURCHASE 
+         && user.getBalance().compareTo(transaction.getTotalValue()) < 0
          ) {
             throw new InsufficientCreditException("User does not have sufficient credit for this transaction.");
         }
