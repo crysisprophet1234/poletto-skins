@@ -8,7 +8,6 @@ import { Box, Stack } from '@mui/material'
 import { useCallback, useEffect, useState } from 'react'
 
 import { SpringPage } from '@/types/vendor/spring-page'
-import './styles.scss'
 import { Listing } from '@/types/entities/listing'
 
 type FilterData = {
