@@ -63,6 +63,9 @@ const Row: React.FC<RowProps> = ({ row, columns, renderCollapsibleContent }) => 
                     <IconButton
                         aria-label='expand row'
                         size='small'
+                        sx={{
+                            color: '#FFFFFF'
+                        }}
                         onClick={() => {
                             setOpen(!open)
                         }}
