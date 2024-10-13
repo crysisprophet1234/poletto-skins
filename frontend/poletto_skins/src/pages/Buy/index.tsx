@@ -5,10 +5,10 @@ import TopFilter from '@/components/TopFilter'
 import { useCart } from '@/hooks/useCart'
 import { get } from '@/services/api'
 import { Box, Stack } from '@mui/material'
-import { useCallback, useEffect, useState } from 'react'
-
 import { SpringPage } from '@/types/vendor/spring-page'
 import { Listing } from '@/types/entities/listing'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useBreakpoint } from '@/hooks/useBreakpoint'
 
 type FilterData = {
     minPrice?: string,
@@ -45,20 +45,29 @@ const Buy = () => {
         }))
     }
 
-    const fetchListings = useCallback(async () => {
-        try {
+    const { isXL, isLarge, isMedium } = useBreakpoint()
 
-            const listingsPage = await get<SpringPage<Listing>>('/listings', { ...filterData })
+    const size = useMemo(() => {
+        if (isXL) return 24
+        if (isLarge) return 16
+        if (isMedium) return 12
+        return 12
+    }, [isXL, isLarge, isMedium])
+
+    const fetchListings = useCallback(async () => {
+
+        try {
+            const listingsPage = await get<SpringPage<Listing>>('/listings', { ...filterData, size })
             setListings(listingsPage)
 
         } catch (error) {
             console.error(`Error trying to fetch listings: ${error}`)
         }
-    }, [filterData])
+    }, [filterData, size])
 
     useEffect(() => {
-        fetchListings()
-    }, [fetchListings])
+        if (filterData) fetchListings()
+    }, [fetchListings, filterData])
 
     return (
 
