@@ -9,11 +9,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -21,16 +23,19 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.poletto.polettoskins.entities.Listing;
+import com.poletto.polettoskins.entities.MarketItem;
 import com.poletto.polettoskins.entities.SteamItem;
 import com.poletto.polettoskins.entities.SteamItemPrice;
 import com.poletto.polettoskins.entities.SteamSticker;
 import com.poletto.polettoskins.entities.SteamUser;
 import com.poletto.polettoskins.exceptions.response.ResourceNotFoundException;
-import com.poletto.polettoskins.repositories.SteamItemRepository;
+import com.poletto.polettoskins.repositories.ListingRepository;
 import com.poletto.polettoskins.services.SteamService;
 
 @Service
@@ -46,7 +51,7 @@ public class SteamServiceImpl implements SteamService {
 	private ObjectMapper objectMapper;
 	
 	@Autowired
-	private SteamItemRepository steamItemRepository;
+	private ListingRepository listingRepository;
 
 	@Override
 	public SteamUser getUserInfo(String steamId) {
@@ -68,39 +73,16 @@ public class SteamServiceImpl implements SteamService {
 	}
 	
 	@Override
-	public void syncItems(String steamUserId) {
+    public Page<MarketItem> getUserInventory(String steamId, String startAssetId, Pageable pageable) {
 		
-		List<SteamItem> itemsFromSteamUser = getUserInventory(steamUserId);
-		
-		for (SteamItem item : itemsFromSteamUser) {
-			
-			String itemIdPrefix = item.getOwnerSteamId() != null
-					? "S" + item.getOwnerSteamId()
-					: "M" + item.getMarketId();
-			
-			String fullItemId = itemIdPrefix + "A" + item.getAssetId() + "D" + item.getD();
-			
-			item.setItemId(fullItemId);
-			
-		}
-		
-		steamItemRepository.saveAll(itemsFromSteamUser);
-		
-	}
-	
-	@Override
-	public Page<SteamItem> getItemsPaged(Pageable pageable, String query) {
-		//var page = steamItemRepository.findAll(pageable);
-		var page = steamItemRepository.findByFullItemName(query, pageable);
-		return page;
-	}
-	
-	@Override
-    public List<SteamItem> getUserInventory(String steamId) {
-		
-        String steamUrl = "https://steamcommunity.com/inventory/" + steamId + "/730/2";
+		String steamUrl = UriComponentsBuilder.fromHttpUrl("https://steamcommunity.com/inventory/" + steamId + "/730/2")
+	            .queryParam("count", pageable.getPageSize())
+	            .queryParam("start_assetid", startAssetId)
+	            .toUriString();
         
         String steamResponseJson = restTemplate.getForObject(steamUrl, String.class);
+        
+        SteamInventoryResponse response = restTemplate.getForObject(steamUrl, SteamInventoryResponse.class);
         
         var itemsSteamData = extractSteamDataFromResponse(steamResponseJson, steamId);
 
@@ -120,9 +102,22 @@ public class SteamServiceImpl implements SteamService {
         	throw new RuntimeException("Problem parsing items information");
         }
         
-        //steamItemRepository.saveAll(steamItemsList);
+        List<MarketItem> marketItems = filterUnlistedItems(steamItems)
+        		.stream()
+        		.map(x -> new MarketItem(
+        				x,
+        				getItemPriceBySteamId(x.getFullItemName())
+        			)
+        		)
+        		.collect(Collectors.toList());
         
-        return steamItems;
+        return new SteamInventoryPage(
+    		marketItems,
+    		pageable,
+    		response.getTotalInventoryCount(),
+    		response.getLastAssetId(),
+    		response.hasMoreItems()
+    	);
     }
 	
 	@Override
@@ -149,17 +144,19 @@ public class SteamServiceImpl implements SteamService {
 	}
 	
 	@Override
-	public SteamItemPrice getItemPriceBySteamId(String itemSteamId) {
+	public SteamItemPrice getItemPriceBySteamId(String fullItemName) {
 		
+		/*
 		SteamItem steamItem = getItemBySteamId(itemSteamId)
 				.orElseThrow(() -> new ResourceNotFoundException("Invalid item or item name not found."));
 		
 		String itemHashName = steamItem.getFullItemName();
+		*/
 		
 		String url = "https://steamcommunity.com/market/priceoverview/"
 				   + "?currency=7"
 				   + "&appid=730"
-				   + "&market_hash_name=" + itemHashName;
+				   + "&market_hash_name=" + fullItemName;
 		
 		String response = restTemplate.getForObject(url, String.class);
 		
@@ -171,7 +168,7 @@ public class SteamServiceImpl implements SteamService {
 
         String lowestPriceStr = jsonResponse.optString("lowest_price", "R$ 0,00");
         String medianPriceStr = jsonResponse.optString("median_price", "R$ 0,00");
-        Integer quantitySoldLast24Hours = Integer.parseInt(jsonResponse.optString("volume", "0"));
+        Integer quantitySoldLast24Hours = Integer.parseInt(jsonResponse.optString("volume", "0").replace(",", ""));
 
         BigDecimal lowestPrice = parsePrice(lowestPriceStr);
         BigDecimal medianPrice = parsePrice(medianPriceStr);
@@ -183,6 +180,23 @@ public class SteamServiceImpl implements SteamService {
 
         return steamItemPrice;
 	}
+	
+	public List<SteamItem> filterUnlistedItems(List<SteamItem> steamItems) {
+        // Collect all asset IDs from the Steam items.
+        List<String> assetIds = steamItems.stream()
+            .map(SteamItem::getAssetId)
+            .collect(Collectors.toList());
+
+        // Get all listed asset IDs in a single query.
+        List<String> listedAssetIds = listingRepository.findAllByAssetIdIn(assetIds).stream()
+            .map(x -> x.getItem().getAssetId())
+            .collect(Collectors.toList());
+
+        // Filter out the items that are already listed.
+        return steamItems.stream()
+            .filter(item -> !listedAssetIds.contains(item.getAssetId()))
+            .collect(Collectors.toList());
+    }
 
 	private BigDecimal parsePrice(String priceStr) {
 
@@ -249,16 +263,7 @@ public class SteamServiceImpl implements SteamService {
             }
 
             Map<String, List<Map<String, Object>>> result = new HashMap<>();
-            //result.put("links", steamData); 
-            
-            
-            //TODO: workaround while there is no pagination
-            if (steamData.size() > 50) {
-            	result.put("links", steamData.subList(0, 100));
-            } else {
-            	result.put("links", steamData);
-            }
-            
+            result.put("links", steamData);
             
             return result;
 
@@ -497,9 +502,55 @@ public class SteamServiceImpl implements SteamService {
             + "A" + steamItem.getAssetId() 
             + "D" + steamItem.getD()
         );
+        
+        steamItem.setItemId(steamItem.constructItemId());
 
         return steamItem;
     }
 
-	
+	// Custom PageImpl to include lastAssetId and hasMore
+    public static class SteamInventoryPage extends PageImpl<MarketItem> {
+
+		private static final long serialVersionUID = 1L;
+		
+		private final String lastAssetId;
+        private final boolean hasMore;
+
+        public SteamInventoryPage(List<MarketItem> content, Pageable pageable, long total, String lastAssetId, boolean hasMore) {
+            super(content, pageable, total);
+            this.lastAssetId = lastAssetId;
+            this.hasMore = hasMore;
+        }
+
+        public String getLastAssetId() {
+            return lastAssetId;
+        }
+
+        public boolean hasMore() {
+            return hasMore;
+        }
+    }
+    
+    private static class SteamInventoryResponse {
+        private List<Object> assets;
+        private boolean more_items;
+        private String last_assetId;
+        private int total_inventory_count;
+
+        // getters and setters
+
+        public boolean hasMoreItems() {
+            return more_items;
+        }
+
+        public String getLastAssetId() {
+            return last_assetId;
+        }
+
+        public int getTotalInventoryCount() {
+            return total_inventory_count;
+        }
+
+    }
+    
 }
