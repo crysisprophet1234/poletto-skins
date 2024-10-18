@@ -66,9 +66,7 @@ public class ListingServiceImpl implements ListingService {
 		
 		listingDTO.setItem(steamItem);
 		
-		String itemId = listingDTO.getItem().getItemId();
-		
-		SteamItemPrice steamItemPrice = steamService.getItemPriceBySteamId(itemId);
+		SteamItemPrice steamItemPrice = steamService.getItemPriceBySteamId(steamItem.getFullItemName());
 		
 		listingDTO.setSteamPrice(steamItemPrice.getMedianPrice());
 		
