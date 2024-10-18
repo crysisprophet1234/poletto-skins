@@ -2,14 +2,13 @@ import SellCatalog from '@/components/SellCatalog'
 import SellList from '@/components/SellList'
 import TopFilter from '@/components/TopFilter'
 import { useAuth } from '@/hooks/useAuth'
+import { useBreakpoint } from '@/hooks/useBreakpoint'
 import { useSell } from '@/hooks/useSell'
 import { get } from '@/services/api'
-import { SteamItemPrice } from '@/types/entities/item'
-import { MarketItem, SteamItem } from '@/types/entities/steam-item'
+import { MarketItem } from '@/types/entities/steam-item'
 import { SpringPage } from '@/types/vendor/spring-page'
-import { extractItemId } from '@/utils/extractItemId'
 import { Box } from '@mui/material'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 type FilterData = {
     minPrice?: string,
@@ -29,15 +28,15 @@ const Sell = () => {
 
     const { addToSellList, removeFromSellList, isItemInSellList } = useSell()
 
-    const handleAddSellListButtonClick = (item: MarketItem) => {
-        if (isItemInSellList(item.assetId)) {
-            removeFromSellList(item.assetId)
+    const handleAddSellListButtonClick = (marketItem: MarketItem) => {
+        if (isItemInSellList(marketItem.item.assetId)) {
+            removeFromSellList(marketItem.item.assetId)
         } else {
-            addToSellList(item)
+            addToSellList(marketItem)
         }
     }
 
-    const [items, setItems] = useState<SpringPage<MarketItem>>()
+    const [marketItems, setMarketItems] = useState<SpringPage<MarketItem>>()
 
     const [/*filterData*/, setFilterData] = useState<FilterData>()
 
@@ -48,45 +47,25 @@ const Sell = () => {
         }))
     }
 
+    const { isXL, isLarge, isMedium } = useBreakpoint()
+
+    const size = useMemo(() => {
+        if (isXL) return 20
+        if (isLarge) return 16
+        if (isMedium) return 9
+        return 9
+    }, [isXL, isLarge, isMedium])
+
     const getUserItems = useCallback(async (steamId: string) => {
+
         try {
-            const steamItemsFromUser = await get<SteamItem[]>(`/users/steam/${steamId}/inventory`)
+            const marketItemsPage = await get<SpringPage<MarketItem>>(`/users/steam/${steamId}/inventory?size=${size}`)
+            setMarketItems(marketItemsPage)
 
-            const marketItemsPromises = steamItemsFromUser.map(async (item) => {
-                try {
-                    const priceData = await get<SteamItemPrice>(`/items/${extractItemId(item as MarketItem)}/market-price`)
-
-                    return {
-                        ...item,
-                        price: priceData.lowestPrice,
-                        steamPrice: priceData.medianPrice
-                    } as MarketItem
-                } catch (error) {
-                    console.error(`Error fetching price for item ${item.assetId}: ${error}`)
-                    return item as MarketItem
-                }
-            })
-
-            const marketItems = await Promise.all(marketItemsPromises)
-
-            //FIXME: provisory solution
-            const marketItemsPage: SpringPage<MarketItem> = {
-                content: marketItems,
-                totalElements: marketItems.length,
-                numberOfElements: marketItems.length,
-                totalPages: 1,
-                size: marketItems.length,
-                number: 0,
-                first: true,
-                last: true,
-                empty: false
-            }
-
-            setItems(marketItemsPage)
         } catch (error) {
             console.error(`Error trying to fetch steam user data: ${error}`)
         }
-    }, [])
+    }, [size])
 
     useEffect(() => {
         if (steamId) {
@@ -118,7 +97,7 @@ const Sell = () => {
                         overflowX: 'hidden'
                     }}
                 >
-                    <SellCatalog items={items!} itemAction={handleAddSellListButtonClick} />
+                    <SellCatalog marketItems={marketItems!} itemAction={handleAddSellListButtonClick} />
                 </Box>
 
             </Box>
