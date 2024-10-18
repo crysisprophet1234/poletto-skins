@@ -1,5 +1,5 @@
 import { useSell } from '@/hooks/useSell'
-import { MarketItem } from '@/types/entities/steam-item'
+import { MarketItem, SteamSticker } from '@/types/entities/steam-item'
 import { itemWearAbbreviator, WearName } from '@/utils/itemWearAbbreviator'
 import { SellRounded } from '@mui/icons-material'
 import { Tooltip, Typography } from '@mui/material'
@@ -16,17 +16,17 @@ const SellItemCard = ({ sellItemProps, openModal, sellItemAction }: SellItemCard
 
     const { isItemInSellList } = useSell()
 
-    const [item, setItem] = useState<MarketItem | null>(null)
+    const [marketItem, setMarketItem] = useState<MarketItem>()
 
     const [isHovered, setIsHovered] = useState(false)
 
     useEffect(() => {
-        setItem(sellItemProps)
+        setMarketItem(sellItemProps)
     }, [sellItemProps])
 
-    if (!item) {
-        return
-    }
+    console.log(marketItem)
+
+    if (!marketItem) return
 
     return (
 
@@ -39,44 +39,47 @@ const SellItemCard = ({ sellItemProps, openModal, sellItemAction }: SellItemCard
 
             <div className='item-info-container'>
 
-                {item.weaponType.toLowerCase() == 'sticker'
+                {marketItem?.item.weaponType.toLowerCase() == 'sticker'
                     ? (
                         <>
                             <span className='skin-name'>
-                                {item.stickers[0].name}
+                                {marketItem?.item.stickers[0].name}
                             </span>
 
                             <span className='category'>
-                                {item.weaponType}
+                                {marketItem?.item.weaponType}
                             </span>
                         </>
                     ) : (
                         <>
                             <span className='skin-name'>
-                                {item.itemName == '-' ? 'Vanilla' : item.itemName}
+                                {marketItem?.item.itemName == '-' 
+                                    ? 'Vanilla' 
+                                    : marketItem?.item.itemName
+                                }
                             </span>
 
                             <span className='category'>
-                                {item.weaponType /*TODO: subcategory?*/}
+                                {marketItem?.item.weaponType /*TODO: subcategory?*/}
                             </span>
 
                             <div className='additional-info'>
 
-                                {item.qualityName.toLowerCase().includes('stattrak') && (
+                                {marketItem?.item.qualityName.toLowerCase().includes('stattrak') && (
                                     <span className='stat-trak'>ST</span>
                                 )}
 
                                 <span className='float-short'>
-                                    {itemWearAbbreviator(item.wearName as WearName)}
+                                    {itemWearAbbreviator(marketItem?.item.wearName as WearName)}
                                 </span>
 
                                 <Tooltip title={
                                     <Typography noWrap minWidth='fit-content'>
-                                        {item.floatValue}
+                                        {marketItem?.item.floatValue}
                                     </Typography>
                                 }>
                                     <span className='float-full'>
-                                        {item.floatValue.toFixed(4)}
+                                        {marketItem?.item.floatValue.toFixed(4)}
                                     </span>
                                 </Tooltip>
 
@@ -90,15 +93,15 @@ const SellItemCard = ({ sellItemProps, openModal, sellItemAction }: SellItemCard
             <div className='item-picture-container'>
 
                 <div className='skin-image'>
-                    <img src={item?.imageUrl} alt='skin-image' loading='lazy' />
+                    <img src={marketItem?.item?.imageUrl} alt='skin-image' loading='lazy' />
                 </div>
 
-                {item.weaponType.toLowerCase() !== 'sticker' && (
+                {marketItem?.item.weaponType.toLowerCase() !== 'sticker' && (
                     <div className='sticker-stack'>
 
-                        {item.stickers.slice(0, 4).map((sticker, index) => { //TODO: slicing 4 stickers
+                        {marketItem?.item.stickers.slice(0, 4).map((sticker: SteamSticker) => { //TODO: slicing 4 stickers
                             return (
-                                <div className='sticker' key={sticker.stickerId + '-' + index}>
+                                <div className='sticker' key={sticker.codename}>
                                     <img src={sticker.imageUrl} alt={sticker.name} loading='lazy' />
                                 </div>
                             )
@@ -114,14 +117,14 @@ const SellItemCard = ({ sellItemProps, openModal, sellItemAction }: SellItemCard
                 <div className='price-container'>
 
                     <div className='price'>
-                        <span>{item?.price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+                        <span>{marketItem?.price?.lowestPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
                     </div>
 
                 </div>
 
                 <div className='add-cart-container' onClick={(e) => e.stopPropagation()}>
                     <AddCartButton
-                        isItemInCart={isItemInSellList(item.assetId)}
+                        isItemInCart={isItemInSellList(marketItem?.item.assetId)}
                         onClick={sellItemAction}
                         isHovered={isHovered}
                     >
