@@ -315,6 +315,25 @@ public class SteamItem implements Serializable {
 	public void setStickers(List<SteamSticker> stickers) {
 		this.stickers = stickers;
 	}
+	
+	public String constructItemId() {
+		
+		StringBuilder itemId = new StringBuilder();
+		
+		if (!marketId.equals("0")) {
+	        itemId.append("M").append(marketId);
+	    }
+
+	    if (!ownerSteamId.equals("0")) {
+	        itemId.append("S").append(ownerSteamId);
+	    }
+		
+		itemId.append("A" + assetId);
+		
+		itemId.append("D" + d);
+		
+		return itemId.toString();
+	}
 
 	@Override
 	public int hashCode() {
