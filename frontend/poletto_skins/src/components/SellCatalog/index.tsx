@@ -7,17 +7,18 @@ import { MarketItem } from '@/types/entities/steam-item'
 import SellItemModal from '../SellItemModal'
 
 type SellCatalogProps = {
-    items: SpringPage<MarketItem>
-    itemAction: (item: MarketItem) => void
+    marketItems: SpringPage<MarketItem>
+    itemAction: (marketItem: MarketItem) => void
 }
 
-const SellCatalog = ({ items, itemAction }: SellCatalogProps) => {
+const SellCatalog = ({ marketItems, itemAction }: SellCatalogProps) => {
+
     const [loading, setLoading] = useState(true)
     const [selectedItem, setSelectedItem] = useState<MarketItem>()
     const [open, setOpen] = useState(false)
 
-    const handleOpen = (item: MarketItem) => {
-        setSelectedItem(item)
+    const handleOpen = (marketItem: MarketItem) => {
+        setSelectedItem(marketItem)
         setOpen(true)
     }
 
@@ -27,10 +28,10 @@ const SellCatalog = ({ items, itemAction }: SellCatalogProps) => {
     }
 
     useEffect(() => {
-        if (items && items.content.length > 0) {
+        if (marketItems && marketItems.content.length > 0) {
             setLoading(false)
         }
-    }, [items])
+    }, [marketItems])
 
     return (
         <Box
@@ -61,7 +62,7 @@ const SellCatalog = ({ items, itemAction }: SellCatalogProps) => {
                     gap: 2,
                 }}
             >
-                <Grid container justifyContent='flex-start' spacing={1} columns={{ xs: 4, sm: 8, md: 12, lg: 12, xl: 16 }}>
+                <Grid container justifyContent='space-between' spacing={1} columns={{ xs: 4, sm: 8, md: 12, lg: 12, xl: 16 }}>
                     {loading
                         ? Array.from(new Array(12)).map((_, index) => (
                             <Grid item xs={2} sm={4} md={4} lg={3} key={index}>
@@ -72,13 +73,13 @@ const SellCatalog = ({ items, itemAction }: SellCatalogProps) => {
                                 />
                             </Grid>
                         ))
-                        : items.content.map((item) => (
-                            <Grid item xs={2} sm={4} md={4} lg={3} key={item.assetId}>
+                        : marketItems.content.map((marketItem) => (
+                            <Grid item xs={2} sm={4} md={4} lg={3} key={marketItem.item.assetId}>
                                 <SellItemCard
-                                    sellItemProps={item}
-                                    key={item.assetId}
-                                    sellItemAction={() => itemAction(item)}
-                                    openModal={() => handleOpen(item)}
+                                    sellItemProps={marketItem}
+                                    key={marketItem.item.assetId}
+                                    sellItemAction={() => itemAction(marketItem)}
+                                    openModal={() => handleOpen(marketItem)}
                                 />
                             </Grid>
                         ))}
@@ -107,7 +108,7 @@ const SellCatalog = ({ items, itemAction }: SellCatalogProps) => {
                         open={open}
                         itemAction={() => itemAction(selectedItem)}
                         handleClose={handleClose}
-                        item={selectedItem}
+                        marketItem={selectedItem}
                     />
             }
         </Box>
