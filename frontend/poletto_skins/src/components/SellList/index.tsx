@@ -58,10 +58,10 @@ const SellList = () => {
                     mb: 2,
                 }}
             >
-                {sellList.map((item, index) => (
-                    <Box key={item.assetId} sx={{ mb: 2, pr: 1 }}>
+                {sellList.map((marketItem, index) => (
+                    <Box key={marketItem.item.assetId} sx={{ mb: 2, pr: 1 }}>
 
-                        <SellListItem item={item} />
+                        <SellListItem marketItem={marketItem} />
 
                         {index < sellList.length - 1 && sellList.length > 1 && (
                             <Divider
