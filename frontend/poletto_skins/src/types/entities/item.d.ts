@@ -39,9 +39,3 @@ export type Sticker = Item & {
 }
 
 export type ItemType = WeaponSkin | Sticker | GloveSkin | KnifeSkin
-
-export type SteamItemPrice = {
-    lowestPrice: number
-    medianPrice: number
-    quantitySoldLast24Hours: number
-}

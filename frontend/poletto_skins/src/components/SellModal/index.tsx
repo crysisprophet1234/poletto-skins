@@ -83,10 +83,13 @@ const SellModal = ({ open, handleClose }: SellModalProps) => {
                     </Box>
 
                     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                        <Typography variant='h6'>
+                        <Typography variant='h6'>           
                             Você possui <Box component='span' sx={{ color: '#806cf5' }}>{totalItems}</Box>{' '}
                             {totalItems === 1 ? 'item' : 'itens'} para vender, somando o valor de{' '}
-                            <Box component='span' sx={{ color: '#806cf5' }}>R${totalPrice.toFixed(2)}</Box>
+                            <Box component='span' sx={{ color: '#806cf5' }}>
+                                {totalPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                            </Box>
+                            .
                         </Typography>
                     </Box>
 

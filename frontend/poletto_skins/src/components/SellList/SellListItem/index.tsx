@@ -9,7 +9,7 @@ import { useForm } from 'react-hook-form'
 import { number, z } from 'zod'
 
 interface SellListItemProps {
-    item: MarketItem
+    marketItem: MarketItem
 }
 
 const priceSchema = z.object({
@@ -19,7 +19,7 @@ const priceSchema = z.object({
 
 type PriceSchemaType = z.infer<typeof priceSchema>
 
-const SellListItem = ({ item }: SellListItemProps) => {
+const SellListItem = ({ marketItem }: SellListItemProps) => {
 
     const TAX_RATE = 0.1
 
@@ -32,8 +32,8 @@ const SellListItem = ({ item }: SellListItemProps) => {
     } = useForm<PriceSchemaType>({
         resolver: zodResolver(priceSchema),
         defaultValues: {
-            sellingPrice: item.price,
-            userPrice: item.price * (1 - TAX_RATE) * 100 / 100
+            sellingPrice: marketItem.price.lowestPrice,
+            userPrice: marketItem.price.lowestPrice * (1 - TAX_RATE) * 100 / 100
         }
     })
 
@@ -41,20 +41,20 @@ const SellListItem = ({ item }: SellListItemProps) => {
 
     useEffect(() => {
 
-        if (item.price !== sellingPrice) {
-            updateItemValue(item.assetId, sellingPrice)
+        if (marketItem.price.lowestPrice !== sellingPrice) {
+            updateItemValue(marketItem.item.assetId, sellingPrice)
             setValue('userPrice', sellingPrice * (1 - TAX_RATE) * 100 / 100)
         }
 
-    }, [sellingPrice, setValue, item.assetId, item.price, updateItemValue])
+    }, [sellingPrice, setValue, marketItem, updateItemValue])
 
     return (
         <Box sx={{ mb: 2, pr: 1 }}>
             <Stack direction={'row'} spacing={1} height={'260px'}>
                 <Box sx={{ transform: 'scale(0.9, 0.75)', transformOrigin: 'top center' }}>
                     <SellItemCard
-                        sellItemProps={item}
-                        sellItemAction={() => removeFromSellList(item.assetId)}
+                        sellItemProps={marketItem}
+                        sellItemAction={() => removeFromSellList(marketItem.item.assetId)}
                         openModal={() => { }}
                     />
                 </Box>
