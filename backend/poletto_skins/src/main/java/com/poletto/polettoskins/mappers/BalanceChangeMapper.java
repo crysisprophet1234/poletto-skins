@@ -7,9 +7,9 @@ import com.poletto.polettoskins.dto.BalanceChangeDTO;
 import com.poletto.polettoskins.entities.BalanceChange;
 
 @Mapper(componentModel = "spring")
-public interface BalanceMapper {
+public interface BalanceChangeMapper {
 	
-	BalanceMapper INSTANCE = Mappers.getMapper(BalanceMapper.class);
+	BalanceChangeMapper INSTANCE = Mappers.getMapper(BalanceChangeMapper.class);
 	
 	BalanceChangeDTO toBalanceChangeDto(BalanceChange balanceChange);
 
