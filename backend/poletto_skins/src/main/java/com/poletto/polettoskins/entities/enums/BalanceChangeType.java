@@ -4,5 +4,5 @@ public enum BalanceChangeType {
 	DEPOSIT,
     WITHDRAWAL,
     PURCHASE,
-    REFUND
+    SELLING
 }
