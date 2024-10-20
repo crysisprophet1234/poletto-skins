@@ -1,7 +1,7 @@
-import AddCartButton from '@/components/AddCartButton'
+import AddItemButton from '@/components/AddItemButton'
 import FloatBar from '@/components/FloatBar'
-import { useCart } from '@/hooks/useCart'
-import { SteamSticker } from '@/types/entities/steam-item'
+import { useSell } from '@/hooks/useSell'
+import { MarketItem, SteamSticker } from '@/types/entities/steam-item'
 import { AddShoppingCartRounded, Close, RemoveShoppingCartRounded } from '@mui/icons-material'
 import { Divider, Link, Stack, Tooltip } from '@mui/material'
 import Box from '@mui/material/Box'
@@ -9,18 +9,17 @@ import Modal from '@mui/material/Modal'
 import Typography from '@mui/material/Typography'
 import { FaExternalLinkAlt } from 'react-icons/fa'
 import './styles.scss'
-import { Listing } from '@/types/entities/listing'
 
-type ListingModalProps = {
-    listing: Listing
+type ItemModalProps = {
+    marketItem: MarketItem
     open: boolean
     handleClose: () => void
     itemAction: () => void
 }
 
-const ListingModal = ({ listing, open, handleClose, itemAction }: ListingModalProps) => {
+const ItemModal = ({ marketItem, open, handleClose, itemAction }: ItemModalProps) => {
 
-    const { isListingInCart } = useCart()
+    const { isItemInSellList } = useSell()
 
     return (
 
@@ -48,13 +47,13 @@ const ListingModal = ({ listing, open, handleClose, itemAction }: ListingModalPr
 
                         <div className='item-title'>
 
-                            {listing?.item.quality == 9 &&
+                            {marketItem.item.quality == 9 &&
                                 <Typography
                                     variant='h5'
                                     fontWeight={600}
                                     color={'#CF6A32'}
                                 >
-                                    {listing?.item.qualityName}&nbsp;
+                                    {marketItem.item.qualityName}&nbsp;
                                 </Typography>
                             }
 
@@ -62,7 +61,7 @@ const ListingModal = ({ listing, open, handleClose, itemAction }: ListingModalPr
                                 variant='h5'
                                 fontWeight={600}
                             >
-                                {`${listing?.item.fullItemName.replace('StatTrak™', '')} ${listing?.item.itemName == '-' ? '| Vanilla' : ''}`}
+                                {`${marketItem.item.fullItemName.replace('StatTrak™', '')} ${marketItem.item.itemName == '-' ? '| Vanilla' : ''}`}
                             </Typography>
 
                         </div>
@@ -81,8 +80,8 @@ const ListingModal = ({ listing, open, handleClose, itemAction }: ListingModalPr
 
                             <div className='item-image'>
                                 <img
-                                    src={listing?.item.imageUrl}
-                                    alt={listing?.item.fullItemName}
+                                    src={marketItem.item.imageUrl}
+                                    alt={marketItem.item.fullItemName}
                                     loading='lazy'
                                 />
                             </div>
@@ -91,7 +90,7 @@ const ListingModal = ({ listing, open, handleClose, itemAction }: ListingModalPr
                                 <Stack direction='row' spacing={2} justifyContent='space-between'>
 
                                     <Link
-                                        href={listing?.item.inspectUrl}
+                                        href={marketItem.item.inspectUrl}
                                         target='_blank'
                                         underline='none'
                                     >
@@ -99,7 +98,7 @@ const ListingModal = ({ listing, open, handleClose, itemAction }: ListingModalPr
                                     </Link>
 
                                     <Link
-                                        href={'https://steamcommunity.com/market/listings/730/' + listing?.item.fullItemName}
+                                        href={'https://steamcommunity.com/market/listings/730/' + marketItem.item.fullItemName}
                                         target='_blank'
                                         underline='none'
                                     >
@@ -107,7 +106,7 @@ const ListingModal = ({ listing, open, handleClose, itemAction }: ListingModalPr
                                     </Link>
 
                                     <Link
-                                        href={`https://youtube.com/results?search_query=${listing?.item.weaponType} ${listing?.item.itemName == '-' ? 'Vanilla' : listing?.item.itemName} - Skin Float And Wear Preview`}
+                                        href={`https://youtube.com/results?search_query=${marketItem.item.weaponType} ${marketItem.item.itemName == '-' ? 'Vanilla' : marketItem.item.itemName} - Skin Float And Wear Preview`}
                                         target='_blank'
                                         underline='none'
                                     >
@@ -117,7 +116,7 @@ const ListingModal = ({ listing, open, handleClose, itemAction }: ListingModalPr
                                 </Stack>
                             </div>
 
-                            {listing?.item.weaponType.toLowerCase() !== 'sticker' && listing?.item.stickers.length > 0 &&
+                            {marketItem.item.weaponType.toLowerCase() !== 'sticker' && marketItem.item.stickers.length > 0 &&
 
                                 <Stack
                                     direction='row'
@@ -127,7 +126,7 @@ const ListingModal = ({ listing, open, handleClose, itemAction }: ListingModalPr
                                     gridTemplateColumns={'repeat(4, 1fr)'}
                                     height={'90px'}
                                 >
-                                    {listing?.item.stickers.slice(0, 4).map((sticker: SteamSticker, index: number) => { //TODO: slicing 4 stickers
+                                    {marketItem.item.stickers.slice(0, 4).map((sticker: SteamSticker, index: number) => { //TODO: slicing 4 stickers
                                         return (
                                             <Tooltip
                                                 key={sticker.stickerId + '-' + index}
@@ -162,7 +161,7 @@ const ListingModal = ({ listing, open, handleClose, itemAction }: ListingModalPr
                             <div className='item-details-box float'>
 
                                 <div className='float-container'>
-                                    <FloatBar floatValue={listing?.item.floatValue * 100} />
+                                    <FloatBar floatValue={marketItem.item.floatValue * 100} />
                                 </div>
 
 
@@ -176,7 +175,7 @@ const ListingModal = ({ listing, open, handleClose, itemAction }: ListingModalPr
 
                                     <div className='item-value'>
                                         <Typography>
-                                            {listing?.item.floatValue}
+                                            {marketItem.item.floatValue}
                                         </Typography>
                                     </div>
 
@@ -198,10 +197,10 @@ const ListingModal = ({ listing, open, handleClose, itemAction }: ListingModalPr
 
                                     <div className='item-value'>
                                         <Typography>
-                                            {listing?.item.rarityName}
+                                            {marketItem.item.rarityName}
                                         </Typography>
                                         <Typography>
-                                            {listing?.item.paintSeed}
+                                            {marketItem.item.paintSeed}
                                         </Typography>
                                     </div>
 
@@ -224,11 +223,11 @@ const ListingModal = ({ listing, open, handleClose, itemAction }: ListingModalPr
 
                                     <div className='item-value'>
                                         <Typography>
-                                            {listing?.listingPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                            {marketItem.price.lowestPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                                         </Typography>
                                         <Typography>
                                             {/* TODO: same price && mocked recommended price */}
-                                            {(listing?.listingPrice / 100 * 85).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                            {(marketItem.price.lowestPrice / 100 * 85).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                                         </Typography>
                                     </div>
 
@@ -246,23 +245,23 @@ const ListingModal = ({ listing, open, handleClose, itemAction }: ListingModalPr
 
                                     <div className='item-value'>
                                         <Typography variant='h6'>
-                                        {listing?.listingPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                        {marketItem.price.lowestPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                                         </Typography>
                                     </div>
 
                                 </div>
 
                                 <div className='add-cart-container'>
-                                    <AddCartButton
-                                        isItemInCart={isListingInCart(listing.id)}
+                                    <AddItemButton
+                                        isItemInCart={isItemInSellList(marketItem.item.assetId)}
                                         onClick={itemAction}
                                         isHovered={true}
                                     >
-                                        {isListingInCart(listing.id)
+                                        {isItemInSellList(marketItem.item.assetId)
                                             ? <RemoveShoppingCartRounded />
                                             : <AddShoppingCartRounded />
                                         }
-                                    </AddCartButton>
+                                    </AddItemButton>
                                 </div>
 
                             </div>
@@ -279,4 +278,4 @@ const ListingModal = ({ listing, open, handleClose, itemAction }: ListingModalPr
     )
 }
 
-export default ListingModal
+export default ItemModal

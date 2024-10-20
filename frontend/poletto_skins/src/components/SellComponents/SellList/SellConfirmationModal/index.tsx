@@ -1,16 +1,16 @@
+import ConfirmItemActionButton from '@/components/ConfirmItemActionButton'
 import { useAuth } from '@/hooks/useAuth'
 import { useSell } from '@/hooks/useSell'
 import { Close } from '@mui/icons-material'
 import { Box, IconButton, Modal, Stack, Typography } from '@mui/material'
 import { useState } from 'react'
-import BuyModalButton from '../BuyModal/BuyModalButton'
 
-type SellModalProps = {
+type SellConfirmationModalProps = {
     open: boolean
     handleClose: () => void
 }
 
-const SellModal = ({ open, handleClose }: SellModalProps) => {
+const SellConfirmationModal = ({ open, handleClose }: SellConfirmationModalProps) => {
 
     const { totalItems, totalPrice, instantSell, createListing } = useSell()
 
@@ -104,21 +104,21 @@ const SellModal = ({ open, handleClose }: SellModalProps) => {
                     flexDirection: 'row',
                     gap: '15px'
                 }}>
-                    <BuyModalButton
+                    <ConfirmItemActionButton
                         onClick={handleClose}
                         loading={loading}
                         text='RETORNAR'
                         color='#f05f75'
                         hoverColor='#ff8095'
                     />
-                    <BuyModalButton
+                    <ConfirmItemActionButton
                         onClick={handleAnnunciate}
                         loading={loading}
                         text='ANUNCIAR'
                         color='#806cf5'
                         hoverColor='#9F8FFF'
                     />
-                    <BuyModalButton
+                    <ConfirmItemActionButton
                         onClick={handleInstantSell}
                         loading={loading}
                         text='VENDA INSTANTÂNEA'
@@ -131,4 +131,4 @@ const SellModal = ({ open, handleClose }: SellModalProps) => {
     )
 }
 
-export default SellModal
+export default SellConfirmationModal

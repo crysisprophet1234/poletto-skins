@@ -1,5 +1,3 @@
-import Cart from '@/components/Cart'
-import Catalog from '@/components/Catalog'
 import MainFilter from '@/components/MainFilter'
 import TopFilter from '@/components/TopFilter'
 import { useCart } from '@/hooks/useCart'
@@ -9,6 +7,8 @@ import { SpringPage } from '@/types/vendor/spring-page'
 import { Listing } from '@/types/entities/listing'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useBreakpoint } from '@/hooks/useBreakpoint'
+import Catalog from '@buy/Catalog'
+import Cart from '@buy/Cart'
 
 type FilterData = {
     minPrice?: string,

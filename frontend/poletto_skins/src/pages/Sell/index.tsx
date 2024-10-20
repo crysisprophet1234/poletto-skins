@@ -1,5 +1,4 @@
-import SellCatalog from '@/components/SellCatalog'
-import SellList from '@/components/SellList'
+import SellCatalog from '@/components/SellComponents/Catalog'
 import TopFilter from '@/components/TopFilter'
 import { useAuth } from '@/hooks/useAuth'
 import { useBreakpoint } from '@/hooks/useBreakpoint'
@@ -8,6 +7,7 @@ import { get } from '@/services/api'
 import { MarketItem } from '@/types/entities/steam-item'
 import { SpringPage } from '@/types/vendor/spring-page'
 import { Box } from '@mui/material'
+import SellList from '@sell/SellList'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 type FilterData = {

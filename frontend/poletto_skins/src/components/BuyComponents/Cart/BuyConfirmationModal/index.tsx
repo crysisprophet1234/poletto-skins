@@ -3,14 +3,14 @@ import { useCart } from '@/hooks/useCart'
 import { Close } from '@mui/icons-material'
 import { Box, IconButton, Modal, Stack, Typography } from '@mui/material'
 import { useState } from 'react'
-import BuyModalButton from './BuyModalButton'
+import BuyModalButton from '../../../ConfirmItemActionButton'
 
-type BuyModalProps = {
+type BuyConfirmationModalProps = {
     open: boolean
     handleClose: () => void
 }
 
-const BuyModal = ({ open, handleClose }: BuyModalProps) => {
+const BuyConfirmationModal = ({ open, handleClose }: BuyConfirmationModalProps) => {
 
     const { totalListings, totalPrice, checkout } = useCart()
 
@@ -171,7 +171,7 @@ const BuyModal = ({ open, handleClose }: BuyModalProps) => {
                         hoverColor='#ff8095'
                     />
                     <BuyModalButton
-                        onClick={userHasEnoughBalance ? handleConfirm : () => alert('not implemented yet')}
+                        onClick={userHasEnoughBalance ? handleConfirm : () => alert('not implemented yet')} //FIXME: now its implemented...
                         loading={loading}
                         text={userHasEnoughBalance ? 'CONFIRMAR' : 'ADICIONAR'}
                         color='#806cf5'
@@ -186,4 +186,4 @@ const BuyModal = ({ open, handleClose }: BuyModalProps) => {
 
 }
 
-export default BuyModal
+export default BuyConfirmationModal

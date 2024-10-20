@@ -1,4 +1,4 @@
-import ItemCartMiniature from '@/components/Cart/ItemCartPopup/ItemCartMiniature'
+import ItemCartMiniature from '@buy/Cart/ItemCartPopup/ItemCartMiniature'
 import { useAuth } from '@/hooks/useAuth'
 import { useCart } from '@/hooks/useCart'
 import { AddShoppingCartRounded, Close } from '@mui/icons-material'

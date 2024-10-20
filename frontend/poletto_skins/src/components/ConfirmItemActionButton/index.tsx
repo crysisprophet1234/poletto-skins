@@ -1,6 +1,6 @@
 import { Button, CircularProgress } from '@mui/material'
 
-type BuyModalButton = {
+type ConfirmItemActionButtonProps = {
     onClick: () => void
     loading: boolean
     text: string
@@ -9,7 +9,7 @@ type BuyModalButton = {
     disabled?: boolean
 }
 
-const BuyModalButton = ({ onClick, loading, text, color, hoverColor, disabled }: BuyModalButton) => {
+const ConfirmItemActionButton = ({ onClick, loading, text, color, hoverColor, disabled }: ConfirmItemActionButtonProps) => {
 
     return (
         <Button
@@ -35,4 +35,4 @@ const BuyModalButton = ({ onClick, loading, text, color, hoverColor, disabled }:
 
 }
 
-export default BuyModalButton
+export default ConfirmItemActionButton

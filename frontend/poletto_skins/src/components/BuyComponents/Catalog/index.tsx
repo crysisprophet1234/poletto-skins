@@ -2,8 +2,8 @@ import { SpringPage } from '@/types/vendor/spring-page'
 import { Box, Button, Grid, Skeleton } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { Listing } from '@/types/entities/listing'
-import ListingCard from '@/components/ListingCard'
-import ListingModal from '../ListingModal'
+import ListingCard from '@/components/BuyComponents/Catalog/ListingCard'
+import ListingModal from '@buy/Catalog/ItemModal'
 
 type CatalogProps = {
     listings: SpringPage<Listing>
