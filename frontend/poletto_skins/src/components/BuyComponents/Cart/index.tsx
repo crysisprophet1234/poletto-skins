@@ -1,7 +1,8 @@
-import BuyModal from '@/components/BuyModal'
-import ItemCartPopup from '@/components/Cart/ItemCartPopup'
-import ShowCartButton from '@/components/Cart/ShowCartButton'
+
 import { useAuth } from '@/hooks/useAuth'
+import BuyModal from '@buy/Cart/BuyConfirmationModal'
+import ItemCartPopup from '@buy/Cart/ItemCartPopup'
+import ShowCartButton from '@buy/Cart/ShowCartButton'
 import { Box, ClickAwayListener, Popper } from '@mui/material'
 import { useState } from 'react'
 

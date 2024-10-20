@@ -1,4 +1,4 @@
-import AddCartButton from '@/components/AddCartButton'
+import AddItemButton from '@/components/AddItemButton'
 import { useCart } from '@/hooks/useCart'
 import { Listing } from '@/types/entities/listing'
 import { extractStickerFinish } from '@/utils/extractStickerFinish'
@@ -109,7 +109,7 @@ const ItemCartMiniature = ({ listing }: ListingCartMiniatureProps) => {
                 </Box>
 
                 <Box height={'28px'}>
-                    <AddCartButton
+                    <AddItemButton
                         isItemInCart={true}
                         onClick={() => removeFromCart(listing.id)}
                     >
@@ -117,7 +117,7 @@ const ItemCartMiniature = ({ listing }: ListingCartMiniatureProps) => {
                             ? <RemoveShoppingCartRounded />
                             : <AddShoppingCartRounded />
                         }
-                    </AddCartButton>
+                    </AddItemButton>
                 </Box>
 
             </Stack >

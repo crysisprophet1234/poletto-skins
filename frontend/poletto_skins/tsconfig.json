@@ -24,9 +24,9 @@
     /* shadcn/ui */
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"],
+      "@sell/*": ["./src/components/SellComponents/*"],
+      "@buy/*": ["./src/components/BuyComponents/*"]
     }
   },
   "include": [

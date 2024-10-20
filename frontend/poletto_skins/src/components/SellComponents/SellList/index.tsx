@@ -2,8 +2,8 @@ import { useAuth } from '@/hooks/useAuth'
 import { useSell } from '@/hooks/useSell'
 import { Box, Button, Divider, Typography } from '@mui/material'
 import { useState } from 'react'
-import SellModal from '../SellModal'
-import SellListItem from './SellListItem'
+import SellListItem from '@sell/SellList/SellListItem'
+import SellConfirmationModal from '@sell/SellList/SellConfirmationModal'
 
 const SellList = () => {
 
@@ -14,9 +14,7 @@ const SellList = () => {
     const [isSellModalOpen, setIsSellModalOpen] = useState(false)
 
     const handleConfirmSelling = async () => {
-
         if (!user) return
-
         setIsSellModalOpen(true)
     }
 
@@ -122,7 +120,7 @@ const SellList = () => {
                 </Button>
             </Box>
 
-            <SellModal
+            <SellConfirmationModal
                 open={isSellModalOpen}
                 handleClose={() => setIsSellModalOpen(!isSellModalOpen)}
             />

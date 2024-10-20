@@ -1,18 +1,18 @@
+import AddItemButton from '@/components/AddItemButton'
 import { useSell } from '@/hooks/useSell'
 import { MarketItem, SteamSticker } from '@/types/entities/steam-item'
 import { itemWearAbbreviator, WearName } from '@/utils/itemWearAbbreviator'
 import { SellRounded } from '@mui/icons-material'
 import { Tooltip, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
-import AddCartButton from '../AddCartButton'
 
-type SellItemCardProps = {
-    sellItemProps: MarketItem
+type ItemCardProps = {
+    itemProps: MarketItem
     openModal: () => void
-    sellItemAction: () => void
+    itemAction: () => void
 }
 
-const SellItemCard = ({ sellItemProps, openModal, sellItemAction }: SellItemCardProps) => {
+const ItemCard = ({ itemProps, openModal, itemAction }: ItemCardProps) => {
 
     const { isItemInSellList } = useSell()
 
@@ -21,10 +21,8 @@ const SellItemCard = ({ sellItemProps, openModal, sellItemAction }: SellItemCard
     const [isHovered, setIsHovered] = useState(false)
 
     useEffect(() => {
-        setMarketItem(sellItemProps)
-    }, [sellItemProps])
-
-    console.log(marketItem)
+        setMarketItem(itemProps)
+    }, [itemProps])
 
     if (!marketItem) return
 
@@ -123,13 +121,13 @@ const SellItemCard = ({ sellItemProps, openModal, sellItemAction }: SellItemCard
                 </div>
 
                 <div className='add-cart-container' onClick={(e) => e.stopPropagation()}>
-                    <AddCartButton
+                    <AddItemButton
                         isItemInCart={isItemInSellList(marketItem?.item.assetId)}
-                        onClick={sellItemAction}
+                        onClick={itemAction}
                         isHovered={isHovered}
                     >
                         <SellRounded />
-                    </AddCartButton>
+                    </AddItemButton>
                 </div>
 
             </div>
@@ -140,4 +138,4 @@ const SellItemCard = ({ sellItemProps, openModal, sellItemAction }: SellItemCard
 
 }
 
-export default SellItemCard
+export default ItemCard

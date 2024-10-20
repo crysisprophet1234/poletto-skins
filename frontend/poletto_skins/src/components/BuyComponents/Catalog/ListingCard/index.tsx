@@ -1,4 +1,4 @@
-import AddCartButton from '@/components/AddCartButton'
+import AddItemButton from '@/components/AddItemButton'
 import { useCart } from '@/hooks/useCart'
 import { itemWearAbbreviator, WearName } from '@/utils/itemWearAbbreviator'
 import { AddShoppingCartRounded, RemoveShoppingCartRounded } from '@mui/icons-material'
@@ -142,7 +142,7 @@ const ListingCard = ({ listingProps, openModal, listingAction }: ListingCardProp
                 </div>
 
                 <div className='add-cart-container' onClick={(e) => e.stopPropagation()}>
-                    <AddCartButton
+                    <AddItemButton
                         isItemInCart={isListingInCart(listing!.id)}
                         onClick={listingAction}
                         isHovered={isHovered}
@@ -151,7 +151,7 @@ const ListingCard = ({ listingProps, openModal, listingAction }: ListingCardProp
                             ? <RemoveShoppingCartRounded />
                             : <AddShoppingCartRounded />
                         }
-                    </AddCartButton>
+                    </AddItemButton>
                 </div>
 
             </div>

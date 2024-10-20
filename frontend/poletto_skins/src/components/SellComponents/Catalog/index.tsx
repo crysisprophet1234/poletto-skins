@@ -1,17 +1,16 @@
 import { SpringPage } from '@/types/vendor/spring-page'
 import { Box, Button, Grid, Skeleton } from '@mui/material'
 import { useEffect, useState } from 'react'
-
-import SellItemCard from '../SellItemCard'
 import { MarketItem } from '@/types/entities/steam-item'
-import SellItemModal from '../SellItemModal'
+import SellItemModal from '@sell/Catalog/ItemModal'
+import ItemCard from '@sell/ItemCard'
 
-type SellCatalogProps = {
+type CatalogProps = {
     marketItems: SpringPage<MarketItem>
     itemAction: (marketItem: MarketItem) => void
 }
 
-const SellCatalog = ({ marketItems, itemAction }: SellCatalogProps) => {
+const Catalog = ({ marketItems, itemAction }: CatalogProps) => {
 
     const [loading, setLoading] = useState(true)
     const [selectedItem, setSelectedItem] = useState<MarketItem>()
@@ -75,10 +74,10 @@ const SellCatalog = ({ marketItems, itemAction }: SellCatalogProps) => {
                         ))
                         : marketItems.content.map((marketItem) => (
                             <Grid item xs={2} sm={4} md={4} lg={3} key={marketItem.item.assetId}>
-                                <SellItemCard
-                                    sellItemProps={marketItem}
+                                <ItemCard
+                                    itemProps={marketItem}
                                     key={marketItem.item.assetId}
-                                    sellItemAction={() => itemAction(marketItem)}
+                                    itemAction={() => itemAction(marketItem)}
                                     openModal={() => handleOpen(marketItem)}
                                 />
                             </Grid>
@@ -115,4 +114,4 @@ const SellCatalog = ({ marketItems, itemAction }: SellCatalogProps) => {
     )
 }
 
-export default SellCatalog
+export default Catalog

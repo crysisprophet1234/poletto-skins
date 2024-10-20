@@ -71,7 +71,6 @@ export const CartProvider = ({ children }: CartProviderProps) => {
 
     const totalListings = cart.length
     const totalPrice = cart.reduce((acc, listing) => {
-        console.log(cart)
         return acc + listing.listingPrice
     }, 0)
 

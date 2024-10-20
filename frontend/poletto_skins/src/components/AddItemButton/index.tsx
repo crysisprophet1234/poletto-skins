@@ -1,14 +1,14 @@
 import { Box, Button } from '@mui/material'
 import { ReactElement } from 'react'
 
-type AddCartButtonProps = {
+type AddItemButtonProps = {
     isItemInCart: boolean
     isHovered?: boolean
     children: ReactElement
     onClick?: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
 }
 
-const AddCartButton = ({ isItemInCart, onClick, children, isHovered }: AddCartButtonProps) => {
+const AddItemButton = ({ isItemInCart, onClick, children, isHovered }: AddItemButtonProps) => {
 
     return (
 
@@ -51,4 +51,4 @@ const AddCartButton = ({ isItemInCart, onClick, children, isHovered }: AddCartBu
     )
 }
 
-export default AddCartButton
+export default AddItemButton

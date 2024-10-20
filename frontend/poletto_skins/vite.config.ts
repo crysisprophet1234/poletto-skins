@@ -16,6 +16,8 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      '@sell': path.resolve(__dirname, './src/components/SellComponents'),
+      '@buy': path.resolve(__dirname, './src/components/BuyComponents')
     }
   }
 })

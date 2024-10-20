@@ -1,5 +1,4 @@
 import FormInputCurrency from '@/components/FormComponents/FormInputCurrency'
-import SellItemCard from '@/components/SellItemCard'
 import { useSell } from '@/hooks/useSell'
 import { MarketItem } from '@/types/entities/steam-item'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -7,6 +6,7 @@ import { Box, Stack, Typography } from '@mui/material'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { number, z } from 'zod'
+import ItemCard from '@sell/ItemCard'
 
 interface SellListItemProps {
     marketItem: MarketItem
@@ -52,9 +52,9 @@ const SellListItem = ({ marketItem }: SellListItemProps) => {
         <Box sx={{ mb: 2, pr: 1 }}>
             <Stack direction={'row'} spacing={1} height={'260px'}>
                 <Box sx={{ transform: 'scale(0.9, 0.75)', transformOrigin: 'top center' }}>
-                    <SellItemCard
-                        sellItemProps={marketItem}
-                        sellItemAction={() => removeFromSellList(marketItem.item.assetId)}
+                    <ItemCard
+                        itemProps={marketItem}
+                        itemAction={() => removeFromSellList(marketItem.item.assetId)}
                         openModal={() => { }}
                     />
                 </Box>
