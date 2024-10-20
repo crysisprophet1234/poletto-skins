@@ -5,12 +5,16 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 public class ExceptionResponse {
 
 	private HttpStatus status;
     private LocalDateTime timestamp;
     private String message;
     private String path;
+    
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private Map<String, String> errors;
     
 

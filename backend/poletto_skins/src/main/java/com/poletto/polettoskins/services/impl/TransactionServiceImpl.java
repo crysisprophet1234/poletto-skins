@@ -14,6 +14,7 @@ import com.poletto.polettoskins.dto.TransactionDTO;
 import com.poletto.polettoskins.entities.DomainUser;
 import com.poletto.polettoskins.entities.Listing;
 import com.poletto.polettoskins.entities.Transaction;
+import com.poletto.polettoskins.entities.enums.BalanceChangeType;
 import com.poletto.polettoskins.entities.enums.ListingStatus;
 import com.poletto.polettoskins.entities.enums.TransactionType;
 import com.poletto.polettoskins.exceptions.response.InsufficientCreditException;
@@ -23,6 +24,7 @@ import com.poletto.polettoskins.mappers.TransactionMapper;
 import com.poletto.polettoskins.repositories.DomainUserRepository;
 import com.poletto.polettoskins.repositories.ListingRepository;
 import com.poletto.polettoskins.repositories.TransactionRepository;
+import com.poletto.polettoskins.services.BalanceService;
 import com.poletto.polettoskins.services.TransactionService;
 
 @Service
@@ -36,6 +38,9 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Autowired
     private DomainUserRepository domainUserRepository;
+    
+    @Autowired
+    private BalanceService balanceService;
     
     @Override
 	public List<TransactionDTO> getUserTransactions(String userId) {
@@ -60,7 +65,6 @@ public class TransactionServiceImpl implements TransactionService {
     		Listing listing = listingRepository.findById(listingDTO.getId())
     		        .orElseThrow(() -> new ResourceNotFoundException("Listing not found."));
     		
-    		//TODO: create customized exception
     		if (!listing.getStatus().equals(ListingStatus.ACTIVE)) {
     			throw new ListingNoLongerActiveException("Listing is no longer available.");
     		}
@@ -88,7 +92,7 @@ public class TransactionServiceImpl implements TransactionService {
         
         buyerTransaction = transactionRepository.save(buyerTransaction);
         
-        updateUserBalance(buyer, buyerTransaction.getTotalValue(), TransactionType.PURCHASE);
+        balanceService.updateUserBalance(buyer, buyerTransaction.getTotalValue(), BalanceChangeType.PURCHASE);
     	
     	for (Listing listing : listings) {
     		
@@ -106,7 +110,7 @@ public class TransactionServiceImpl implements TransactionService {
     	    
     	    transactionRepository.save(sellerTransaction);
     	    
-    	    updateUserBalance(seller, listing.getListingPrice(), TransactionType.SELLING);
+    	    balanceService.updateUserBalance(seller, listing.getListingPrice(), BalanceChangeType.SELLING);
 	
     	}
 
@@ -122,11 +126,13 @@ public class TransactionServiceImpl implements TransactionService {
         }
     }
 
+    /*
     private void updateUserBalance(DomainUser user, BigDecimal transactionTotal, TransactionType transactionType) {
     	
         BigDecimal balanceChange = transactionType == TransactionType.PURCHASE ? transactionTotal.negate() : transactionTotal;
         user.setBalance(user.getBalance().add(balanceChange));
         domainUserRepository.save(user);
     }
+    */
     
 }

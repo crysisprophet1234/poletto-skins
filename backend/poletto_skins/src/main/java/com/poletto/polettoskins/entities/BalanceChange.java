@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.poletto.polettoskins.entities.enums.BalanceChangeType;
+import com.poletto.polettoskins.entities.enums.PaymentMethod;
 
 @Document(collection = "balance_changes")
 public class BalanceChange {
@@ -16,75 +17,75 @@ public class BalanceChange {
     private String id;
     private BigDecimal amount;
     private BalanceChangeType type;
+    private PaymentMethod paymentMethod;
     private LocalDateTime timestamp;
-    private String description;
-    private String userId;
+    private DomainUser user;
 
-    public BalanceChange() {
-    	
-    }
+    public BalanceChange() {}
 
-    public BalanceChange(
-    	String userId,
+	public BalanceChange(
+		String id,
 		BigDecimal amount,
 		BalanceChangeType type,
-		LocalDateTime localDateTime,
-		String description
+		PaymentMethod paymentMethod,
+		LocalDateTime timestamp,
+		DomainUser user
 	) {
-        this.userId = userId;
-        this.amount = amount;
-        this.type = type;
-        this.timestamp = LocalDateTime.now();
-        this.description = description;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getUserId() {
-		return userId;
+		this.id = id;
+		this.amount = amount;
+		this.type = type;
+		this.paymentMethod = paymentMethod;
+		this.timestamp = timestamp;
+		this.user = user;
 	}
 
-	public void setUserId(String userId) {
-		this.userId = userId;
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	public BigDecimal getAmount() {
-        return amount;
-    }
+		return amount;
+	}
 
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
-    }
+	public void setAmount(BigDecimal amount) {
+		this.amount = amount;
+	}
 
-    public BalanceChangeType getType() {
-        return type;
-    }
+	public BalanceChangeType getType() {
+		return type;
+	}
 
-    public void setType(BalanceChangeType type) {
-        this.type = type;
-    }
+	public void setType(BalanceChangeType type) {
+		this.type = type;
+	}
 
-    public LocalDateTime getTimestamp() {
-        return timestamp;
-    }
+	public PaymentMethod getPaymentMethod() {
+		return paymentMethod;
+	}
 
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
-    }
+	public void setPaymentMethod(PaymentMethod paymentMethod) {
+		this.paymentMethod = paymentMethod;
+	}
 
-    public String getDescription() {
-        return description;
-    }
+	public LocalDateTime getTimestamp() {
+		return timestamp;
+	}
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+	public void setTimestamp(LocalDateTime timestamp) {
+		this.timestamp = timestamp;
+	}
+
+	public DomainUser getUser() {
+		return user;
+	}
+
+	public void setUser(DomainUser user) {
+		this.user = user;
+	}
 
 	@Override
 	public int hashCode() {
@@ -105,8 +106,8 @@ public class BalanceChange {
 
 	@Override
 	public String toString() {
-		return "BalanceChange [id=" + id + ", amount=" + amount + ", type=" + type + ", timestamp=" + timestamp
-				+ ", description=" + description + ", userId=" + userId + "]";
-	}	
-
-}
+		return "BalanceChange [id=" + id + ", amount=" + amount + ", type=" + type + ", paymentMethod=" + paymentMethod
+				+ ", timestamp=" + timestamp + ", user=" + user + "]";
+	}
+    
+}   
