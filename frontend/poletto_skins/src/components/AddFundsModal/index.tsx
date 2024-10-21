@@ -7,9 +7,6 @@ import {
     Button,
     IconButton,
     Grid,
-    Alert,
-    Snackbar,
-    Portal,
     CircularProgress
 } from '@mui/material'
 import { number, z } from 'zod'
@@ -19,6 +16,7 @@ import PaymentMethodSelection from './PaymentMethodSelection'
 import AmountInput from './AmountInput'
 import { useAuth } from '@/hooks/useAuth'
 import { post } from '@/services/api'
+import SnackbarAlert from '../SnackbarAlert'
 
 type AddFundsModalProps = {
     open: boolean
@@ -286,26 +284,15 @@ const AddFundsModal = ({ open, onClose }: AddFundsModalProps) => {
 
                 </Grid>
 
-                <Portal container={document.body}>
-
-                    <Snackbar
-                        open={openSnackbar && !!success.message}
-                        autoHideDuration={5000}
-                        onClose={handleClose}
-                        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-                    >
-                        <Alert
-                            onClose={handleClose}
-                            severity={success.isSuccess ? 'success' : 'error'}
-                            sx={{
-                                width: '100%'
-                            }}
-                        >
-                            {success.message}
-                        </Alert>
-                    </Snackbar>
-
-                </Portal>
+                <SnackbarAlert
+                    open={openSnackbar && !!success.message}
+                    container={document.body}
+                    timeout={5000}
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                    handleClose={handleClose}
+                    message={success.message}
+                    severity={success.isSuccess ? 'success' : 'error'} 
+                />
 
             </Box>
 
