@@ -1,0 +1,8 @@
+target
+pom.xml~
+*.md
+*.log
+.git
+.gitignore
+Dockerfile
+docker-compose.yml
