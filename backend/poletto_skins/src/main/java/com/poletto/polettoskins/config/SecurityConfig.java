@@ -33,7 +33,8 @@ public class SecurityConfig {
 		CorsConfiguration corsConfig = new CorsConfiguration();
 		corsConfig.setAllowedOriginPatterns(Arrays.asList(
 			"http://localhost:[5173]",
-			"http://localhost:[88]"
+			"http://localhost:[88]",
+			"http://localhost:[3000]"
 		));
 		corsConfig.setAllowedMethods(Arrays.asList("POST", "GET", "PUT", "DELETE", "PATCH"));
 		corsConfig.setAllowCredentials(true);

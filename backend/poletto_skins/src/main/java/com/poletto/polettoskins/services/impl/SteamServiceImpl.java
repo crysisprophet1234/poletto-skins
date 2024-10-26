@@ -28,7 +28,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.poletto.polettoskins.entities.Listing;
 import com.poletto.polettoskins.entities.MarketItem;
 import com.poletto.polettoskins.entities.SteamItem;
 import com.poletto.polettoskins.entities.SteamItemPrice;
@@ -537,9 +536,8 @@ public class SteamServiceImpl implements SteamService {
         private String last_assetId;
         private int total_inventory_count;
 
-        // getters and setters
 
-        public boolean hasMoreItems() {
+		public boolean hasMoreItems() {
             return more_items;
         }
 
