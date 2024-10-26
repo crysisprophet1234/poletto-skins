@@ -79,7 +79,7 @@ const router = createBrowserRouter(
     }
   ],
   {
-    basename: '/poletto-skins'
+    basename: '/'
   }
 )
 
