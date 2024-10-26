@@ -76,10 +76,10 @@ public class OpenIDController {
         
         if (identifier != null) {
             String steamId = identifier.getIdentifier().replace("https://steamcommunity.com/openid/id/", "");
-            return "redirect:http://localhost:5173/poletto-skins/login?steamId=" + steamId;
+            return "redirect:http://localhost:3000/login?steamId=" + steamId;
         }
         
-        return "redirect:http://localhost:5173/poletto-skins/";
+        return "redirect:http://localhost:3000/";
     }
     
 }
