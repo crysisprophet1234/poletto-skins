@@ -3,7 +3,7 @@ import { useCart } from '@/hooks/useCart'
 import { Close } from '@mui/icons-material'
 import { Box, IconButton, Modal, Stack, Typography } from '@mui/material'
 import { useState } from 'react'
-import BuyModalButton from '../../../ConfirmItemActionButton'
+import ConfirmItemActionButton from '../../../ConfirmItemActionButton'
 
 type BuyConfirmationModalProps = {
     open: boolean
@@ -25,11 +25,12 @@ const BuyConfirmationModal = ({ open, handleClose }: BuyConfirmationModalProps) 
         setLoading(true)
 
         try {
-            checkout(user?.id)
+            await checkout(user?.id)
             refreshUser()
             handleClose()
-        } catch (err) {
-            console.error(err)
+        } catch (error) {
+            console.error('Error submitting checkout:', error as Error)
+           
         } finally {
             setLoading(false)
         }
@@ -163,14 +164,14 @@ const BuyConfirmationModal = ({ open, handleClose }: BuyConfirmationModalProps) 
                     flexDirection: 'row',
                     gap: '15px'
                 }}>
-                    <BuyModalButton
+                    <ConfirmItemActionButton
                         onClick={handleClose}
                         loading={loading}
                         text='CANCELAR'
                         color='#f05f75'
                         hoverColor='#ff8095'
                     />
-                    <BuyModalButton
+                    <ConfirmItemActionButton
                         onClick={userHasEnoughBalance ? handleConfirm : () => alert('not implemented yet')} //FIXME: now its implemented...
                         loading={loading}
                         text={userHasEnoughBalance ? 'CONFIRMAR' : 'ADICIONAR'}
@@ -180,6 +181,7 @@ const BuyConfirmationModal = ({ open, handleClose }: BuyConfirmationModalProps) 
                 </Box>
 
             </Box >
+
         </Modal >
 
     )

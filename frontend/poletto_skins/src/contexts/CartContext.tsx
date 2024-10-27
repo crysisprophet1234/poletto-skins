@@ -1,12 +1,23 @@
 import { post } from '@/services/api'
 import { Listing } from '@/types/entities/listing'
+import { ApiError } from '@/types/vendor/api-error'
 import { createContext, ReactNode, useState } from 'react'
+
+type CheckoutSuccess = {
+    message: string
+    isSuccessful: boolean
+}
 
 type CartContextValue = {
     cart: Listing[]
     isListingInCart: (listingId: Listing['id']) => boolean
     addToCart: (listing: Listing) => void
-    checkout: (userId: string) => void
+    checkout: (userId: string) => Promise<void>
+    checkoutSuccess: CheckoutSuccess
+    setCheckoutSuccess: React.Dispatch<React.SetStateAction<{
+        message: string;
+        isSuccessful: boolean;
+    }>>
     removeFromCart: (listingId: Listing['id']) => void
     clearCart: () => void
     totalListings: number
@@ -17,11 +28,13 @@ export const CartContext = createContext<CartContextValue>({
     cart: [],
     isListingInCart: () => { throw new Error('isListingInCart function not implemented') },
     addToCart: () => { throw new Error('addToCart function not implemented') },
-    checkout: () => { throw new Error('checkout function not implemented') },
+    checkout: async () => { throw new Error('checkout function not implemented') },
+    checkoutSuccess: { message: '', isSuccessful: false },
+    setCheckoutSuccess: () => { throw new Error('setCheckoutSuccess function not implemented') },
     removeFromCart: () => { throw new Error('removeFromCart function not implemented') },
     clearCart: () => { throw new Error('clearCart function not implemented') },
     totalListings: 0,
-    totalPrice: 0,
+    totalPrice: 0
 })
 
 type CartProviderProps = {
@@ -31,6 +44,11 @@ type CartProviderProps = {
 export const CartProvider = ({ children }: CartProviderProps) => {
 
     const [cart, setCart] = useState<Listing[]>([])
+
+    const [checkoutSuccess, setCheckoutSuccess] = useState({
+        message: '',
+        isSuccessful: false
+    })
 
     const isListingInCart = (listingId: Listing['id']) => {
         return cart.some((listing) => listing.id === listingId)
@@ -50,22 +68,40 @@ export const CartProvider = ({ children }: CartProviderProps) => {
 
     const checkout = async (userId: string) => {
 
-        try {
-            const listings = cart.map(listing => ({
-                id: listing.id
-            }))
+        setCheckoutSuccess({
+            isSuccessful: false,
+            message: ''
+        })
 
-            const requestData = {
-                listings,
-                userId
-            }
+        const listings = cart.map(listing => ({
+            id: listing.id
+        }))
+
+        const requestData = {
+            listings,
+            userId
+        }
+
+        try {
 
             await post('/transactions/checkout-cart', requestData)
+
+            setCheckoutSuccess({
+                isSuccessful: true,
+                message: 'Compra realizada com sucesso!'
+            })
 
             clearCart()
 
         } catch (error) {
-            console.error('Purchase failed:', error)
+
+            console.error('Erro na função checkout:', error)
+
+            setCheckoutSuccess({
+                isSuccessful: false,
+                message: `Erro ao realizar compra: ${(error as ApiError).response?.data.message || (error as Error).message}`
+            })
+
         }
     }
 
@@ -81,6 +117,8 @@ export const CartProvider = ({ children }: CartProviderProps) => {
                 isListingInCart,
                 addToCart,
                 checkout,
+                checkoutSuccess,
+                setCheckoutSuccess,
                 removeFromCart,
                 clearCart,
                 totalListings,
