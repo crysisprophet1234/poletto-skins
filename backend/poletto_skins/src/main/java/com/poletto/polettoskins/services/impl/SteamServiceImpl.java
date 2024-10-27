@@ -39,6 +39,15 @@ import com.poletto.polettoskins.services.SteamService;
 
 @Service
 public class SteamServiceImpl implements SteamService {
+	
+	@Value("${steam.community.url}")
+	private String steamCommunityUrl;
+	
+	@Value("${csfloat.api.url}")
+	private String csfloatApiUrl;
+	
+	@Value("${steam.api.url}")
+	private String steamApiUrl;
 
 	@Value("${steam.api.key}")
 	private String steamApiKey;
@@ -54,10 +63,14 @@ public class SteamServiceImpl implements SteamService {
 
 	@Override
 	public SteamUser getUserInfo(String steamId) {
-		   
-        String url = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/" 
-                   + "?key=" + steamApiKey
-                   + "&steamids=" + steamId;
+		
+		String url = UriComponentsBuilder
+				.fromHttpUrl(steamApiUrl)
+				.pathSegment("ISteamUser", "GetPlayerSummaries", "v0002")
+				.queryParam("key", steamApiKey)
+	            .queryParam("steamids", "{steamId}")
+	            .build(steamId)
+	            .toString();
 
         String responseJson = restTemplate.getForObject(url, String.class);
         
@@ -74,14 +87,18 @@ public class SteamServiceImpl implements SteamService {
 	@Override
     public Page<MarketItem> getUserInventory(String steamId, String startAssetId, Pageable pageable) {
 		
-		String steamUrl = UriComponentsBuilder.fromHttpUrl("https://steamcommunity.com/inventory/" + steamId + "/730/2")
+		String url = UriComponentsBuilder
+				.fromHttpUrl(steamCommunityUrl)
+				.pathSegment("inventory", "{steamId}", "730", "2")
 	            .queryParam("count", pageable.getPageSize())
 	            .queryParam("start_assetid", startAssetId)
-	            .toUriString();
+	            .build(steamId)
+	            .toString();
         
-        String steamResponseJson = restTemplate.getForObject(steamUrl, String.class);
+        String steamResponseJson = restTemplate.getForObject(url, String.class);
         
-        SteamInventoryResponse response = restTemplate.getForObject(steamUrl, SteamInventoryResponse.class);
+        //TODO: ??
+        SteamInventoryResponse response = restTemplate.getForObject(url, SteamInventoryResponse.class);
         
         var itemsSteamData = extractSteamDataFromResponse(steamResponseJson, steamId);
 
@@ -121,12 +138,21 @@ public class SteamServiceImpl implements SteamService {
 	
 	@Override
 	public Optional<SteamItem> getItemBySteamId(String itemSteamId) {
-	    String csfloatApiUrl = "http://localhost:81"
+		
+		String url = UriComponentsBuilder
+				.fromHttpUrl(csfloatApiUrl)
+				.queryParam("url", "?url=steam://rungame/730/76561202255233023/+csgo_econ_action_preview%20{itemSteamId}")
+				.build(itemSteamId)
+				.toString();
+		
+		/*
+	    String csfloatApiUrl = "http://localhost:80"
 	        + "?url=steam://rungame/730/76561202255233023/+csgo_econ_action_preview%20"
 	        + itemSteamId;
+	    */
 
 	    try {
-	        String responseJson = restTemplate.getForObject(csfloatApiUrl, String.class);
+	        String responseJson = restTemplate.getForObject(url, String.class);
 	        Map<String, Object> responseMap = objectMapper.readValue(responseJson, new TypeReference<Map<String, Object>>() {});
 	        Map<String, Object> itemMap = (Map<String, Object>) responseMap.get("iteminfo");
 	        
@@ -150,12 +176,27 @@ public class SteamServiceImpl implements SteamService {
 				.orElseThrow(() -> new ResourceNotFoundException("Invalid item or item name not found."));
 		
 		String itemHashName = steamItem.getFullItemName();
+		
 		*/
 		
+		
+		String url = UriComponentsBuilder
+				.fromHttpUrl(steamCommunityUrl)
+				.pathSegment("market", "priceoverview")
+				.queryParam("currency", 7) // R$
+				.queryParam("appid", 730)  // CSGO
+ 				.queryParam("market_hash_name", fullItemName)
+				.build()
+				.toString();
+		
+		
+		/*
 		String url = "https://steamcommunity.com/market/priceoverview/"
 				   + "?currency=7"
 				   + "&appid=730"
 				   + "&market_hash_name=" + fullItemName;
+		*/
+				   
 		
 		String response = restTemplate.getForObject(url, String.class);
 		
@@ -210,14 +251,22 @@ public class SteamServiceImpl implements SteamService {
 	
 	private String fetchBulkItemsFromCsfloatApi(Map<String, List<Map<String, Object>>> inspectUrlListBody) {
 		
-		String csfloatApiUrl = "http://localhost:81/bulk";
+		String url = UriComponentsBuilder
+				.fromHttpUrl(csfloatApiUrl)
+				.pathSegment("bulk")
+				.build()
+				.toString();
+		
+		/*
+		String csfloatApiUrl = "http://localhost:80/bulk";
+		*/
         
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
         
         HttpEntity<Map<String, List<Map<String, Object>>>> requestEntity = new HttpEntity<>(inspectUrlListBody, headers);
         
-        ResponseEntity<String> csfloatApiResponse = restTemplate.exchange(csfloatApiUrl, HttpMethod.POST, requestEntity, String.class);
+        ResponseEntity<String> csfloatApiResponse = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
         
         return csfloatApiResponse.getBody();
 		
@@ -308,8 +357,11 @@ public class SteamServiceImpl implements SteamService {
 	        }
 	        
 	        for (int i = 0; i < linkList.size(); i++) {
+	        	
 	        	Map<String, Object> link = linkList.get(i);
+	        	
 	        	String steamImageUrl = "https://community.akamai.steamstatic.com/economy/image/" + (String) link.get("imageUrl");
+	        	
 	        	steamItems.stream()
                 	.filter(item -> item.getFullItemName().equals(link.get("marketName")))
                 	.forEach(item -> item.setImageUrl(steamImageUrl));

@@ -23,9 +23,6 @@ target/
 *.log
 *.log.*.gz
 
-### Env ###
-application*.yml
-
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
@@ -38,3 +35,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+
+### Variables ###
+.env

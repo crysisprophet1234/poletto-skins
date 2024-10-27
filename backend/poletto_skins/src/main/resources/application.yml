@@ -1,0 +1,62 @@
+spring:
+
+  application:
+    name: poletto_skins
+    
+  config:
+      
+    import:
+      - "file:./.env[.properties]"
+      
+  data:
+    mongodb:
+      uri: ${MONGODB_URI}
+
+logging:
+  file:
+    name: ${LOG_FILE_PATH}
+  level:
+    root: ${LOG_LEVEL}
+    org:
+      springframework:
+        web: ${LOG_LEVEL}
+        http: ${LOG_LEVEL}
+
+server:
+  port: ${SERVER_PORT}
+  shutdown: graceful
+  servlet:
+    context-path: ${SERVER_CONTEXT_PATH}
+    
+cors:
+  allowed-origin: ${CORS_ALLOWED_ORIGIN}
+    
+openid:
+  providers:
+    steam: ${OPENID_PROVIDERS_STEAM}
+  return-to-url: ${OPENID_RETURN_TO_URL}
+  redirect:
+    login-success: ${LOGIN_SUCCESS_URL}
+    login-failure: ${LOGIN_FAILURE_URL}
+
+steam:
+  api:
+    url: ${STEAM_API_URL}
+    key: ${STEAM_API_KEY}
+  community:
+    url: ${STEAM_COMMUNITY_URL}
+    
+csfloat:
+  api:
+    url: ${CSFLOAT_API_URL}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: 
+          - "metrics"
+          - "health"
+  health:
+    mongo:
+      enabled: true
