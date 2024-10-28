@@ -57,7 +57,7 @@ const SellList = () => {
                 }}
             >
                 {sellList.map((marketItem, index) => (
-                    <Box key={marketItem.item.assetId} sx={{ mb: 2, pr: 1 }}>
+                    <Box key={marketItem.assetId} sx={{ mb: 2, pr: 1 }}>
 
                         <SellListItem marketItem={marketItem} />
 

@@ -47,13 +47,13 @@ const ItemModal = ({ marketItem, open, handleClose, itemAction }: ItemModalProps
 
                         <div className='item-title'>
 
-                            {marketItem.item.quality == 9 &&
+                            {marketItem.quality == 9 &&
                                 <Typography
                                     variant='h5'
                                     fontWeight={600}
                                     color={'#CF6A32'}
                                 >
-                                    {marketItem.item.qualityName}&nbsp;
+                                    {marketItem.qualityName}&nbsp;
                                 </Typography>
                             }
 
@@ -61,7 +61,7 @@ const ItemModal = ({ marketItem, open, handleClose, itemAction }: ItemModalProps
                                 variant='h5'
                                 fontWeight={600}
                             >
-                                {`${marketItem.item.fullItemName.replace('StatTrak™', '')} ${marketItem.item.itemName == '-' ? '| Vanilla' : ''}`}
+                                {`${marketItem.fullItemName.replace('StatTrak™', '')} ${marketItem.itemName == '-' ? '| Vanilla' : ''}`}
                             </Typography>
 
                         </div>
@@ -80,8 +80,8 @@ const ItemModal = ({ marketItem, open, handleClose, itemAction }: ItemModalProps
 
                             <div className='item-image'>
                                 <img
-                                    src={marketItem.item.imageUrl}
-                                    alt={marketItem.item.fullItemName}
+                                    src={marketItem.imageUrl}
+                                    alt={marketItem.fullItemName}
                                     loading='lazy'
                                 />
                             </div>
@@ -90,7 +90,7 @@ const ItemModal = ({ marketItem, open, handleClose, itemAction }: ItemModalProps
                                 <Stack direction='row' spacing={2} justifyContent='space-between'>
 
                                     <Link
-                                        href={marketItem.item.inspectUrl}
+                                        href={marketItem.inspectUrl}
                                         target='_blank'
                                         underline='none'
                                     >
@@ -98,7 +98,7 @@ const ItemModal = ({ marketItem, open, handleClose, itemAction }: ItemModalProps
                                     </Link>
 
                                     <Link
-                                        href={'https://steamcommunity.com/market/listings/730/' + marketItem.item.fullItemName}
+                                        href={'https://steamcommunity.com/market/listings/730/' + marketItem.fullItemName}
                                         target='_blank'
                                         underline='none'
                                     >
@@ -106,7 +106,7 @@ const ItemModal = ({ marketItem, open, handleClose, itemAction }: ItemModalProps
                                     </Link>
 
                                     <Link
-                                        href={`https://youtube.com/results?search_query=${marketItem.item.weaponType} ${marketItem.item.itemName == '-' ? 'Vanilla' : marketItem.item.itemName} - Skin Float And Wear Preview`}
+                                        href={`https://youtube.com/results?search_query=${marketItem.weaponType} ${marketItem.itemName == '-' ? 'Vanilla' : marketItem.itemName} - Skin Float And Wear Preview`}
                                         target='_blank'
                                         underline='none'
                                     >
@@ -116,7 +116,7 @@ const ItemModal = ({ marketItem, open, handleClose, itemAction }: ItemModalProps
                                 </Stack>
                             </div>
 
-                            {marketItem.item.weaponType.toLowerCase() !== 'sticker' && marketItem.item.stickers.length > 0 &&
+                            {marketItem.weaponType.toLowerCase() !== 'sticker' && marketItem.stickers &&
 
                                 <Stack
                                     direction='row'
@@ -126,7 +126,7 @@ const ItemModal = ({ marketItem, open, handleClose, itemAction }: ItemModalProps
                                     gridTemplateColumns={'repeat(4, 1fr)'}
                                     height={'90px'}
                                 >
-                                    {marketItem.item.stickers.slice(0, 4).map((sticker: SteamSticker, index: number) => { //TODO: slicing 4 stickers
+                                    {marketItem.stickers.slice(0, 4).map((sticker: SteamSticker, index: number) => { //TODO: slicing 4 stickers
                                         return (
                                             <Tooltip
                                                 key={sticker.stickerId + '-' + index}
@@ -161,7 +161,7 @@ const ItemModal = ({ marketItem, open, handleClose, itemAction }: ItemModalProps
                             <div className='item-details-box float'>
 
                                 <div className='float-container'>
-                                    <FloatBar floatValue={marketItem.item.floatValue * 100} />
+                                    <FloatBar floatValue={marketItem.floatValue * 100} />
                                 </div>
 
 
@@ -175,7 +175,7 @@ const ItemModal = ({ marketItem, open, handleClose, itemAction }: ItemModalProps
 
                                     <div className='item-value'>
                                         <Typography>
-                                            {marketItem.item.floatValue}
+                                            {marketItem.floatValue}
                                         </Typography>
                                     </div>
 
@@ -197,10 +197,10 @@ const ItemModal = ({ marketItem, open, handleClose, itemAction }: ItemModalProps
 
                                     <div className='item-value'>
                                         <Typography>
-                                            {marketItem.item.rarityName}
+                                            {marketItem.rarityName}
                                         </Typography>
                                         <Typography>
-                                            {marketItem.item.paintSeed}
+                                            {marketItem.paintSeed}
                                         </Typography>
                                     </div>
 
@@ -223,11 +223,11 @@ const ItemModal = ({ marketItem, open, handleClose, itemAction }: ItemModalProps
 
                                     <div className='item-value'>
                                         <Typography>
-                                            {marketItem.price.lowestPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                            {marketItem.lowestPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                                         </Typography>
                                         <Typography>
                                             {/* TODO: same price && mocked recommended price */}
-                                            {(marketItem.price.lowestPrice / 100 * 85).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                            {(marketItem.lowestPrice / 100 * 85).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                                         </Typography>
                                     </div>
 
@@ -245,7 +245,7 @@ const ItemModal = ({ marketItem, open, handleClose, itemAction }: ItemModalProps
 
                                     <div className='item-value'>
                                         <Typography variant='h6'>
-                                        {marketItem.price.lowestPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                        {marketItem.lowestPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                                         </Typography>
                                     </div>
 
@@ -253,11 +253,11 @@ const ItemModal = ({ marketItem, open, handleClose, itemAction }: ItemModalProps
 
                                 <div className='add-cart-container'>
                                     <AddItemButton
-                                        isItemInCart={isItemInSellList(marketItem.item.assetId)}
+                                        isItemInCart={isItemInSellList(marketItem.assetId)}
                                         onClick={itemAction}
                                         isHovered={true}
                                     >
-                                        {isItemInSellList(marketItem.item.assetId)
+                                        {isItemInSellList(marketItem.assetId)
                                             ? <RemoveShoppingCartRounded />
                                             : <AddShoppingCartRounded />
                                         }
