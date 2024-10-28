@@ -42,7 +42,8 @@ public class ListingServiceImpl implements ListingService {
 	public Page<ListingDTO> findListingsPaged(
 	    Pageable pageable, 
 	    String query, 
-	    String userId, 
+	    String userId,
+	    ListingStatus listingStatus,
 	    Double minPrice, 
 	    Double maxPrice, 
 	    Double minFloat, 
@@ -50,7 +51,7 @@ public class ListingServiceImpl implements ListingService {
 	) {
 		
 	    Page<Listing> result = listingRepository.findListingsPaged(
-	        pageable, query, userId, minPrice, maxPrice, minFloat, maxFloat
+	        pageable, query, userId, listingStatus, minPrice, maxPrice, minFloat, maxFloat
 	    );
 	    return result.map(item -> ListingMapper.INSTANCE.toListingDTO(item));
 	}
