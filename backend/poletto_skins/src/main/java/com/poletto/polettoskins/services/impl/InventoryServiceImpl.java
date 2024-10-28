@@ -3,6 +3,7 @@ package com.poletto.polettoskins.services.impl;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,7 @@ import com.poletto.polettoskins.entities.Inventory;
 import com.poletto.polettoskins.entities.MarketItem;
 import com.poletto.polettoskins.entities.SteamItem;
 import com.poletto.polettoskins.entities.SteamItemPrice;
+import com.poletto.polettoskins.repositories.ListingRepository;
 import com.poletto.polettoskins.services.CSFloatService;
 import com.poletto.polettoskins.services.InventoryService;
 import com.poletto.polettoskins.services.SteamService;
@@ -27,6 +29,9 @@ public class InventoryServiceImpl implements InventoryService {
 	
 	@Autowired
 	private SteamService steamService;
+	
+	@Autowired
+	private ListingRepository listingRepository;
 
 	@Override
 	public Inventory getUserInventory(String steamId) {
@@ -47,6 +52,8 @@ public class InventoryServiceImpl implements InventoryService {
 			updatedItems.add(updatedItem);
 			
 		}
+		
+		updatedItems = filterUnlistedItems(updatedItems);
 		
 		List<MarketItem> marketItems = new ArrayList<>();
 		
@@ -72,5 +79,20 @@ public class InventoryServiceImpl implements InventoryService {
 		
 		return inventory;
 	}
+	
+	private List<SteamItem> filterUnlistedItems(List<SteamItem> steamItems) {
+
+        List<String> assetIds = steamItems.stream()
+            .map(SteamItem::getAssetId)
+            .collect(Collectors.toList());
+
+        List<String> listedAssetIds = listingRepository.findAllByAssetIdIn(assetIds).stream()
+            .map(x -> x.getItem().getAssetId())
+            .collect(Collectors.toList());
+
+        return steamItems.stream()
+            .filter(item -> !listedAssetIds.contains(item.getAssetId()))
+            .collect(Collectors.toList());
+    }
 
 }
