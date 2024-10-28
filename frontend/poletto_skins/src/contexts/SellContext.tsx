@@ -57,7 +57,7 @@ export const SellProvider = ({ children }: SellProviderProps) => {
     const updateItemValue = (itemId: MarketItem['assetId'], value: number) => {
         setSellList(sellList.map(marketItem =>
             marketItem.assetId === itemId 
-                ? { ...marketItem, price: { ...marketItem, lowestPrice: value} } 
+                ? { ...marketItem, lowestPrice: value } 
                 : marketItem
         ))
     }
