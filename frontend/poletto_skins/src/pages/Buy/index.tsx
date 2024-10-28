@@ -57,7 +57,11 @@ const Buy = () => {
     const fetchListings = useCallback(async () => {
 
         try {
-            const listingsPage = await get<SpringPage<Listing>>('/listings', { ...filterData, size })
+            const listingsPage = await get<SpringPage<Listing>>('/listings', { 
+                ...filterData,
+                size,
+                status: 'ACTIVE' 
+            })
             setListings(listingsPage)
 
         } catch (error) {
