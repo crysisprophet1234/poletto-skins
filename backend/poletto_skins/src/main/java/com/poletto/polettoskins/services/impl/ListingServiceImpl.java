@@ -19,6 +19,7 @@ import com.poletto.polettoskins.exceptions.response.ResourceNotFoundException;
 import com.poletto.polettoskins.mappers.ListingMapper;
 import com.poletto.polettoskins.repositories.DomainUserRepository;
 import com.poletto.polettoskins.repositories.ListingRepository;
+import com.poletto.polettoskins.services.CSFloatService;
 import com.poletto.polettoskins.services.ListingService;
 import com.poletto.polettoskins.services.SteamService;
 
@@ -33,6 +34,9 @@ public class ListingServiceImpl implements ListingService {
 	
 	@Autowired
 	private SteamService steamService;
+	
+	@Autowired
+	private CSFloatService csFloatService;
 	
 	@Override
 	public Page<ListingDTO> findListingsPaged(
@@ -61,8 +65,11 @@ public class ListingServiceImpl implements ListingService {
 		DomainUser user = domainUserRepository.findById(listingDTO.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("User id provided doesn't exist: " + listingDTO.getUserId()));
 		
-		SteamItem steamItem = steamService.getItemBySteamId(listingDTO.getItem().getItemId())
-				.orElseThrow(() -> new ResourceNotFoundException("Invalid item or item name not found."));
+		//TODO: doesnt have inspect url at this point
+		String inspectUrl = "steam://rungame/730/76561202255233023/+csgo_econ_action_preview%20" + listingDTO.getItem().getItemId();
+		
+		SteamItem steamItem = csFloatService.findItemByInspectUrl(inspectUrl)
+				.orElseThrow(() -> new ResourceNotFoundException("Invalid item or item not found."));
 		
 		listingDTO.setItem(steamItem);
 		
