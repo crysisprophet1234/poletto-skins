@@ -45,7 +45,8 @@ type SteamItemPrice = {
     quantitySoldLast24Hours: number
 }
 
-export type MarketItem = {
-    item: SteamItem
-    price: SteamItemPrice
+export type MarketItem = SteamItem & {
+    lowestPrice: number
+    medianPrice: number
+    quantitySoldLast24Hours: number 
 }
