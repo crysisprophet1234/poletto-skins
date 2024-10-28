@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.poletto.polettoskins.dto.ListingDTO;
+import com.poletto.polettoskins.entities.enums.ListingStatus;
 
 @Service
 public interface ListingService {
@@ -14,7 +15,8 @@ public interface ListingService {
 	Page<ListingDTO> findListingsPaged(
 	    Pageable pageable, 
 	    String query, 
-	    String userId, 
+	    String userId,
+	    ListingStatus listingStatus,
 	    Double minPrice, 
 	    Double maxPrice, 
 	    Double minFloat, 
