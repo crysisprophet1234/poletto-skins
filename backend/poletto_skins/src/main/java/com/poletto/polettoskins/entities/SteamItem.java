@@ -6,37 +6,75 @@ import java.util.Objects;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+
 @Document(collection = "steam_item")
 public class SteamItem implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
 	private String itemId;
+	
+	@JsonAlias("a")
 	private String assetId;
+	
+	@JsonAlias("s")
 	private String ownerSteamId;
+	
+	@JsonAlias("d")
 	private String d;
+	
+	@JsonAlias("m")
 	private String marketId;
+	
 	private Integer origin;
     private Integer quality;
     private Integer rarity;
+    
+    @JsonAlias("paintseed")
     private Integer paintSeed;
+    
+    @JsonAlias("defindex")
     private Integer defIndex;
+    
+    @JsonAlias("paintindex")
     private Integer paintIndex;
+    
+    @JsonAlias("floatid")
     private String floatId;
-    private Integer lowRank;
-    private Integer highRank;
+    
+    @JsonAlias("floatvalue")
     private Double floatValue;
+    
+    @JsonAlias("imageurl")
     private String imageUrl;
+     
     private String inspectUrl;
     private Double min;
     private Double max;
+    
+    @JsonAlias("weapon_type")
     private String weaponType;
+    
+    @JsonAlias("item_name")
     private String itemName;
+    
+    @JsonAlias("rarity_name")
     private String rarityName;
+    
+    @JsonAlias("quality_name")
     private String qualityName;
+    
+    @JsonAlias("origin_name")
     private String originName;
+    
+    @JsonAlias("wear_name")
     private String wearName;
+    
+    @JsonAlias("full_item_name")
     private String fullItemName;
+    
+    
     private List<SteamSticker> stickers;
     
     public SteamItem() {}
@@ -54,8 +92,6 @@ public class SteamItem implements Serializable {
 		Integer defIndex,
 		Integer paintIndex,
 		String floatId,
-		Integer lowRank,
-		Integer highRank,
 		Double floatValue,	
 		String imageUrl,
 		String inspectUrl,
@@ -82,8 +118,6 @@ public class SteamItem implements Serializable {
 		this.defIndex = defIndex;
 		this.paintIndex = paintIndex;
 		this.floatId = floatId;
-		this.lowRank = lowRank;
-		this.highRank = highRank;
 		this.floatValue = floatValue;
 		this.imageUrl = imageUrl;
 		this.inspectUrl = inspectUrl;
@@ -194,22 +228,6 @@ public class SteamItem implements Serializable {
 
 	public void setFloatId(String floatId) {
 		this.floatId = floatId;
-	}
-
-	public Integer getLowRank() {
-		return lowRank;
-	}
-
-	public void setLowRank(Integer lowRank) {
-		this.lowRank = lowRank;
-	}
-
-	public Integer getHighRank() {
-		return highRank;
-	}
-
-	public void setHighRank(Integer highRank) {
-		this.highRank = highRank;
 	}
 
 	public Double getFloatValue() {
@@ -358,7 +376,7 @@ public class SteamItem implements Serializable {
 		return "SteamItem [itemId=" + itemId + ", assetId=" + assetId + ", ownerSteamId=" + ownerSteamId + ", d=" + d
 				+ ", marketId=" + marketId + ", origin=" + origin + ", quality=" + quality + ", rarity=" + rarity
 				+ ", paintSeed=" + paintSeed + ", defIndex=" + defIndex + ", paintIndex=" + paintIndex + ", floatId="
-				+ floatId + ", lowRank=" + lowRank + ", highRank=" + highRank + ", floatValue=" + floatValue
+				+ floatId + ", floatValue=" + floatValue
 				+ ", imageUrl=" + imageUrl + ", inspectUrl=" + inspectUrl + ", min=" + min + ", max=" + max
 				+ ", weaponType=" + weaponType + ", itemName=" + itemName + ", rarityName=" + rarityName
 				+ ", qualityName=" + qualityName + ", originName=" + originName + ", wearName=" + wearName
