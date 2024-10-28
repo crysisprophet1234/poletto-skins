@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.poletto.polettoskins.entities.Listing;
+import com.poletto.polettoskins.entities.enums.ListingStatus;
 
 @Repository
 public interface ListingRepository extends MongoRepository<Listing, String> {
@@ -25,19 +26,23 @@ public interface ListingRepository extends MongoRepository<Listing, String> {
 	       "  ] }, " +
 	       "  { $or: [ " +
 	       "    { $expr: { $eq: [null, ?2] } }, " +
-	       "    { $expr: { $gte: [ { $toDouble: '$listingPrice' }, ?2 ] } }" +
+	       "    { status: ?2 }" +
 	       "  ] }, " +
 	       "  { $or: [ " +
 	       "    { $expr: { $eq: [null, ?3] } }, " +
-	       "    { $expr: { $lte: [ { $toDouble: '$listingPrice' }, ?3 ] } }" +
+	       "    { $expr: { $gte: [ { $toDouble: '$listingPrice' }, ?3 ] } }" +
 	       "  ] }, " +
 	       "  { $or: [ " +
 	       "    { $expr: { $eq: [null, ?4] } }, " +
-	       "    { 'item.floatValue': { $gte: ?4 } }" +
+	       "    { $expr: { $lte: [ { $toDouble: '$listingPrice' }, ?4 ] } }" +
 	       "  ] }, " +
 	       "  { $or: [ " +
 	       "    { $expr: { $eq: [null, ?5] } }, " +
-	       "    { 'item.floatValue': { $lte: ?5 } }" +
+	       "    { 'item.floatValue': { $gte: ?5 } }" +
+	       "  ] }, " +
+	       "  { $or: [ " +
+	       "    { $expr: { $eq: [null, ?6] } }, " +
+	       "    { 'item.floatValue': { $lte: ?6 } }" +
 	       "  ] }" +
 	       "] }"
 	)
@@ -45,6 +50,7 @@ public interface ListingRepository extends MongoRepository<Listing, String> {
 	    Pageable pageable,
 	    String query,
 	    String userId,
+	    ListingStatus listingStatus,
 	    Double minPrice,
 	    Double maxPrice,
 	    Double minFloat,
