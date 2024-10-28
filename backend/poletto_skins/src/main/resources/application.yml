@@ -49,6 +49,8 @@ steam:
 csfloat:
   api:
     url: ${CSFLOAT_API_URL}
+    referer: ${CSFLOAT_API_REFERER}
+    origin: ${CSFLOAT_API_ORIGIN}
 
 management:
   endpoints:
