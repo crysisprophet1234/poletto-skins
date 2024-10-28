@@ -32,8 +32,8 @@ const SellListItem = ({ marketItem }: SellListItemProps) => {
     } = useForm<PriceSchemaType>({
         resolver: zodResolver(priceSchema),
         defaultValues: {
-            sellingPrice: marketItem.price.lowestPrice,
-            userPrice: marketItem.price.lowestPrice * (1 - TAX_RATE) * 100 / 100
+            sellingPrice: marketItem.lowestPrice,
+            userPrice: marketItem.lowestPrice * (1 - TAX_RATE) * 100 / 100
         }
     })
 
@@ -41,8 +41,8 @@ const SellListItem = ({ marketItem }: SellListItemProps) => {
 
     useEffect(() => {
 
-        if (marketItem.price.lowestPrice !== sellingPrice) {
-            updateItemValue(marketItem.item.assetId, sellingPrice)
+        if (marketItem.lowestPrice !== sellingPrice) {
+            updateItemValue(marketItem.assetId, sellingPrice)
             setValue('userPrice', sellingPrice * (1 - TAX_RATE) * 100 / 100)
         }
 
@@ -54,7 +54,7 @@ const SellListItem = ({ marketItem }: SellListItemProps) => {
                 <Box sx={{ transform: 'scale(0.9, 0.75)', transformOrigin: 'top center' }}>
                     <ItemCard
                         itemProps={marketItem}
-                        itemAction={() => removeFromSellList(marketItem.item.assetId)}
+                        itemAction={() => removeFromSellList(marketItem.assetId)}
                         openModal={() => { }}
                     />
                 </Box>

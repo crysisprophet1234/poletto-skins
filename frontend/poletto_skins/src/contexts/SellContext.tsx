@@ -6,12 +6,12 @@ import { createContext, ReactNode, useState } from 'react'
 
 type SellContextValue = {
     sellList: MarketItem[]
-    isItemInSellList: (itemId: MarketItem['item']['assetId']) => boolean
+    isItemInSellList: (itemId: MarketItem['assetId']) => boolean
     addToSellList: (item: MarketItem) => void
-    updateItemValue: (itemId: MarketItem['item']['assetId'], value: number) => void
+    updateItemValue: (itemId: MarketItem['assetId'], value: number) => void
     instantSell: (userId: string) => Promise<void>
     createListing: (userId: string) => Promise<void>
-    removeFromSellList: (itemId: MarketItem['item']['assetId']) => void
+    removeFromSellList: (itemId: MarketItem['assetId']) => void
     clearSellList: () => void
     totalItems: number
     totalPrice: number
@@ -40,24 +40,24 @@ export const SellProvider = ({ children }: SellProviderProps) => {
 
     const [sellList, setSellList] = useState<MarketItem[]>([])
 
-    const isItemInSellList = (itemId: MarketItem['item']['assetId']) => {
-        return sellList.some((marketItem) => marketItem.item.assetId === itemId)
+    const isItemInSellList = (itemId: MarketItem['assetId']) => {
+        return sellList.some((marketItem) => marketItem.assetId === itemId)
     }
 
     const addToSellList = (marketItem: MarketItem) => {
-        if (!isItemInSellList(marketItem.item.assetId)) {
+        if (!isItemInSellList(marketItem.assetId)) {
             setSellList([...sellList, marketItem])
         }
     }
 
-    const removeFromSellList = (itemId: MarketItem['item']['assetId']) => {
-        setSellList(sellList.filter((marketItem) => marketItem.item.assetId !== itemId))
+    const removeFromSellList = (itemId: MarketItem['assetId']) => {
+        setSellList(sellList.filter((marketItem) => marketItem.assetId !== itemId))
     }
 
-    const updateItemValue = (itemId: MarketItem['item']['assetId'], value: number) => {
+    const updateItemValue = (itemId: MarketItem['assetId'], value: number) => {
         setSellList(sellList.map(marketItem =>
-            marketItem.item.assetId === itemId 
-                ? { ...marketItem, price: { ...marketItem.price, lowestPrice: value} } 
+            marketItem.assetId === itemId 
+                ? { ...marketItem, price: { ...marketItem, lowestPrice: value} } 
                 : marketItem
         ))
     }
@@ -68,7 +68,7 @@ export const SellProvider = ({ children }: SellProviderProps) => {
         try {
             const items = sellList.map(marketItem => ({
                 itemId: extractItemId(marketItem),
-                value: parseFloat(marketItem.price.lowestPrice.toFixed(2))
+                value: parseFloat(marketItem.lowestPrice.toFixed(2))
             }))
 
             const requestData = {
@@ -92,7 +92,7 @@ export const SellProvider = ({ children }: SellProviderProps) => {
         try {
             const items = sellList.map(marketItem => ({
                 itemId: extractItemId(marketItem),
-                value: parseFloat(marketItem.price.lowestPrice.toFixed(2))
+                value: parseFloat(marketItem.lowestPrice.toFixed(2))
             }))
 
             const requests = items.map(marketItem => {
@@ -115,7 +115,7 @@ export const SellProvider = ({ children }: SellProviderProps) => {
     }
 
     const totalItems = sellList.length
-    const totalPrice = sellList.reduce((acc, marketItem) => acc + marketItem.price.lowestPrice, 0)
+    const totalPrice = sellList.reduce((acc, marketItem) => acc + marketItem.lowestPrice, 0)
 
     return (
         <SellContext.Provider

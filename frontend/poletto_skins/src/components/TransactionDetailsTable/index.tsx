@@ -1,4 +1,3 @@
-import { Sticker } from '@/types/entities/item'
 import { Listing } from '@/types/entities/listing'
 import { Transaction } from '@/types/entities/transaction'
 import { Skeleton, Stack, Table, TableBody, TableCell, TableHead, TableRow } from '@mui/material'
@@ -59,7 +58,7 @@ const TransactionDetailsTable = ({ transaction }: TransactionDetailsTableProps) 
                             <TableCell>{listing.item.floatValue}</TableCell>
                             <TableCell>{listing.listingPrice.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</TableCell>
                             <TableCell>
-                                {listing.item.stickers.map((sticker: Sticker, index: number) => (
+                                {listing.item.stickers.map((sticker, index) => (
                                     <Stack key={index} direction={'column'}>
                                         {sticker.name}
                                     </Stack>

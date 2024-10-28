@@ -95,7 +95,7 @@ const ListingCard = ({ listingProps, openModal, listingAction }: ListingCardProp
                     <img src={listing?.item?.imageUrl} alt='skin-image' loading='lazy' />
                 </div>
 
-                {listing?.item.weaponType.toLowerCase() !== 'sticker' && (
+                {listing?.item.weaponType.toLowerCase() !== 'sticker' && listing?.item.stickers && (
                     <div className='sticker-stack'>
 
                     {listing?.item.stickers.slice(0, 4).map((sticker: SteamSticker, index: number) => {

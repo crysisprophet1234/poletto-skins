@@ -1,4 +1,5 @@
-import { SteamItem } from '@/entities/steam-item'
+import { SteamItem } from "./steam-item"
+
 
 export type Listing = {
     id: string
