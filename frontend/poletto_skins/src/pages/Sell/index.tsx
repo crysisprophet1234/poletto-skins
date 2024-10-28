@@ -1,14 +1,13 @@
 import SellCatalog from '@/components/SellComponents/Catalog'
 import TopFilter from '@/components/TopFilter'
 import { useAuth } from '@/hooks/useAuth'
-import { useBreakpoint } from '@/hooks/useBreakpoint'
 import { useSell } from '@/hooks/useSell'
 import { get } from '@/services/api'
+import { Inventory } from '@/types/entities/inventory'
 import { MarketItem } from '@/types/entities/steam-item'
-import { SpringPage } from '@/types/vendor/spring-page'
 import { Box } from '@mui/material'
 import SellList from '@sell/SellList'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 type FilterData = {
     minPrice?: string,
@@ -29,16 +28,16 @@ const Sell = () => {
     const { addToSellList, removeFromSellList, isItemInSellList } = useSell()
 
     const handleAddSellListButtonClick = (marketItem: MarketItem) => {
-        if (isItemInSellList(marketItem.item.assetId)) {
-            removeFromSellList(marketItem.item.assetId)
+        if (isItemInSellList(marketItem.assetId)) {
+            removeFromSellList(marketItem.assetId)
         } else {
             addToSellList(marketItem)
         }
     }
 
-    const [marketItems, setMarketItems] = useState<SpringPage<MarketItem>>()
+    const [userInventory, setUserInventory] = useState<Inventory>()
 
-    const [/*filterData*/, setFilterData] = useState<FilterData>()
+    const [/* filterData */, setFilterData] = useState<FilterData>()
 
     const handleFilterChange = (data: FilterData) => {
         setFilterData(prevFilterData => ({
@@ -47,6 +46,7 @@ const Sell = () => {
         }))
     }
 
+    /*
     const { isXL, isLarge, isMedium } = useBreakpoint()
 
     const size = useMemo(() => {
@@ -55,23 +55,26 @@ const Sell = () => {
         if (isMedium) return 9
         return 9
     }, [isXL, isLarge, isMedium])
+    */
 
-    const getUserItems = useCallback(async (steamId: string) => {
+    const getUserItems = async (steamId: string) => {
 
         try {
-            const marketItemsPage = await get<SpringPage<MarketItem>>(`/users/steam/${steamId}/inventory?size=${size}`)
-            setMarketItems(marketItemsPage)
-
+            const fetchedUserInventory = await get<Inventory>('/inventory', { steamId })
+            if (fetchedUserInventory.items.length > 0) {
+                setUserInventory(fetchedUserInventory)
+            }
+    
         } catch (error) {
             console.error(`Error trying to fetch steam user data: ${error}`)
         }
-    }, [size])
+    }
 
     useEffect(() => {
         if (steamId) {
             getUserItems(steamId)
         }
-    }, [getUserItems, steamId])
+    }, [steamId])
 
     return (
 
@@ -97,7 +100,12 @@ const Sell = () => {
                         overflowX: 'hidden'
                     }}
                 >
-                    <SellCatalog marketItems={marketItems!} itemAction={handleAddSellListButtonClick} />
+                    {userInventory && userInventory.items.length > 0 &&
+                        <SellCatalog
+                            marketItems={userInventory!.items}
+                            itemAction={handleAddSellListButtonClick} />
+                    }
+
                 </Box>
 
             </Box>

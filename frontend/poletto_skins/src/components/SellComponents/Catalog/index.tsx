@@ -1,16 +1,15 @@
-import { SpringPage } from '@/types/vendor/spring-page'
-import { Box, Button, Grid, Skeleton } from '@mui/material'
-import { useEffect, useState } from 'react'
 import { MarketItem } from '@/types/entities/steam-item'
+import { Box, Button, Grid, Skeleton } from '@mui/material'
 import SellItemModal from '@sell/Catalog/ItemModal'
 import ItemCard from '@sell/ItemCard'
+import { useEffect, useState } from 'react'
 
-type CatalogProps = {
-    marketItems: SpringPage<MarketItem>
+type SellCatalogProps = {
+    marketItems: MarketItem[]
     itemAction: (marketItem: MarketItem) => void
 }
 
-const Catalog = ({ marketItems, itemAction }: CatalogProps) => {
+const SellCatalog = ({ marketItems, itemAction }: SellCatalogProps) => {
 
     const [loading, setLoading] = useState(true)
     const [selectedItem, setSelectedItem] = useState<MarketItem>()
@@ -27,7 +26,7 @@ const Catalog = ({ marketItems, itemAction }: CatalogProps) => {
     }
 
     useEffect(() => {
-        if (marketItems && marketItems.content.length > 0) {
+        if (marketItems && marketItems.length > 0) {
             setLoading(false)
         }
     }, [marketItems])
@@ -72,11 +71,11 @@ const Catalog = ({ marketItems, itemAction }: CatalogProps) => {
                                 />
                             </Grid>
                         ))
-                        : marketItems.content.map((marketItem) => (
-                            <Grid item xs={2} sm={4} md={4} lg={3} key={marketItem.item.assetId}>
+                        : marketItems.map((marketItem) => (
+                            <Grid item xs={2} sm={4} md={4} lg={3} key={marketItem.assetId}>
                                 <ItemCard
                                     itemProps={marketItem}
-                                    key={marketItem.item.assetId}
+                                    key={marketItem.assetId}
                                     itemAction={() => itemAction(marketItem)}
                                     openModal={() => handleOpen(marketItem)}
                                 />
@@ -114,4 +113,4 @@ const Catalog = ({ marketItems, itemAction }: CatalogProps) => {
     )
 }
 
-export default Catalog
+export default SellCatalog
