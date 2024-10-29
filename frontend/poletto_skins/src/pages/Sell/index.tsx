@@ -1,13 +1,14 @@
 import SellCatalog from '@/components/SellComponents/Catalog'
 import TopFilter from '@/components/TopFilter'
 import { useAuth } from '@/hooks/useAuth'
+import { useBreakpoint } from '@/hooks/useBreakpoint'
 import { useSell } from '@/hooks/useSell'
 import { get } from '@/services/api'
 import { Inventory } from '@/types/entities/inventory'
 import { MarketItem } from '@/types/entities/steam-item'
 import { Box } from '@mui/material'
 import SellList from '@sell/SellList'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 type FilterData = {
     minPrice?: string,
@@ -46,35 +47,41 @@ const Sell = () => {
         }))
     }
 
-    /*
     const { isXL, isLarge, isMedium } = useBreakpoint()
 
     const size = useMemo(() => {
-        if (isXL) return 20
-        if (isLarge) return 16
-        if (isMedium) return 9
-        return 9
+        if (isXL) return 10
+        if (isLarge) return 8
+        if (isMedium) return 6
+        return 6
     }, [isXL, isLarge, isMedium])
-    */
 
-    const getUserItems = async (steamId: string) => {
+    const getUserItems = useCallback(async (steamId: string) => {
+
+        const requestParams = {
+            steamId,
+            size,
+            page: 1,
+            filterListed: true
+        }
 
         try {
-            const fetchedUserInventory = await get<Inventory>('/inventory', { steamId })
-            if (fetchedUserInventory.items.length > 0) {
-                setUserInventory(fetchedUserInventory)
-            }
+            const fetchedUserInventory = await get<Inventory>('/inventory', requestParams)
+            setUserInventory(fetchedUserInventory)
     
         } catch (error) {
             console.error(`Error trying to fetch steam user data: ${error}`)
         }
-    }
+    }, [size])
+
+    const hasFetchedRef = useRef(false)
 
     useEffect(() => {
-        if (steamId) {
+        if (steamId && !hasFetchedRef.current) {
             getUserItems(steamId)
+            hasFetchedRef.current = true
         }
-    }, [steamId])
+    }, [steamId, getUserItems])
 
     return (
 
