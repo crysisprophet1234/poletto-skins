@@ -2,7 +2,8 @@ import MainFilter from '@/components/MainFilter'
 import TopFilter from '@/components/TopFilter'
 import { useCart } from '@/hooks/useCart'
 import { get } from '@/services/api'
-import { Box, Stack } from '@mui/material'
+import { Box, Stack, Typography } from '@mui/material'
+import SentimentDissatisfiedIcon from '@mui/icons-material/SentimentDissatisfied'
 import { SpringPage } from '@/types/vendor/spring-page'
 import { Listing } from '@/types/entities/listing'
 import { useCallback, useEffect, useMemo, useState } from 'react'
@@ -26,17 +27,16 @@ const Buy = () => {
 
     const { addToCart, removeFromCart, isListingInCart } = useCart()
 
-    const handleAddCartButtonClick = (listing: Listing) => {
+    const handleAddCartButtonClick = useCallback((listing: Listing) => {
         if (isListingInCart(listing.id)) {
             removeFromCart(listing.id)
         } else {
             addToCart(listing)
         }
-    }
+    }, [isListingInCart, addToCart, removeFromCart])
 
-    const [listings, setListings] = useState<SpringPage<Listing>>()
-
-    const [filterData, setFilterData] = useState<FilterData>()
+    const [listings, setListings] = useState<SpringPage<Listing> | null>(null)
+    const [filterData, setFilterData] = useState<FilterData | null>(null)
 
     const handleFilterChange = (data: FilterData) => {
         setFilterData(prevFilterData => ({
@@ -57,20 +57,21 @@ const Buy = () => {
     const fetchListings = useCallback(async () => {
 
         try {
-            const listingsPage = await get<SpringPage<Listing>>('/listings', { 
+            const listingsPage = await get<SpringPage<Listing>>('/listings', {
                 ...filterData,
                 size,
-                status: 'ACTIVE' 
+                status: 'ACTIVE'
             })
             setListings(listingsPage)
-
         } catch (error) {
-            console.error(`Error trying to fetch listings: ${error}`)
+            console.error(`Erro ao buscar anúncios: ${error}`)
         }
     }, [filterData, size])
 
     useEffect(() => {
-        if (filterData) fetchListings()
+        if (filterData) {
+            fetchListings()
+        }
     }, [fetchListings, filterData])
 
     return (
@@ -99,16 +100,44 @@ const Buy = () => {
                     <TopFilter onFilterChange={handleFilterChange} />
 
                     <Cart />
-                    
+
                 </Stack>
 
                 <Box
                     sx={{
                         overflowY: 'auto',
-                        overflowX: 'hidden'
+                        overflowX: 'hidden',
+                        flexGrow: 1,
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        padding: 2
                     }}
                 >
-                    <Catalog listings={listings!} listingAction={handleAddCartButtonClick} />
+                    {listings && listings.totalElements > 0 ? (
+
+                        <Catalog listings={listings} listingAction={handleAddCartButtonClick} />
+
+                    ) : (
+
+                        <Box
+                            display='flex'
+                            flexDirection='column'
+                            alignItems='center'
+                            justifyContent='center'
+                            textAlign='center'
+                        >
+                            <SentimentDissatisfiedIcon sx={{ fontSize: 80, mb: 2 }} />
+                            <Typography variant='h6' gutterBottom>
+                                Nenhum anúncio encontrado.
+                            </Typography>
+                            <Typography variant='body1'>
+                                Tente ajustar seus filtros ou verifique novamente mais tarde.
+                            </Typography>
+                        </Box>
+
+                    )}
+
                 </Box>
 
             </Box>
