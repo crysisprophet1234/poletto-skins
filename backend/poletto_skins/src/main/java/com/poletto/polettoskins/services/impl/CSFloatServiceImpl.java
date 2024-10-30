@@ -49,39 +49,71 @@ public class CSFloatServiceImpl implements CSFloatService {
 
     @Override
     public Optional<SteamItem> findItemByInspectUrl(String inspectUrl) {
+    	
         if (inspectUrl == null || inspectUrl.isEmpty()) {
             logger.warn("Inspect URL is null or empty.");
             return Optional.empty();
         }
 
-        try {
-            URI uri = buildUri(inspectUrl);
-            HttpRequest request = buildHttpRequest(uri);
+        int maxRetries = 5;
+        int retryCount = 0;
+        long waitTime = 500;
+        double backoffMultiplier = 1.5;
 
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+        while (retryCount < maxRetries) {
+        	
+            try {
+            	
+                URI uri = buildUri(inspectUrl);
+                HttpRequest request = buildHttpRequest(uri);
 
-            if (response.statusCode() != 200) {
-                logger.error("Failed to retrieve item info from CSFloat API. HTTP status code: {}", response.statusCode());
+                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+                if (response.statusCode() == 200) {
+                    return parseResponse(response.body(), inspectUrl);
+                } else {
+                    logger.error("Failed to retrieve item info from CSFloat API. HTTP status code: {}", response.statusCode());
+                }
+
+            } catch (IOException e) {
+                logger.error("IO exception occurred while communicating with CSFloat API.", e);
+                
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                logger.error("Thread was interrupted while communicating with CSFloat API.", e);
+                return Optional.empty();
+                
+            } catch (URISyntaxException e) {
+                logger.error("Invalid URI syntax for CSFloat API URL.", e);
+                return Optional.empty();
+                
+            } catch (Exception e) {
+                logger.error("Unexpected exception occurred while retrieving item from CSFloat API.", e);
                 return Optional.empty();
             }
 
-            return parseResponse(response.body(), inspectUrl);
-
-        } catch (IOException e) {
-            logger.error("IO exception occurred while communicating with CSFloat API.", e);
-            return Optional.empty();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            logger.error("Thread was interrupted while communicating with CSFloat API.", e);
-            return Optional.empty();
-        } catch (URISyntaxException e) {
-            logger.error("Invalid URI syntax for CSFloat API URL.", e);
-            return Optional.empty();
-        } catch (Exception e) {
-            logger.error("Unexpected exception occurred while retrieving item from CSFloat API.", e);
-            return Optional.empty();
+            retryCount++;
+            
+            if (retryCount < maxRetries) {
+            	
+                logger.info("Attempt {} of {}: waiting {} ms before retrying...", retryCount, maxRetries, waitTime);
+                
+                try {
+                    Thread.sleep(waitTime);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    logger.error("Thread interrupted during retry wait", e);
+                    return Optional.empty();
+                }
+                
+                waitTime *= backoffMultiplier;
+            }
         }
+
+        logger.error("Maximum number of attempts reached. Returning empty optional.");
+        return Optional.empty();
     }
+
 
     private URI buildUri(String inspectUrl) throws URISyntaxException {
         return UriComponentsBuilder.fromHttpUrl(apiUrl)
