@@ -2,97 +2,145 @@ package com.poletto.polettoskins.services.impl;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.poletto.polettoskins.entities.Inventory;
+import com.poletto.polettoskins.dto.InventoryDTO;
 import com.poletto.polettoskins.entities.MarketItem;
 import com.poletto.polettoskins.entities.SteamItem;
 import com.poletto.polettoskins.entities.SteamItemPrice;
+import com.poletto.polettoskins.entities.SteamSticker;
 import com.poletto.polettoskins.repositories.ListingRepository;
 import com.poletto.polettoskins.services.CSFloatService;
 import com.poletto.polettoskins.services.InventoryService;
-import com.poletto.polettoskins.services.SteamService;
 import com.poletto.polettoskins.services.TradeItService;
 
 @Service
 public class InventoryServiceImpl implements InventoryService {
-	
-	@Autowired
+
+    private static final Logger logger = LoggerFactory.getLogger(InventoryServiceImpl.class);
+
+    @Autowired
 	private TradeItService tradeItService;
 	
 	@Autowired
 	private CSFloatService csFloatService;
 	
 	@Autowired
-	private SteamService steamService;
-	
-	@Autowired
 	private ListingRepository listingRepository;
 
-	@Override
-	public Inventory getUserInventory(String steamId) {
-		
-		List<SteamItem> userItems = tradeItService.fetchInventoryBySteamId(steamId);
-		
-		List<SteamItem> updatedItems = new ArrayList<>();
-		
-		for (SteamItem item : userItems) {
-			
-			//TODO: specific ex
-			SteamItem updatedItem = csFloatService.findItemByInspectUrl(item.getInspectUrl())
-					.orElseThrow(() -> new RuntimeException());
-			
-			updatedItem.setInspectUrl(item.getInspectUrl());
-			updatedItem.setImageUrl(item.getImageUrl());
-			
-			updatedItems.add(updatedItem);
-			
-		}
-		
-		updatedItems = filterUnlistedItems(updatedItems);
-		
-		List<MarketItem> marketItems = new ArrayList<>();
-		
-		for (SteamItem item: updatedItems) {
-			
-			SteamItemPrice price = steamService.getItemPriceBySteamId(item.getFullItemName());
-			
-			var marketItem = new MarketItem(item, price);
-			
-			marketItems.add(marketItem);
-			
-		}
-		
-		BigDecimal totalPrice = marketItems.stream()
-		    .map(MarketItem::getMedianPrice)
-		    .reduce(BigDecimal.ZERO, BigDecimal::add);
-		
-		Inventory inventory = new Inventory();
-		inventory.setSteamId(steamId);
-		inventory.setItemCount(marketItems.size());
-		inventory.setTotalSteamPrice(totalPrice);
-		inventory.setItems(marketItems);
-		
-		return inventory;
-	}
-	
-	private List<SteamItem> filterUnlistedItems(List<SteamItem> steamItems) {
+    @Override
+    public InventoryDTO getUserInventory(String steamId, int size, int page, boolean filterListed) {
+    	
+        List<MarketItem> userItems = tradeItService.fetchInventoryBySteamId(steamId);
+        
+        int totalItems = userItems.size();
+        int pageStart = (page - 1) * size;
+        int pageEnd = Math.min(pageStart + size, totalItems);
+        
+        BigDecimal totalPrice = userItems.stream()
+                .map(MarketItem::getMedianPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        
+        InventoryDTO inventory = new InventoryDTO();
+        inventory.setSteamId(steamId);
+        inventory.setItemCount(totalItems);
+        inventory.setTotalSteamPrice(totalPrice);
 
-        List<String> assetIds = steamItems.stream()
-            .map(SteamItem::getAssetId)
-            .collect(Collectors.toList());
+        if (pageStart >= totalItems) {	
+            inventory.setItems(Collections.emptyList());
+            return inventory;
+        }
 
-        List<String> listedAssetIds = listingRepository.findAllByAssetIdIn(assetIds).stream()
-            .map(x -> x.getItem().getAssetId())
-            .collect(Collectors.toList());
+        List<MarketItem> pagedItems = userItems.subList(pageStart, pageEnd);
 
-        return steamItems.stream()
-            .filter(item -> !listedAssetIds.contains(item.getAssetId()))
-            .collect(Collectors.toList());
+        if (filterListed) {
+            pagedItems = filterUnlistedItems(pagedItems);
+        }
+
+        List<MarketItem> marketItems = pagedItems.parallelStream()
+                .map(this::processMarketItem)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+
+        inventory.setItems(marketItems);
+
+        return inventory;
     }
 
+    private Optional<MarketItem> processMarketItem(MarketItem item) {
+    	
+        try {
+        	
+            Optional<SteamItem> optionalUpdatedItem = csFloatService.findItemByInspectUrl(item.getInspectUrl());
+            
+            if (optionalUpdatedItem.isEmpty()) {
+                logger.warn("Item not found for inspect URL: {}", item.getInspectUrl());
+                return Optional.empty();
+            }
+
+            SteamItem updatedItem = optionalUpdatedItem.get();
+            updatedItem.setInspectUrl(item.getInspectUrl());
+            updatedItem.setImageUrl(item.getImageUrl());
+
+            updateItemStickers(item, updatedItem);
+
+            SteamItemPrice steamItemPrice = new SteamItemPrice(
+                    item.getLowestPrice(),
+                    item.getMedianPrice(),
+                    null
+            );
+
+            return Optional.of(new MarketItem(updatedItem, steamItemPrice));
+
+        } catch (Exception e) {
+            logger.error("Error processing market item with inspect URL: {}", item.getInspectUrl(), e);
+            return Optional.empty();
+        }
+    }
+
+    private void updateItemStickers(MarketItem item, SteamItem updatedItem) {
+    	
+    	if (item.getStickers() != null && updatedItem.getStickers() != null) {
+    		
+    	    List<SteamSticker> updatedStickers = new ArrayList<>();
+    	    
+    	    Iterator<SteamSticker> updatedItemStickers = updatedItem.getStickers().iterator();
+    	    
+    	    Iterator<SteamSticker> itemStickers = item.getStickers().iterator();
+
+    	    while (updatedItemStickers.hasNext() && itemStickers.hasNext()) {
+    	        SteamSticker sticker = updatedItemStickers.next();
+    	        sticker.setImageUrl(itemStickers.next().getImageUrl());
+    	        updatedStickers.add(sticker);
+    	    }
+
+    	    updatedItem.setStickers(updatedStickers);
+    	}
+    }
+
+    private List<MarketItem> filterUnlistedItems(List<MarketItem> steamItems) {
+    	
+        List<String> assetIds = steamItems.stream()
+                .map(SteamItem::getAssetId)
+                .collect(Collectors.toList());
+
+        Set<String> listedAssetIds = listingRepository.findAllByAssetIdIn(assetIds).stream()
+                .map(x -> x.getItem().getAssetId())
+                .collect(Collectors.toSet());
+
+        return steamItems.stream()
+                .filter(item -> !listedAssetIds.contains(item.getAssetId()))
+                .collect(Collectors.toList());
+    }
 }
