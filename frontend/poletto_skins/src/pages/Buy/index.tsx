@@ -114,11 +114,7 @@ const Buy = () => {
                         padding: 2
                     }}
                 >
-                    {listings && listings.totalElements > 0 ? (
-
-                        <Catalog listings={listings} listingAction={handleAddCartButtonClick} />
-
-                    ) : (
+                    {listings && listings.totalElements == 0 ? (
 
                         <Box
                             display='flex'
@@ -136,6 +132,10 @@ const Buy = () => {
                             </Typography>
                         </Box>
 
+                    ) : (
+
+                        <Catalog listings={listings!} listingAction={handleAddCartButtonClick} />
+                        
                     )}
 
                 </Box>
