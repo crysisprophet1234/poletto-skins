@@ -234,6 +234,10 @@ public class TradeItServiceImpl implements TradeItService {
         if (itemJson.has("stickers") && !itemJson.isNull("stickers")) {
             addStickersImageUrl(marketItem, itemJson);
         }
+        
+        if (itemJson.getString("name").contains("Sticker")) {
+        	initializeStickerArray(marketItem, itemJson);
+        }
 
         BigDecimal steamPriceUsd = itemJson.getBigDecimal("steamPrice").movePointLeft(2);
         BigDecimal medianPriceUsd = itemJson.getBigDecimal("price").movePointLeft(2);
@@ -262,10 +266,15 @@ public class TradeItServiceImpl implements TradeItService {
     }
 
     private MarketItem addStickersImageUrl(MarketItem marketItem, JSONObject itemJson) {
+    	
         JSONArray stickersArr = itemJson.optJSONArray("stickers");
+        
         if (stickersArr != null) {
+        	
             for (int i = 0; i < stickersArr.length(); i++) {
+            	
                 JSONObject sticker = stickersArr.getJSONObject(i);
+                
                 String stickerImgUrl = sticker.getString("link");
 
                 SteamSticker steamSticker = new SteamSticker();
@@ -274,9 +283,23 @@ public class TradeItServiceImpl implements TradeItService {
                 if (marketItem.getStickers() == null) {
                     marketItem.setStickers(new ArrayList<>());
                 }
+                
                 marketItem.getStickers().add(steamSticker);
             }
         }
+        
         return marketItem;
+    }
+    
+    private MarketItem initializeStickerArray(MarketItem marketItem, JSONObject itemJson) {
+    	
+    	SteamSticker steamSticker = new SteamSticker();
+    	
+    	steamSticker.setImageUrl(itemJson.getString("imgURL"));
+    	
+    	marketItem.getStickers().add(steamSticker);
+    	
+    	return marketItem;
+    	
     }
 }
