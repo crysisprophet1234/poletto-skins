@@ -30,9 +30,9 @@ public class InventoryController {
         @NotBlank(message = "Steam ID cannot be blank")
 		String steamId,
 		
-		@RequestParam(defaultValue = "6")
-        @Min(value = 1, message = "Page size must be greater than 0")
-		@Max(value = 12, message = "Page size must be lesser than 13")
+		@RequestParam(defaultValue = "12")
+        @Min(value = 6, message = "Page size must be greater than 0")
+		@Max(value = 24, message = "Page size maximum value is 24")
 		Integer size,
 		
 		@RequestParam(defaultValue = "1")
