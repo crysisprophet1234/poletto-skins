@@ -1,11 +1,11 @@
-name: Backend CI/CD
+name: Build and Deploy Spring Boot Backend Docker Image
 
 on:
   push:
     branches:
       - main
     paths:
-      - 'backend/poletto-skins/**'
+      - 'backend/poletto_skins/**'
   workflow_dispatch:
 
 jobs:
@@ -15,9 +15,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: List repository contents
-        run: ls -R
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
@@ -34,11 +31,11 @@ jobs:
             ${{ runner.os }}-maven-
 
       - name: Build with Maven
-        working-directory: ./backend/poletto-skins/
+        working-directory: ./backend/poletto_skins/
         run: mvn clean package --no-transfer-progress
 
       - name: Run tests with Maven
-        working-directory: ./backend/poletto-skins/
+        working-directory: ./backend/poletto_skins/
         run: mvn test --no-transfer-progress
 
       - name: Set up Docker Buildx
@@ -53,8 +50,8 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
         with:
-          context: ./backend/poletto-skins/
-          file: ./backend/poletto-skins/Dockerfile
+          context: ./backend/poletto_skins/
+          file: ./backend/poletto_skins/Dockerfile
           push: true
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/poletto-skins-api:latest
@@ -62,4 +59,6 @@ jobs:
 
       - name: Call Deploy Webhook
         if: success()
-        run: curl -L -X POST "${{ secrets.DEPLOY_WEBHOOK_URL }}"
+        uses: wei/curl@v1.3.1
+        with:
+          args: -X POST ${{ secrets.DEPLOY_WEBHOOK_URL }}
