@@ -12,6 +12,7 @@ import Login from './pages/Login'
 import Sell from './pages/Sell'
 import User from './pages/User'
 import Root from './routes/root'
+import BuildingPage from './pages/BuildingPage'
 
 const Buy = lazy(() => import('./pages/Buy'))
 
@@ -74,6 +75,10 @@ const router = createBrowserRouter(
                 </SellProvider>
               </PrivateRoute>
             </Suspense>
+        },
+        {
+          path: '*',
+          element: <BuildingPage />,
         }
       ]
     }
