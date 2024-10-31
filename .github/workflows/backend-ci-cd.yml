@@ -59,6 +59,4 @@ jobs:
 
       - name: Call Deploy Webhook
         if: success()
-        uses: wei/curl@v1.3.1
-        with:
-          args: -X POST ${{ secrets.DEPLOY_WEBHOOK_URL }}
+        run: curl -L -X POST "${{ secrets.DEPLOY_WEBHOOK_URL }}"
