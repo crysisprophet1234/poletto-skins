@@ -6,7 +6,7 @@ spring:
   config:
       
     import:
-      - "file:./.env[.properties]"
+      - "optional:file:./.env[.properties]"
       
   data:
     mongodb:
