@@ -74,8 +74,8 @@ jobs:
           push: true
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/poletto-skins-api:latest
-            ${{ secrets.DOCKER_USERNAME }}/poletto-skins-api:${{ format('yyyyMMdd', github.run_started_at) }}
+            ${{ secrets.DOCKER_USERNAME }}/poletto-skins-api:${{ github.run_id }}
 
       - name: Call Deploy Webhook
         if: success()
-        run: curl -X POST ${{ secrets.DEPLOY_WEBHOOK_URL }}
+        run: curl --fail ${{ secrets.DEPLOY_WEBHOOK_URL }}
