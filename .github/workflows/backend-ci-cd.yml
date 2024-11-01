@@ -12,7 +12,26 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
+    env:
+      MONGODB_URI: ${{ secrets.MONGODB_URI }}
+      LOG_FILE_PATH: ${{ secrets.LOG_FILE_PATH }}
+      LOG_LEVEL: ${{ secrets.LOG_LEVEL }}
+      SERVER_PORT: ${{ secrets.SERVER_PORT }}
+      SERVER_CONTEXT_PATH: ${{ secrets.SERVER_CONTEXT_PATH }}
+      CORS_ALLOWED_ORIGIN: ${{ secrets.CORS_ALLOWED_ORIGIN }}
+      CSFLOAT_API_URL: ${{ secrets.CSFLOAT_API_URL }}
+      CSFLOAT_API_REFERER: ${{ secrets.CSFLOAT_API_REFERER }}
+      CSFLOAT_API_ORIGIN: ${{ secrets.CSFLOAT_API_ORIGIN }}
+      STEAM_API_URL: ${{ secrets.STEAM_API_URL }}
+      STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
+      STEAM_COMMUNITY_URL: ${{ secrets.STEAM_COMMUNITY_URL }}
+      OPENID_PROVIDERS_STEAM: ${{ secrets.OPENID_PROVIDERS_STEAM }}
+      OPENID_RETURN_TO_URL: ${{ secrets.OPENID_RETURN_TO_URL }}
+      LOGIN_SUCCESS_URL: ${{ secrets.LOGIN_SUCCESS_URL }}
+      LOGIN_FAILURE_URL: ${{ secrets.LOGIN_FAILURE_URL }}
+
     steps:
+    
       - name: Checkout repository
         uses: actions/checkout@v4
 
