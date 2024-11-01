@@ -116,7 +116,7 @@ const ItemModal = ({ marketItem, open, handleClose, itemAction }: ItemModalProps
                                 </Stack>
                             </div>
 
-                            {marketItem.weaponType.toLowerCase() !== 'sticker' && marketItem.stickers &&
+                            {!['sticker', 'operator'].includes(marketItem?.weaponType.toLowerCase()) && marketItem?.stickers &&
 
                                 <Stack
                                     direction='row'
