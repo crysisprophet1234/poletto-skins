@@ -117,7 +117,7 @@ const ListingModal = ({ listing, open, handleClose, itemAction }: ListingModalPr
                                 </Stack>
                             </div>
 
-                            {listing?.item.weaponType.toLowerCase() !== 'sticker' && listing?.item.stickers &&
+                            {!['sticker', 'operator'].includes(listing?.item.weaponType.toLowerCase()) && listing?.item.stickers &&
 
                                 <Stack
                                     direction='row'
