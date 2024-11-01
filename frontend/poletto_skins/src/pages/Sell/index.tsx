@@ -50,10 +50,10 @@ const Sell = () => {
     const { isXL, isLarge, isMedium } = useBreakpoint()
 
     const size = useMemo(() => {
-        if (isXL) return 10
-        if (isLarge) return 8
-        if (isMedium) return 6
-        return 6
+        if (isXL) return 24
+        if (isLarge) return 16
+        if (isMedium) return 12
+        return 12
     }, [isXL, isLarge, isMedium])
 
     const getUserItems = useCallback(async (steamId: string) => {
