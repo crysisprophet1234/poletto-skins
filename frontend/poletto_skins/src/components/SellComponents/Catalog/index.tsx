@@ -60,7 +60,7 @@ const SellCatalog = ({ marketItems, itemAction }: SellCatalogProps) => {
                     gap: 2,
                 }}
             >
-                <Grid container justifyContent='flex-start' spacing={1} columns={{ xs: 4, sm: 8, md: 12, lg: 12, xl: 16 }}>
+                <Grid container justifyContent='flex-start' spacing={1} columns={{ xs: 4, sm: 8, md: 12, lg: 12, xl: 18 }}>
                     {loading
                         ? Array.from(new Array(12)).map((_, index) => (
                             <Grid item xs={2} sm={4} md={4} lg={3} key={index}>

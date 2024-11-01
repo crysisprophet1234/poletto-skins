@@ -39,12 +39,6 @@ type SteamSticker = {
     name: string
 }
 
-type SteamItemPrice = {
-    lowestPrice: number
-    medianPrice: number
-    quantitySoldLast24Hours: number
-}
-
 export type MarketItem = SteamItem & {
     lowestPrice: number
     medianPrice: number

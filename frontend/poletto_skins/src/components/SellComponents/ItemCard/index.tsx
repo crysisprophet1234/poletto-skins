@@ -51,8 +51,8 @@ const ItemCard = ({ itemProps, openModal, itemAction }: ItemCardProps) => {
                     ) : (
                         <>
                             <span className='skin-name'>
-                                {marketItem?.itemName == '-' 
-                                    ? 'Vanilla' 
+                                {marketItem?.itemName == '-'
+                                    ? 'Vanilla'
                                     : marketItem?.itemName
                                 }
                             </span>
@@ -61,27 +61,32 @@ const ItemCard = ({ itemProps, openModal, itemAction }: ItemCardProps) => {
                                 {marketItem?.weaponType /*TODO: subcategory?*/}
                             </span>
 
-                            <div className='additional-info'>
+                            {marketItem?.weaponType !== 'Operator' &&
 
-                                {marketItem?.qualityName.toLowerCase().includes('stattrak') && (
-                                    <span className='stat-trak'>ST</span>
-                                )}
+                                <div className='additional-info'>
 
-                                <span className='float-short'>
-                                    {itemWearAbbreviator(marketItem?.wearName as WearName)}
-                                </span>
+                                    {marketItem?.qualityName.toLowerCase().includes('stattrak') && (
+                                        <span className='stat-trak'>ST</span>
+                                    )}
 
-                                <Tooltip title={
-                                    <Typography noWrap minWidth='fit-content'>
-                                        {marketItem?.floatValue}
-                                    </Typography>
-                                }>
-                                    <span className='float-full'>
-                                        {marketItem?.floatValue.toFixed(4)}
+                                    <span className='float-short'>
+                                        {itemWearAbbreviator(marketItem?.wearName as WearName)}
                                     </span>
-                                </Tooltip>
 
-                            </div>
+                                    <Tooltip title={
+                                        <Typography noWrap minWidth='fit-content'>
+                                            {marketItem?.floatValue}
+                                        </Typography>
+                                    }>
+                                        <span className='float-full'>
+                                            {marketItem?.floatValue.toFixed(4)}
+                                        </span>
+                                    </Tooltip>
+
+                                </div>
+
+                            }
+
                         </>
                     )
                 }

@@ -62,27 +62,32 @@ const ListingCard = ({ listingProps, openModal, listingAction }: ListingCardProp
                                 {listing?.item.weaponType /*TODO: subcategory?*/}
                             </span>
 
-                            <div className='additional-info'>
+                            {listing?.item.weaponType !== 'Operator' &&
 
-                                {listing?.item.qualityName.toLowerCase().includes('stattrak') && (
-                                    <span className='stat-trak'>ST</span>
-                                )}
+                                <div className='additional-info'>
 
-                                <span className='float-short'>
-                                    {itemWearAbbreviator(listing?.item.wearName as WearName)}
-                                </span>
+                                    {listing?.item.qualityName.toLowerCase().includes('stattrak') && (
+                                        <span className='stat-trak'>ST</span>
+                                    )}
 
-                                <Tooltip title={
-                                    <Typography noWrap minWidth='fit-content'>
-                                        {listing?.item.floatValue}
-                                    </Typography>
-                                }>
-                                    <span className='float-full'>
-                                        {listing?.item.floatValue.toFixed(4)}
+                                    <span className='float-short'>
+                                        {itemWearAbbreviator(listing?.item.wearName as WearName)}
                                     </span>
-                                </Tooltip>
 
-                            </div>
+                                    <Tooltip title={
+                                        <Typography noWrap minWidth='fit-content'>
+                                            {listing?.item.floatValue}
+                                        </Typography>
+                                    }>
+                                        <span className='float-full'>
+                                            {listing?.item.floatValue.toFixed(4)}
+                                        </span>
+                                    </Tooltip>
+
+                                </div>
+
+                            }
+                            
                         </>
                     )
                 }
@@ -95,16 +100,16 @@ const ListingCard = ({ listingProps, openModal, listingAction }: ListingCardProp
                     <img src={listing?.item?.imageUrl} alt='skin-image' loading='lazy' />
                 </div>
 
-                {listing?.item.weaponType.toLowerCase() !== 'sticker' && listing?.item.stickers && (
+                {!['sticker', 'operator'].includes(listing?.item.weaponType.toLowerCase()) && listing?.item.stickers && (
                     <div className='sticker-stack'>
 
-                    {listing?.item.stickers.slice(0, 4).map((sticker: SteamSticker, index: number) => {
-                        return (
-                            <div className='sticker' key={sticker.stickerId + '-' + index}>
-                                <img src={sticker.imageUrl} alt={sticker.name} loading='lazy' />
-                            </div>
-                        )
-                    })}
+                        {listing?.item.stickers.slice(0, 4).map((sticker: SteamSticker, index: number) => {
+                            return (
+                                <div className='sticker' key={sticker.stickerId + '-' + index}>
+                                    <img src={sticker.imageUrl} alt={sticker.name} loading='lazy' />
+                                </div>
+                            )
+                        })}
 
                     </div>
                 )}
