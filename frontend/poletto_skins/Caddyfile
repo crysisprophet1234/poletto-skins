@@ -1,37 +1,43 @@
 # global options
 {
-    admin off # theres no need for the admin api in railway's environment
-    persist_config off # storage isn't persistent anyway
-    auto_https off # railway handles https for us, this would cause issues if left enabled
-    # runtime logs
+    admin off
+    persist_config off
+    auto_https off
     log {
-        format json # set runtime log format to json mode 
+        format json
     }
-    # server options
     servers {
-        trusted_proxies static private_ranges 100.0.0.0/8 # trust railway's proxy
+        trusted_proxies static private_ranges 100.0.0.0/8
     }
 }
 
-# site block, listens on the $PORT environment variable, automatically assigned by railway
+# site block
 :{$PORT:3000} {
-    # access logs
     log {
-        format json # set access log format to json mode
+        format json
     }
 
-    # health check for railway
+    # Health check para Railway
     rewrite /health /*
 
-    # serve from the 'dist' folder (Vite builds into the 'dist' folder)
+    # Proxy para as requisições da API
+    handle /api/* {
+        reverse_proxy poletto-skins-api.up.railway.app:443 {
+            transport http {
+                tls
+            }
+        }
+    }
+
+    # Servir arquivos estáticos da pasta 'dist'
     root * dist
 
-    # enable gzipping responses
+    # Habilitar compressão gzip
     encode gzip
 
-    # serve files from 'dist'
+    # Servir arquivos
     file_server
 
-    # if path doesn't exist, redirect it to 'index.html' for client side routing
+    # Roteamento para Single Page Application (SPA)
     try_files {path} /index.html
 }
