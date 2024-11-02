@@ -1,43 +1,30 @@
-# global options
 {
     admin off
     persist_config off
     auto_https off
+
     log {
-        format json
+        format json 
     }
+   
     servers {
         trusted_proxies static private_ranges 100.0.0.0/8
     }
 }
 
-# site block
 :{$PORT:3000} {
+
     log {
-        format json
+        format json # set access log format to json mode
     }
 
-    # Health check para Railway
     rewrite /health /*
-
-    # Proxy para as requisições da API
-    handle /api/* {
-        reverse_proxy poletto-skins-api.up.railway.app:443 {
-            transport http {
-                tls
-            }
-        }
-    }
-
-    # Servir arquivos estáticos da pasta 'dist'
+    
     root * dist
 
-    # Habilitar compressão gzip
     encode gzip
 
-    # Servir arquivos
     file_server
 
-    # Roteamento para Single Page Application (SPA)
     try_files {path} /index.html
 }
