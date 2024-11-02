@@ -3,9 +3,9 @@ const apiUrl = import.meta.env.VITE_POLETTO_SKINS_API_URL || process.env.POLETTO
 const baseURL = `${apiUrl}/api`
 
 export function steamAuth() {
-    window.location.href = baseURL + '/api/login?provider=steam'
+    window.location.href = baseURL + '/login?provider=steam'
 }
 
 export function githubAuth() {
-    window.location.href = baseURL + '/api/login?provider=github'
+    window.location.href = baseURL + '/login?provider=github'
 }
