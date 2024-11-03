@@ -1,5 +1,4 @@
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
-
 import { lazy, Suspense } from 'react'
 import './assets/styles/global.scss'
 import PrivateRoute from './components/PrivateRoute'
@@ -20,54 +19,55 @@ const router = createBrowserRouter(
   [
     {
       path: '/',
-      element:
+      element: (
         <AuthProvider>
           <Root />
-        </AuthProvider>,
+        </AuthProvider>
+      ),
       errorElement: <ErrorPage />,
       children: [
         {
-          path: '/',
-          element:
-            <Suspense fallback={<h1>Loading...</h1>}>
-              <Navigate to={'buy'} replace />
-            </Suspense>
+          index: true,
+          element: <Navigate to='buy' replace />,
         },
         {
-          path: '/login',
+          path: 'login',
           element: <Login />,
-          errorElement: <ErrorPage />
+          errorElement: <ErrorPage />,
         },
         {
-          path: '/user',
-          element:
+          path: 'user',
+          element: (
             <Suspense fallback={<h1> Loading...</h1>}>
               <PrivateRoute>
                 <User />
               </PrivateRoute>
-            </Suspense >
+            </Suspense>
+          ),
         },
         {
-          path: '/history',
-          element:
+          path: 'history',
+          element: (
             <Suspense fallback={<h1> Loading...</h1>}>
               <PrivateRoute>
                 <History />
               </PrivateRoute>
-            </Suspense >
+            </Suspense>
+          ),
         },
         {
-          path: '/buy',
-          element:
+          path: 'buy',
+          element: (
             <Suspense fallback={<h1>Loading...</h1>}>
               <CartProvider>
                 <Buy />
               </CartProvider>
             </Suspense>
+          ),
         },
         {
-          path: '/sell',
-          element:
+          path: 'sell',
+          element: (
             <Suspense fallback={<h1>Loading...</h1>}>
               <PrivateRoute>
                 <SellProvider>
@@ -75,26 +75,22 @@ const router = createBrowserRouter(
                 </SellProvider>
               </PrivateRoute>
             </Suspense>
+          ),
         },
         {
           path: '*',
           element: <BuildingPage />,
-        }
-      ]
-    }
+        },
+      ],
+    },
   ],
   {
-    basename: '/'
+    basename: '/',
   }
 )
 
 const App = () => {
-
-  return (
-
-    <RouterProvider router={router} />
-
-  )
+  return <RouterProvider router={router} />
 }
 
 export default App
