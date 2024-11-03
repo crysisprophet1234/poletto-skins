@@ -1,35 +1,43 @@
-# Etapa de build
-FROM node:18.20.3-alpine AS build
+# Use a imagem oficial do Node Alpine
+FROM node:lts-alpine AS build
 
-# Defina o diretório de trabalho
+# Configurações de ambiente
+ENV YARN_CACHE_FOLDER=/usr/local/share/.cache/yarn
+
+# Passa as variáveis de ambiente para o build
+ARG VITE_POLETTO_SKINS_API_URL
+
+ENV VITE_POLETTO_SKINS_API_URL=${VITE_POLETTO_SKINS_API_URL}
+
+# Cria e acessa o diretório da aplicação
 WORKDIR /app
 
-# Copie os arquivos de dependências
+# Copia os arquivos de dependências para o container
 COPY package.json yarn.lock ./
 
-# Instale as dependências
-RUN yarn install --frozen-lockfile --prefer-offline
+# Instala as dependências usando o Yarn
+RUN yarn install --frozen-lockfile
 
-# Copie o restante do código-fonte
-COPY . .
+# Copia o restante do código para o container
+COPY . ./
 
-# Defina a variável de ambiente
-ENV NODE_ENV=production
+# Compila a aplicação com as variáveis de ambiente
+RUN yarn build
 
-# Faça o build da aplicação
-RUN yarn build && yarn cache clean --all
+# Usa a imagem do Caddy
+FROM caddy:latest
 
-# Etapa final
-FROM nginx:1.21.0-alpine
+# Cria e acessa o diretório da aplicação
+WORKDIR /app
 
-# Copie os arquivos de build para o diretório do Nginx
-COPY --from=build /app/dist /usr/share/nginx/html
+# Copia o Caddyfile para o container
+COPY Caddyfile ./
 
-# Custom Nginx config
-COPY nginx.conf /etc/nginx/conf.d/default.conf  
+# Formata o Caddyfile
+RUN caddy fmt Caddyfile --overwrite
 
-# Exponha a porta 80
-EXPOSE 80
+# Copia os arquivos construídos da etapa de build
+COPY --from=build /app/dist ./dist
 
-# Comando para iniciar o Nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Define o comando para rodar o Caddy e servir a aplicação
+CMD ["caddy", "run", "--config", "Caddyfile", "--adapter", "caddyfile"]

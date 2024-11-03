@@ -1,11 +1,10 @@
 import axios, { AxiosResponse } from 'axios'
 
 const apiUrl = import.meta.env.VITE_POLETTO_SKINS_API_URL || process.env.POLETTO_SKINS_API_URL
-const apiPort = import.meta.env.VITE_POLETTO_SKINS_API_PORT || process.env.POLETTO_SKINS_API_URL
-const apiBaseUrl = apiUrl + ':' + apiPort + '/api'
+const baseURL = `${apiUrl}/api`
 
 const api = axios.create({
-    baseURL: apiBaseUrl,
+    baseURL,
     headers: {
         'Content-Type': 'application/json'
     }
