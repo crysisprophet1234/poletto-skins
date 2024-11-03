@@ -6,10 +6,8 @@ ENV YARN_CACHE_FOLDER=/usr/local/share/.cache/yarn
 
 # Passa as variáveis de ambiente para o build
 ARG VITE_POLETTO_SKINS_API_URL
-ARG VITE_POLETTO_SKINS_API_PORT
 
 ENV VITE_POLETTO_SKINS_API_URL=${VITE_POLETTO_SKINS_API_URL}
-ENV VITE_POLETTO_SKINS_API_PORT=${VITE_POLETTO_SKINS_API_PORT}
 
 # Cria e acessa o diretório da aplicação
 WORKDIR /app
