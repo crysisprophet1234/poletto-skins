@@ -1,22 +1,22 @@
 version: '3.8'
 services:
   frontend:
-    image: poletto-skins-client
-    container_name: frontend
+    image: crysisprophet1234/poletto-skins-client
+    container_name: poletto-skins-frontend
     ports:
-      - "3000:80" 
+      - "3000:3000" 
     depends_on:
-      - poletto-skins-api
+      - backend
     networks:
       - app-network
 
-  poletto-skins-api:
-    image: poletto-skins-api
-    container_name: poletto-skins-api
+  backend:
+    image: crysisprophet1234/poletto-skins-api
+    container_name: poletto-skins-backend
     ports:
       - "8080:8080"
-    environment:
-      - SPRING_PROFILES_ACTIVE=prod
+    env_file:
+      - ./backend/poletto_skins/.env.compose
     depends_on:
       - mongo
     networks:
