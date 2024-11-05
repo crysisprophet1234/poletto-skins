@@ -38,4 +38,4 @@ build/
 
 
 ### Variables ###
-.env
+*.env*
