@@ -2,35 +2,58 @@ name: Frontend CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: 
+      - main
+    paths:
+      - 'frontend/poletto_skins/**'
   pull_request:
-    branches: [ "main" ]
+    branches: 
+      - main
+    paths:
+      - 'frontend/poletto_skins/**'
   workflow_dispatch:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: [18.x, 20.x]
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'yarn'
-        cache-dependency-path: ./frontend/poletto_skins/yarn.lock
-    - name: Install Dependencies
-      run: yarn install
-      working-directory: ./frontend/poletto_skins/
-    - name: Build Frontend
-      run: yarn build
-      working-directory: ./frontend/poletto_skins/
-    - name: Run Tests
-      run: #yarn test
-        echo "No tests yet"        
-      working-directory: ./frontend/poletto_skins/
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Cache Node modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            frontend/poletto_skins/node_modules
+            ~/.cache/yarn
+          key: ${{ runner.os }}-yarn-${{ hashFiles('frontend/poletto_skins/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'yarn'
+          cache-dependency-path: ./frontend/poletto_skins/yarn.lock
+
+      - name: Install Dependencies
+        run: yarn install --frozen-lockfile
+        working-directory: ./frontend/poletto_skins/
+
+      - name: Lint Code
+        run: yarn lint
+        working-directory: ./frontend/poletto_skins/
+
+  #  - name: Run Tests
+  #    run: yarn test
+  #    working-directory: ./frontend/poletto_skins/
+
+      - name: Build Frontend
+        run: yarn build
+        working-directory: ./frontend/poletto_skins/
