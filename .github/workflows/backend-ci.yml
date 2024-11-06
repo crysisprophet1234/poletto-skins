@@ -61,4 +61,18 @@ jobs:
         run: mvn clean verify --no-transfer-progress
 
       - name: Run Dependency Check
-        run: mvn org.owasp:dependency-check-maven:check
+        uses: dependency-check/Dependency-Check_Action@main
+        id: Depcheck
+        with:
+          project: 'test'
+          path: '.'
+          format: 'HTML'
+          args: >
+            --failOnCVSS 7
+            --enableRetired
+            
+      - name: Upload Test results
+        uses: actions/upload-artifact@master
+        with:
+           name: Depcheck report
+           path: ${{github.workspace}}/reports
