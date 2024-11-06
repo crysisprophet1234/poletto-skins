@@ -1,21 +1,21 @@
+// components/PrivateRoute.tsx
 import { useAuth } from '@/hooks/useAuth'
 import { ReactNode } from 'react'
-import { Navigate } from 'react-router-dom'
+import AccessDenied from '@/components/AccessDenied'
+
 
 type PrivateRouteProps = {
-    children: ReactNode
-    redirectPath?: string
+  children: ReactNode
 }
 
-const PrivateRoute = ({ children, redirectPath = '/' }: PrivateRouteProps) => {
+const PrivateRoute = ({ children }: PrivateRouteProps) => {
+  const { isAuthenticated } = useAuth()
 
-    const { isAuthenticated } = useAuth()
+  if (!isAuthenticated) {
+    return <AccessDenied />
+  }
 
-    if (!isAuthenticated) {
-        return <Navigate to={redirectPath} replace />
-    }
-
-    return children
+  return <>{children}</>
 }
 
 export default PrivateRoute
