@@ -77,10 +77,12 @@ const router = createBrowserRouter(
             </Suspense>
           ),
         },
+        /*
         {
           path: '*',
           element: <BuildingPage />,
         },
+        */
       ],
     },
   ],
