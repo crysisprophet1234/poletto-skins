@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-and-deploy:
+  build-and-test:
     runs-on: ubuntu-latest
 
     env:
@@ -61,4 +61,4 @@ jobs:
         run: mvn clean verify --no-transfer-progress
 
       - name: Run Dependency Check
-        run: mvn dependency-check:check
+        run: mvn org.owasp:dependency-check-maven:check
