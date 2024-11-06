@@ -1,5 +1,5 @@
 [![Frontend CI](https://github.com/crysisprophet1234/poletto-skins/actions/workflows/frontend-ci.yml/badge.svg?event=pull_request)](https://github.com/crysisprophet1234/poletto-skins/actions/workflows/frontend-ci.yml)
-[![Backend CI/CD](https://github.com/crysisprophet1234/poletto-skins/actions/workflows/backend-ci-cd.yml/badge.svg)](https://github.com/crysisprophet1234/poletto-skins/actions/workflows/backend-ci-cd.yml)
+[![Backend CI](https://github.com/crysisprophet1234/poletto-skins/actions/workflows/backend-ci.yml/badge.svg)](https://github.com/crysisprophet1234/poletto-skins/actions/workflows/backend-ci.yml)
 
 # Poletto Skins
                                                                               
