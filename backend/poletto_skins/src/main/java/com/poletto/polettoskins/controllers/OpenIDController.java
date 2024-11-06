@@ -43,8 +43,6 @@ public class OpenIDController {
         HttpServletRequest request,
         HttpServletResponse response
     ) throws Exception {
-    	
-        logger.info("Login requested with provider: {}", provider);
         
         consumerManager.setMaxAssocAttempts(0);
 
