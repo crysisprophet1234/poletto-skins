@@ -31,12 +31,12 @@ const router = createBrowserRouter(
           element: <Navigate to='buy' replace />,
         },
         {
-          path: 'login',
+          path: '/login',
           element: <Login />,
           errorElement: <ErrorPage />,
         },
         {
-          path: 'user',
+          path: '/user',
           element: (
             <Suspense fallback={<h1> Loading...</h1>}>
               <PrivateRoute>
@@ -46,7 +46,7 @@ const router = createBrowserRouter(
           ),
         },
         {
-          path: 'history',
+          path: '/history',
           element: (
             <Suspense fallback={<h1> Loading...</h1>}>
               <PrivateRoute>
@@ -56,7 +56,7 @@ const router = createBrowserRouter(
           ),
         },
         {
-          path: 'buy',
+          path: '/buy',
           element: (
             <Suspense fallback={<h1>Loading...</h1>}>
               <CartProvider>
@@ -66,7 +66,7 @@ const router = createBrowserRouter(
           ),
         },
         {
-          path: 'sell',
+          path: '/sell',
           element: (
             <Suspense fallback={<h1>Loading...</h1>}>
               <PrivateRoute>
