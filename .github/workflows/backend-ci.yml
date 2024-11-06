@@ -1,4 +1,4 @@
-name: Backend CI/CD
+name: Backend CI
 
 on:
   push:
@@ -42,40 +42,23 @@ jobs:
           java-version: '17'
 
       - name: Cache Maven packages
-        uses: actions/cache@v3
+        uses: actions/cache@v3.11.0
         with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          path: |
+            ~/.m2/repository
+            .mvn
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-maven-version-${{ steps.maven-version.outputs.version }}
           restore-keys: |
             ${{ runner.os }}-maven-
+            ${{ runner.os }}-maven-wrapper-
 
-      - name: Build with Maven
+      - name: Get Maven Version
+        id: maven-version
+        run: echo "::set-output name=version::$(mvn -v | grep 'Apache Maven' | awk '{print $3}')"
+
+      - name: Build and Test with Maven
         working-directory: ./backend/poletto_skins/
-        run: mvn clean package --no-transfer-progress
+        run: mvn clean verify --no-transfer-progress
 
-      - name: Run tests with Maven
-        working-directory: ./backend/poletto_skins/
-        run: mvn test --no-transfer-progress
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_TOKEN }}
-
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v4
-        with:
-          context: ./backend/poletto_skins/
-          file: ./backend/poletto_skins/Dockerfile
-          push: true
-          tags: |
-            ${{ secrets.DOCKER_USERNAME }}/poletto-skins-api:latest
-            ${{ secrets.DOCKER_USERNAME }}/poletto-skins-api:${{ github.run_id }}
-
-      - name: Call Deploy Webhook
-        if: success()
-        run: curl --fail ${{ secrets.DEPLOY_WEBHOOK_URL }}
+      - name: Run Dependency Check
+        run: mvn dependency-check:check
