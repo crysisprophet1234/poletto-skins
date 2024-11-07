@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -17,8 +18,10 @@ import com.poletto.polettoskins.services.DomainUserService;
 import com.poletto.polettoskins.services.TransactionService;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 
 @RestController
+@Validated
 @RequestMapping("/users")
 public class DomainUserController {
 
@@ -34,9 +37,13 @@ public class DomainUserController {
 	}
 
 	@GetMapping("/steam/{steamId}")
-	public DomainUserDTO getUserBySteamId(@PathVariable String steamId) {
-		return domainUserService.findOrRegisterUserBySteamId(steamId);
-	}
+    public DomainUserDTO getUserBySteamId(
+        @PathVariable 
+        @Pattern(regexp = "^\\d{17}$", message = "Steam ID inválido. Deve conter exatamente 17 dígitos.") 
+        String steamId
+    ) {
+        return domainUserService.findOrRegisterUserBySteamId(steamId);
+    }
 	
 	@GetMapping("/{userId}/transactions")
 	public List<TransactionDTO> getUserTransactions(@PathVariable String userId) {
