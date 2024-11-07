@@ -53,7 +53,7 @@ public class SteamServiceImpl implements SteamService {
 	private ObjectMapper objectMapper;
 
 	@Override
-	public SteamUser getUserInfo(String steamId) {
+	public SteamUser findSteamUserBySteamId(String steamId) {
 
 		try {
 
