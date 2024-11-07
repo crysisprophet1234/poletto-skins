@@ -10,7 +10,7 @@ import com.poletto.polettoskins.entities.SteamUser;
 public interface SteamService {
 
 	@Transactional(readOnly = true)
-	SteamUser getUserInfo(String steamId);
+	SteamUser findSteamUserBySteamId(String steamId);
 	
 	@Transactional(readOnly = true)
 	SteamItemPrice getItemPriceBySteamId(String fullItemName);

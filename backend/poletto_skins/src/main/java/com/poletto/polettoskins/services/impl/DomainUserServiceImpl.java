@@ -37,7 +37,7 @@ public class DomainUserServiceImpl implements DomainUserService {
 	@Override
 	public DomainUserDTO findOrRegisterUserBySteamId(String steamId) {	
 		
-		var steamUser = steamService.getUserInfo(steamId);
+		var steamUser = steamService.findSteamUserBySteamId(steamId);
 		
 		var optionalUser = domainUserRepository.findBySteamUserId(steamId);
 		
