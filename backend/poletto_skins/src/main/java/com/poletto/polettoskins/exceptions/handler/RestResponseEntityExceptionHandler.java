@@ -20,6 +20,7 @@ import com.poletto.polettoskins.exceptions.response.EmailAlreadyInUseException;
 import com.poletto.polettoskins.exceptions.response.InsufficientCreditException;
 import com.poletto.polettoskins.exceptions.response.ListingNoLongerActiveException;
 import com.poletto.polettoskins.exceptions.response.ResourceNotFoundException;
+import com.poletto.polettoskins.exceptions.response.SteamApiProcessingException;
 import com.poletto.polettoskins.exceptions.response.model.ExceptionResponse;
 
 @RestControllerAdvice
@@ -71,6 +72,18 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
 		);
     	
     	return new ResponseEntity<>(exResponse, exResponse.getStatus());
+    }
+    
+    @ExceptionHandler(SteamApiProcessingException.class)
+    public ResponseEntity<ExceptionResponse> handleSteamApiProcessingException(RuntimeException ex, WebRequest request) {
+    	
+    	ExceptionResponse exResponse = new ExceptionResponse(
+			HttpStatus.INTERNAL_SERVER_ERROR,
+			ex.getMessage(),
+			request.getDescription(false).replace("uri=", "")
+		);
+        	
+        return new ResponseEntity<>(exResponse, exResponse.getStatus());
     }
     
     @ExceptionHandler(InsufficientCreditException.class)
