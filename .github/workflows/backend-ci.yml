@@ -6,6 +6,11 @@ on:
       - main
     paths:
       - 'backend/poletto_skins/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'backend/poletto_skins/**'
   workflow_dispatch:
 
 jobs:
