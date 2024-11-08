@@ -10,10 +10,10 @@ const Login = () => {
 
     useEffect(() => {
 
-        const steamId = searchParams.get('steamId')
+        const token = searchParams.get('token')
 
-        if (steamId) {
-            login(steamId)
+        if (token) {
+            login(token)
         }
 
     }, [login, searchParams])

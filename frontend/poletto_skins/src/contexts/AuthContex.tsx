@@ -1,24 +1,26 @@
-
 import { get, put } from '@/services/api'
 import { steamAuth } from '@/services/auth'
 import { User } from '@/types/entities/user'
+import { jwtUtils } from '@/utils/jwtUtils'
 import { createContext, ReactNode, useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 type AuthContextType = {
     isAuthenticated: boolean
     steamId: string | null,
+    token: string | null,
     user: User | null,
     refreshUser: () => void,
     updateProfile: (property: 'email' | 'phoneNumber' | 'steamTradeUrl', value: string) => void,
     steamAuthRedirect: () => void,
-    login: (steamId: string) => void
+    login: (token: string) => void
     logout: () => void
 }
 
 export const AuthContext = createContext<AuthContextType>({
     isAuthenticated: false,
     steamId: null,
+    token: null,
     user: null,
     refreshUser: () => { throw new Error('refreshUser function not implemented') },
     updateProfile: () => { throw new Error('updateProfile function not implemented') },
@@ -39,12 +41,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     const [steamId, setSteamId] = useState<string | null>(null)
 
+    const [token, setToken] = useState<string | null>(null)
+
     const [user, setUser] = useState<User | null>(null)
 
     const steamAuthRedirect = () => steamAuth()
 
-    const login = (steamId: string) => {
-        localStorage.setItem('steamId', steamId)
+    const login = (jwtToken: string) => {
+        localStorage.setItem('jwt', jwtToken)
+        setToken(jwtToken)
+        setSteamId(jwtUtils.getSteamId(jwtToken))
         setIsAuthenticated(true)
         navigate('/')
     }
@@ -56,8 +62,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
 
     const logout = () => {
-        localStorage.removeItem('steamId')
+        localStorage.removeItem('jwt')
+        setToken(null)
+        setSteamId(null)
         setIsAuthenticated(false)
+        setUser(null)
+        navigate('/')
     }
 
     const fetchSteamProfile = useCallback(async (steamId: string) => {
@@ -87,9 +97,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }, [steamId, isAuthenticated, fetchSteamProfile])
 
     useEffect(() => {
-        const steamId = localStorage.getItem('steamId')
-        if (steamId) {
-            setSteamId(steamId)
+        const storedToken = localStorage.getItem('jwt')
+        if (storedToken) {
+            setToken(storedToken)
+            setSteamId(jwtUtils.getSteamId(storedToken))
             setIsAuthenticated(true)
         }
     }, [])
@@ -99,6 +110,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             value={{
                 isAuthenticated,
                 steamId,
+                token,
                 user,
                 refreshUser,
                 updateProfile,

@@ -19,12 +19,12 @@ import com.poletto.polettoskins.entities.SteamUser;
 import com.poletto.polettoskins.entities.responses.SteamAPIUserResponse;
 import com.poletto.polettoskins.entities.responses.SteamAPIUserResponse.Player;
 import com.poletto.polettoskins.entities.responses.SteamCommunityPriceOverviewResponse;
-import com.poletto.polettoskins.entities.utils.HttpRequestBuilderUtil;
 import com.poletto.polettoskins.exceptions.response.ResourceNotFoundException;
 import com.poletto.polettoskins.exceptions.response.SteamApiProcessingException;
 import com.poletto.polettoskins.mappers.SteamItemPriceMapper;
 import com.poletto.polettoskins.mappers.SteamUserMapper;
 import com.poletto.polettoskins.services.SteamService;
+import com.poletto.polettoskins.utils.HttpRequestBuilderUtil;
 
 @Service
 public class SteamServiceImpl implements SteamService {
