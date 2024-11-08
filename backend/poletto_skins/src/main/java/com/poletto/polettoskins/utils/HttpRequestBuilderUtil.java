@@ -1,4 +1,4 @@
-package com.poletto.polettoskins.entities.utils;
+package com.poletto.polettoskins.utils;
 
 import java.net.URI;
 import java.net.http.HttpRequest;
