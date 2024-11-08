@@ -24,6 +24,8 @@ jobs:
       SERVER_PORT: ${{ secrets.SERVER_PORT }}
       SERVER_CONTEXT_PATH: ${{ secrets.SERVER_CONTEXT_PATH }}
       CORS_ALLOWED_ORIGIN: ${{ secrets.CORS_ALLOWED_ORIGIN }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      JWT_TIMEOUT: ${{ secrets.JWT_TIMEOUT }}
       CSFLOAT_API_URL: ${{ secrets.CSFLOAT_API_URL }}
       CSFLOAT_API_REFERER: ${{ secrets.CSFLOAT_API_REFERER }}
       CSFLOAT_API_ORIGIN: ${{ secrets.CSFLOAT_API_ORIGIN }}
