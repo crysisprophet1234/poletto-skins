@@ -5,6 +5,7 @@ import { itemWearAbbreviator, WearName } from '@/utils/itemWearAbbreviator'
 import { SellRounded } from '@mui/icons-material'
 import { Tooltip, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
+import './styles.scss'
 
 type ItemCardProps = {
     itemProps: MarketItem
