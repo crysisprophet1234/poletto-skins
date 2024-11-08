@@ -7,14 +7,14 @@ public class SteamItemPrice {
 
     private BigDecimal lowestPrice;
     private BigDecimal medianPrice;
-    private Integer quantitySoldLast24Hours;
+    private Integer volume;
 
     public SteamItemPrice() {}
 
-    public SteamItemPrice(BigDecimal lowestPrice, BigDecimal medianPrice, Integer quantitySoldLast24Hours) {
+    public SteamItemPrice(BigDecimal lowestPrice, BigDecimal medianPrice, Integer volume) {
         this.lowestPrice = lowestPrice;
         this.medianPrice = medianPrice;
-        this.quantitySoldLast24Hours = quantitySoldLast24Hours;
+        this.volume = volume;
     }
 
     public BigDecimal getLowestPrice() {
@@ -33,12 +33,12 @@ public class SteamItemPrice {
         this.medianPrice = medianPrice;
     }
 
-    public Integer getQuantitySoldLast24Hours() {
-        return quantitySoldLast24Hours;
+    public Integer getVolume() {
+        return volume;
     }
 
-    public void setQuantitySoldLast24Hours(Integer quantitySoldLast24Hours) {
-        this.quantitySoldLast24Hours = quantitySoldLast24Hours;
+    public void setVolume(Integer volume) {
+        this.volume = volume;
     }
 
     @Override
@@ -48,18 +48,18 @@ public class SteamItemPrice {
         SteamItemPrice that = (SteamItemPrice) o;
         return Objects.equals(lowestPrice, that.lowestPrice) &&
                 Objects.equals(medianPrice, that.medianPrice) &&
-                Objects.equals(quantitySoldLast24Hours, that.quantitySoldLast24Hours);
+                Objects.equals(volume, that.volume);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(lowestPrice, medianPrice, quantitySoldLast24Hours);
+        return Objects.hash(lowestPrice, medianPrice, volume);
     }
 
 	@Override
 	public String toString() {
 		return "SteamItemPrice [lowestPrice=" + lowestPrice + ", medianPrice=" + medianPrice
-				+ ", quantitySoldLast24Hours=" + quantitySoldLast24Hours + "]";
+				+ ", volume=" + volume + "]";
 	}
     
 }

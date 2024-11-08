@@ -13,6 +13,6 @@ public interface SteamService {
 	SteamUser findSteamUserBySteamId(String steamId);
 	
 	@Transactional(readOnly = true)
-	SteamItemPrice getItemPriceBySteamId(String fullItemName);
+	SteamItemPrice findSteamItemPriceByName(String fullItemName);
 	
 }
