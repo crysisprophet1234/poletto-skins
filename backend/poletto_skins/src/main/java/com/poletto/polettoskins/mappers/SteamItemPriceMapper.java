@@ -15,7 +15,7 @@ public interface SteamItemPriceMapper {
     
     @Mapping(target = "lowestPrice", expression = "java(parsePrice(response.getLowestPrice()))")
     @Mapping(target = "medianPrice", expression = "java(parsePrice(response.getMedianPrice()))")
-    @Mapping(target = "quantitySoldLast24Hours", expression = "java(parseQuantity(response.getVolume()))")
+    @Mapping(target = "volume", expression = "java(parseQuantity(response.getVolume()))")
     SteamItemPrice toSteamItemPrice(SteamCommunityPriceOverviewResponse response);
     
     default BigDecimal parsePrice(String priceStr) {
