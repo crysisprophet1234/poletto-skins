@@ -1,21 +1,16 @@
 package com.poletto.polettoskins.services.impl;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,9 +18,11 @@ import com.poletto.polettoskins.entities.SteamItemPrice;
 import com.poletto.polettoskins.entities.SteamUser;
 import com.poletto.polettoskins.entities.responses.SteamAPIUserResponse;
 import com.poletto.polettoskins.entities.responses.SteamAPIUserResponse.Player;
+import com.poletto.polettoskins.entities.responses.SteamCommunityPriceOverviewResponse;
 import com.poletto.polettoskins.entities.utils.HttpRequestBuilderUtil;
 import com.poletto.polettoskins.exceptions.response.ResourceNotFoundException;
 import com.poletto.polettoskins.exceptions.response.SteamApiProcessingException;
+import com.poletto.polettoskins.mappers.SteamItemPriceMapper;
 import com.poletto.polettoskins.mappers.SteamUserMapper;
 import com.poletto.polettoskins.services.SteamService;
 
@@ -128,56 +125,103 @@ public class SteamServiceImpl implements SteamService {
 	}
 
 	@Override
-	public SteamItemPrice getItemPriceBySteamId(String fullItemName) {
+	public SteamItemPrice findSteamItemPriceByName(String fullItemName) {
+	    
+	    int maxRetries = 5;
+	    int retryCount = 0;
+	    long waitTime = 500;
 
-		try {
+	    String uri = HttpRequestBuilderUtil.buildUri(steamCommunityUrl, "market", "priceoverview")
+	            .queryParam("currency", 7) // R$
+	            .queryParam("appid", 730)  // CSGO
+	            .queryParam("market_hash_name", fullItemName)
+	            .encode()
+	            .build()
+	            .toString();
 
-			String uri = UriComponentsBuilder.fromHttpUrl(steamCommunityUrl).pathSegment("market", "priceoverview")
-					.queryParam("currency", 7) // R$
-					.queryParam("appid", 730) // CSGO
-					.queryParam("market_hash_name", fullItemName).build().toString();
+	    while (retryCount < maxRetries) {
+	            
+	            try {
+	            	
+	                HttpRequest request = HttpRequestBuilderUtil.buildRequest(uri);
 
-			HttpRequest request = HttpRequestBuilderUtil.buildRequest(uri);
+	                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-			HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+	                if (response.statusCode() == 200) {
+	                    String responseJson = response.body();
 
-			// String responseJson = response.body();
+	                    SteamCommunityPriceOverviewResponse apiResponse = objectMapper.readValue(responseJson, SteamCommunityPriceOverviewResponse.class);
 
-			JSONObject jsonResponse = new JSONObject(response);
+	                    if (!apiResponse.getSuccess()) {
+	                        logger.error("Steam Market API: retorno sem sucesso para Item '{}'", fullItemName);
+	                        throw new SteamApiProcessingException("Steam Market API: retorno sem sucesso para o item fornecido: " + fullItemName);
+	                    }
 
-			if (!jsonResponse.getBoolean("success")) {
-				throw new RuntimeException("Failed to fetch price data from Steam Market");
-			}
+	                    SteamItemPrice steamItemPrice = SteamItemPriceMapper.INSTANCE.toSteamItemPrice(apiResponse);
 
-			String lowestPriceStr = jsonResponse.optString("lowest_price", "R$ 0,00");
-			String medianPriceStr = jsonResponse.optString("median_price", "R$ 0,00");
-			Integer quantitySoldLast24Hours = Integer.parseInt(jsonResponse.optString("volume", "0").replace(",", ""));
+	                    return steamItemPrice;
 
-			BigDecimal lowestPrice = parsePrice(lowestPriceStr);
-			BigDecimal medianPrice = parsePrice(medianPriceStr);
+	                } else if (response.statusCode() == 429 || (response.statusCode() >= 500 && response.statusCode() < 600)) {
 
-			SteamItemPrice steamItemPrice = new SteamItemPrice();
-			steamItemPrice.setLowestPrice(lowestPrice);
-			steamItemPrice.setMedianPrice(medianPrice);
-			steamItemPrice.setQuantitySoldLast24Hours(quantitySoldLast24Hours);
+	                    retryCount++;
 
-			return steamItemPrice;
+	                    if (retryCount >= maxRetries) {
+	                        logger.error("Máximo de tentativas atingido para Item '{}'. Status: {}", fullItemName, response.statusCode());
+	                        throw new SteamApiProcessingException("Máximo de tentativas atingido para Steam Market API. Status: " + response.statusCode());
+	                    }
 
-		} catch (InterruptedException | IOException e) {
-			logger.error("Erro ao processar a resposta JSON da Steam API", e);
-			throw new SteamApiProcessingException("Erro ao processar a resposta da API", e);
-		}
-	}
+	                    logger.info("Tentativa {} de {} para Item '{}'. Status: {}. Retentando em {} ms...", 
+	                                retryCount, maxRetries, fullItemName, response.statusCode(), waitTime);
+	                    
+	                    Thread.sleep(waitTime);
+	                    waitTime *= 2;
 
-	private BigDecimal parsePrice(String priceStr) {
+	                    continue;
 
-		Pattern pattern = Pattern.compile("R\\$\\s*([0-9\\.]+,[0-9]{2})");
-		Matcher matcher = pattern.matcher(priceStr);
-		if (matcher.find()) {
-			String numericValue = matcher.group(1).replace(".", "").replace(",", ".");
-			return new BigDecimal(numericValue);
-		}
-		return BigDecimal.ZERO;
+	                } else {
+	                    logger.error(
+	                            "Erro na chamada à Steam Market API para Item '{}'. Status: {}, Corpo: {}", 
+	                            fullItemName, response.statusCode(), response.body()
+	                    );
+	                    throw new SteamApiProcessingException("Erro na chamada à Steam Market API. Status: " + response.statusCode());
+	                }
+
+	            } catch (InterruptedException e) {
+	                Thread.currentThread().interrupt();
+	                logger.error("Thread interrompida durante a chamada à Steam Market API para Item '{}'", fullItemName, e);
+	                throw new SteamApiProcessingException("Thread interrompida durante a chamada à Steam Market API", e);
+
+	            } catch (IOException e) {
+	            	
+	                retryCount++;
+
+	                if (retryCount >= maxRetries) {
+	                    logger.error("Erro de I/O ao chamar a Steam Market API para Item '{}'. Máximo de tentativas atingido.", fullItemName, e);
+	                    throw new SteamApiProcessingException("Erro de I/O ao chamar a Steam Market API", e);
+	                }
+
+	                logger.warn("Erro de I/O na tentativa {} para Item '{}'. Retentando em {} ms...", 
+	                            retryCount, fullItemName, waitTime, e);
+	                
+	                try {
+	                    Thread.sleep(waitTime);
+	                } catch (InterruptedException ie) {
+	                    Thread.currentThread().interrupt();
+	                    logger.error("Thread interrompida durante o backoff para Item '{}'", fullItemName, ie);
+	                    throw new SteamApiProcessingException("Thread interrompida durante o backoff", ie);
+	                }
+
+	                waitTime *= 2;
+
+	            } catch (Exception e) {
+	                logger.error("Erro genérico ao chamar a Steam Market API para Item '{}'", fullItemName, e);
+	                throw new SteamApiProcessingException("Erro genérico ao chamar a Steam Market API", e);
+	            }
+
+	    }
+
+	    logger.error("Máximo de tentativas atingido. Falha ao obter preço para Item '{}'.", fullItemName);
+	    throw new SteamApiProcessingException("Falha ao obter preço do item após várias tentativas.");
 	}
 
 }
