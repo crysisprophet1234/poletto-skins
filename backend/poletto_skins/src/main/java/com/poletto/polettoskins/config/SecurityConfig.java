@@ -40,7 +40,7 @@ public class SecurityConfig {
 			//.requiresChannel(channel -> channel.anyRequest().requiresSecure())
 
 			.authorizeHttpRequests(authz -> authz
-	            .requestMatchers(HttpMethod.GET, "/login", "/openidreturn", "/listings").permitAll()
+	            .requestMatchers(HttpMethod.GET, "/login", "/openidreturn", "/listings", "/actuator/health").permitAll()
 	            .anyRequest().authenticated()
 	        )
 			
