@@ -10,7 +10,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.poletto.polettoskins.dto.ListingDTO;
-import com.poletto.polettoskins.entities.DomainUser;
 import com.poletto.polettoskins.entities.Listing;
 import com.poletto.polettoskins.entities.SteamItem;
 import com.poletto.polettoskins.entities.SteamItemPrice;
@@ -63,7 +62,7 @@ public class ListingServiceImpl implements ListingService {
 		
 		listingDTO.setStatus(ListingStatus.ACTIVE);
 		
-		DomainUser user = domainUserRepository.findById(listingDTO.getUserId())
+		domainUserRepository.findById(listingDTO.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("User id provided doesn't exist: " + listingDTO.getUserId()));
 		
 		//TODO: doesnt have inspect url at this point
@@ -74,7 +73,7 @@ public class ListingServiceImpl implements ListingService {
 		
 		listingDTO.setItem(steamItem);
 		
-		SteamItemPrice steamItemPrice = steamService.getItemPriceBySteamId(steamItem.getFullItemName());
+		SteamItemPrice steamItemPrice = steamService.findSteamItemPriceByName(steamItem.getFullItemName());
 		
 		listingDTO.setSteamPrice(steamItemPrice.getMedianPrice());
 		
