@@ -1,6 +1,7 @@
 package com.poletto.polettoskins.controllers;
 
 import java.util.List;
+
 import org.openid4java.consumer.ConsumerManager;
 import org.openid4java.discovery.DiscoveryInformation;
 import org.openid4java.discovery.Identifier;
@@ -14,6 +15,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import com.poletto.polettoskins.utils.JwtUtil;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -36,6 +40,9 @@ public class OpenIDController {
 
     @Autowired
     private ConsumerManager consumerManager;
+    
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @GetMapping("/login")
     public void login(
@@ -87,16 +94,22 @@ public class OpenIDController {
         ).getVerifiedId();
 
         if (identifier != null) {
+        	
             String steamId = identifier.getIdentifier().replace("https://steamcommunity.com/openid/id/", "");
             logger.info("Successfully authenticated with Steam ID: {}", steamId);
+            
+            String jwt = jwtUtil.generateToken(steamId);
+            logger.info("Generated JWT: {}", jwt);
 
             String returnUrl = UriComponentsBuilder
                 .fromHttpUrl(redirectLoginSuccessUrl)
                 .pathSegment("login")
-                .queryParam("steamId", steamId)
+                .queryParam("token", jwt)
                 .toUriString();
+            
             logger.info("Redirecting to success URL: {}", returnUrl);
             return "redirect:" + returnUrl;
+            
         } else {
             logger.warn("Authentication failed; redirecting to failure URL");
             return "redirect:" + redirectLoginFailureUrl;
