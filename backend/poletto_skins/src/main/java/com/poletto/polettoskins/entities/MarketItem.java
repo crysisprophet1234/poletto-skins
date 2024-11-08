@@ -55,7 +55,7 @@ public class MarketItem extends SteamItem implements Serializable {
         }
         this.lowestPrice = price.getLowestPrice();
         this.medianPrice = price.getMedianPrice();
-        this.quantitySoldLast24Hours = price.getQuantitySoldLast24Hours();
+        this.quantitySoldLast24Hours = price.getVolume();
     }
 
 	public BigDecimal getLowestPrice() {
