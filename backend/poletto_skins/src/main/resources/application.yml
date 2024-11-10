@@ -22,7 +22,9 @@ logging:
     root: ${LOG_LEVEL}
     org:
       springframework:
-        web: ${LOG_LEVEL}
+        web: 
+          filter:
+            CommonsRequestLoggingFilter: DEBUG
         http: ${LOG_LEVEL}
 
 server:
