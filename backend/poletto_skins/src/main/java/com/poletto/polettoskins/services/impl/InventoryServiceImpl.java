@@ -2,7 +2,6 @@ package com.poletto.polettoskins.services.impl;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -19,18 +18,19 @@ import com.poletto.polettoskins.entities.MarketItem;
 import com.poletto.polettoskins.entities.SteamItem;
 import com.poletto.polettoskins.entities.SteamItemPrice;
 import com.poletto.polettoskins.entities.SteamSticker;
+import com.poletto.polettoskins.entities.enums.SteamWebInventorySortType;
 import com.poletto.polettoskins.repositories.ListingRepository;
 import com.poletto.polettoskins.services.CSFloatService;
 import com.poletto.polettoskins.services.InventoryService;
-import com.poletto.polettoskins.services.TradeItService;
+import com.poletto.polettoskins.services.SteamWebService;
 
 @Service
 public class InventoryServiceImpl implements InventoryService {
 
     private static final Logger logger = LoggerFactory.getLogger(InventoryServiceImpl.class);
-
+    
     @Autowired
-	private TradeItService tradeItService;
+    private SteamWebService steamWebService;
 	
 	@Autowired
 	private CSFloatService csFloatService;
@@ -39,13 +39,15 @@ public class InventoryServiceImpl implements InventoryService {
 	private ListingRepository listingRepository;
 
     @Override
-    public InventoryDTO getUserInventory(String steamId, int size, int page, boolean filterListed) {
+    public InventoryDTO getUserInventory(
+		String steamId,
+		int size,
+		int page,
+		SteamWebInventorySortType sort,
+		boolean filterListed
+	) {
     	
-        List<MarketItem> userItems = tradeItService.fetchInventoryBySteamId(steamId);
-        
-        int totalItems = userItems.size();
-        int pageStart = (page - 1) * size;
-        int pageEnd = Math.min(pageStart + size, totalItems);
+        List<MarketItem> userItems = steamWebService.fetchInventoryBySteamId(steamId, page, size, sort);
         
         BigDecimal totalPrice = userItems.stream()
                 .map(MarketItem::getMedianPrice)
@@ -53,21 +55,14 @@ public class InventoryServiceImpl implements InventoryService {
         
         InventoryDTO inventory = new InventoryDTO();
         inventory.setSteamId(steamId);
-        inventory.setItemCount(totalItems);
+        inventory.setItemCount(userItems.size());
         inventory.setTotalSteamPrice(totalPrice);
 
-        if (pageStart >= totalItems) {	
-            inventory.setItems(Collections.emptyList());
-            return inventory;
-        }
-
-        List<MarketItem> pagedItems = userItems.subList(pageStart, pageEnd);
-
         if (filterListed) {
-            pagedItems = filterUnlistedItems(pagedItems);
+        	userItems = filterUnlistedItems(userItems);
         }
 
-        List<MarketItem> marketItems = pagedItems.parallelStream()
+        List<MarketItem> marketItems = userItems.parallelStream()
                 .map(this::processMarketItem)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
