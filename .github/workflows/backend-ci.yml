@@ -36,6 +36,8 @@ jobs:
       OPENID_RETURN_TO_URL: ${{ secrets.OPENID_RETURN_TO_URL }}
       LOGIN_SUCCESS_URL: ${{ secrets.LOGIN_SUCCESS_URL }}
       LOGIN_FAILURE_URL: ${{ secrets.LOGIN_FAILURE_URL }}
+      STEAM_WEB_API_URL: ${{ secrets.STEAM_WEB_API_URL }}
+      STEAM_WEB_API_KEY: ${{ secrets.STEAM_WEB_API_KEY }}
 
     steps:
     

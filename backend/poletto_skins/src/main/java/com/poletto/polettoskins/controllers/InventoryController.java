@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.poletto.polettoskins.dto.InventoryDTO;
+import com.poletto.polettoskins.entities.enums.SteamWebInventorySortType;
 import com.poletto.polettoskins.services.InventoryService;
 
 import jakarta.validation.constraints.Max;
@@ -39,12 +40,15 @@ public class InventoryController {
         @Min(value = 1, message = "Page number must be greater than 0") 
 		Integer page,
 		
+		@RequestParam(defaultValue = "PRICE_MAX")
+		SteamWebInventorySortType sort,
+		
 		@RequestParam(defaultValue = "false") 
 		Boolean filterListed
 	) {
 		
 		return ResponseEntity.ok(
-            inventoryService.getUserInventory(steamId, size, page, filterListed)
+            inventoryService.getUserInventory(steamId, size, page, sort, filterListed)
         );
 		
 	}
