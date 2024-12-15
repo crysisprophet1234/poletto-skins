@@ -12,6 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -20,6 +23,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.poletto.polettoskins.entities.SteamItem;
+import com.poletto.polettoskins.exceptions.response.CSFloatServiceException;
 import com.poletto.polettoskins.services.CSFloatService;
 
 @Service
@@ -48,72 +52,56 @@ public class CSFloatServiceImpl implements CSFloatService {
     private String origin;
 
     @Override
+    @Cacheable(
+	    cacheNames = "csfloatApiResponse", 
+	    key = "#inspectUrl"
+	)
+    @Retryable(
+        retryFor = {
+            IOException.class,
+            CSFloatServiceException.class
+        },
+        maxAttempts = 5,
+        backoff = @Backoff(delay = 500, multiplier = 1.5)
+    )
     public Optional<SteamItem> findItemByInspectUrl(String inspectUrl) {
     	
         if (inspectUrl == null || inspectUrl.isEmpty()) {
             logger.warn("Inspect URL is null or empty.");
             return Optional.empty();
         }
-
-        int maxRetries = 5;
-        int retryCount = 0;
-        long waitTime = 500;
-        double backoffMultiplier = 1.5;
-
-        while (retryCount < maxRetries) {
         	
-            try {
-            	
-                URI uri = buildUri(inspectUrl);
-                HttpRequest request = buildHttpRequest(uri);
+        try {
+        	
+            URI uri = buildUri(inspectUrl);
+            HttpRequest request = buildHttpRequest(uri);
 
-                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-                if (response.statusCode() == 200) {
-                    return parseResponse(response.body(), inspectUrl);
-                } else {
-                    logger.error("Failed to retrieve item info from CSFloat API. HTTP status code: {}", response.statusCode());
-                }
-
-            } catch (IOException e) {
-                logger.error("IO exception occurred while communicating with CSFloat API.", e);
-                
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                logger.error("Thread was interrupted while communicating with CSFloat API.", e);
-                return Optional.empty();
-                
-            } catch (URISyntaxException e) {
-                logger.error("Invalid URI syntax for CSFloat API URL.", e);
-                return Optional.empty();
-                
-            } catch (Exception e) {
-                logger.error("Unexpected exception occurred while retrieving item from CSFloat API.", e);
-                return Optional.empty();
+            if (response.statusCode() == 200) {
+                return parseResponse(response.body(), inspectUrl);
+            } else {
+                logger.error("Failed to retrieve item info from CSFloat API. HTTP status code: {}", response.statusCode());
+                throw new CSFloatServiceException("Failed to retrieve item info from CSFloat API");
             }
 
-            retryCount++;
+        } catch (IOException e) {
+            logger.error("IO exception occurred while communicating with CSFloat API.", e);
             
-            if (retryCount < maxRetries) {
-            	
-                logger.info("Attempt {} of {}: waiting {} ms before retrying...", retryCount, maxRetries, waitTime);
-                
-                try {
-                    Thread.sleep(waitTime);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    logger.error("Thread interrupted during retry wait", e);
-                    return Optional.empty();
-                }
-                
-                waitTime *= backoffMultiplier;
-            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            logger.error("Thread was interrupted while communicating with CSFloat API.", e);
+            
+        } catch (URISyntaxException e) {
+            logger.error("Invalid URI syntax for CSFloat API URL.", e);
+            
+        } catch (Exception e) {
+            logger.error("Unexpected exception occurred while retrieving item from CSFloat API.", e);
         }
-
-        logger.error("Maximum number of attempts reached. Returning empty optional.");
+        
         return Optional.empty();
-    }
 
+    }
 
     private URI buildUri(String inspectUrl) throws URISyntaxException {
         return UriComponentsBuilder.fromHttpUrl(apiUrl)
@@ -133,7 +121,9 @@ public class CSFloatServiceImpl implements CSFloatService {
     }
 
     private Optional<SteamItem> parseResponse(String responseBody, String inspectUrl) {
+    	
         try {
+        	
             JsonNode rootNode = objectMapper.readTree(responseBody);
 
             JsonNode itemInfoNode = rootNode.get("iteminfo");
