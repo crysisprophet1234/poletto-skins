@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -14,10 +15,12 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.poletto.polettoskins.entities.MarketItem;
 import com.poletto.polettoskins.entities.SteamItemPrice;
 import com.poletto.polettoskins.entities.SteamUser;
 import com.poletto.polettoskins.entities.responses.SteamAPIUserResponse;
 import com.poletto.polettoskins.entities.responses.SteamAPIUserResponse.Player;
+import com.poletto.polettoskins.entities.responses.SteamCommunityInventoryResponse;
 import com.poletto.polettoskins.entities.responses.SteamCommunityPriceOverviewResponse;
 import com.poletto.polettoskins.exceptions.response.ResourceNotFoundException;
 import com.poletto.polettoskins.exceptions.response.SteamApiProcessingException;
@@ -54,7 +57,13 @@ public class SteamServiceImpl implements SteamService {
 
 		try {
 
-			String uri = HttpRequestBuilderUtil.buildUri(steamApiUrl, "ISteamUser", "GetPlayerSummaries", "v0002")
+			String uri = HttpRequestBuilderUtil
+					.buildUri(
+						steamApiUrl,
+						"ISteamUser",
+						"GetPlayerSummaries",
+						"v0002"
+					)
 					.queryParam("key", steamApiKey)
 					.queryParam("steamids", steamId)
 					.build()
@@ -63,11 +72,11 @@ public class SteamServiceImpl implements SteamService {
 			HttpRequest request = HttpRequestBuilderUtil.buildRequest(uri);
 
 			HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-			
+
 			if (response.statusCode() != 200) {
-	            logger.error("Erro na chamada à Steam API. Status: {}, Corpo: {}", response.statusCode(), response.body());
-	            throw new SteamApiProcessingException("Erro na chamada à Steam API. Status: " + response.statusCode());
-	        }
+				logger.error("Erro na chamada à Steam API. Status: {}, Corpo: {}", response.statusCode(), response.body());
+				throw new SteamApiProcessingException("Erro na chamada à Steam API. Status: " + response.statusCode());
+			}
 
 			String responseJson = response.body();
 
@@ -79,149 +88,232 @@ public class SteamServiceImpl implements SteamService {
 			Thread.currentThread().interrupt();
 			logger.error("Thread interrompida durante a chamada à Steam API", e);
 			throw new SteamApiProcessingException("Thread interrompida durante a chamada à Steam API", e);
-			
+
 		} catch (IOException e) {
 			logger.error("Erro de I/O ao chamar a Steam API", e);
 			throw new SteamApiProcessingException("Erro de I/O ao chamar a Steam API", e);
 		}
 
 	}
-
-	private SteamUser extractPlayerFromResponse(String responseJson) {
+	
+	@Override
+	public List<MarketItem> findUserInventoryBySteamId(String steamId) {
 		
-	    try {
-	    	
-	        SteamAPIUserResponse apiResponse = objectMapper.readValue(responseJson, SteamAPIUserResponse.class);
+		try {
+		
+			String uri = HttpRequestBuilderUtil
+					.buildUri(
+						steamCommunityUrl,
+						"inventory",
+						steamId,						
+						"730",
+						"2"
+					)
+					.build()
+					.toString();
+			
+			HttpRequest request = HttpRequestBuilderUtil.buildRequest(uri);
+	
+			HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+	
+			if (response.statusCode() >= 400) {
+				logger.error("Erro na chamada à Steam API. Status: {}, Corpo: {}", response.statusCode(), response.body());
+				throw new SteamApiProcessingException("Erro na chamada à Steam API. Status: " + response.statusCode());
+			}
+			
+			SteamCommunityInventoryResponse inventory = objectMapper.readValue(response.body(), SteamCommunityInventoryResponse.class);
+			
+			List<MarketItem> marketItems = new ArrayList<>();
+			
+			inventory.getDescriptions().forEach(x -> {
+				
+				if (x.getActions() == null || x.getActions().isEmpty()) {
+		            logger.error("Item não possui inspectUrl, skippando");
+		            return;
+		        }
+				
+				MarketItem item = new MarketItem();
+				
+				String inspectUrl = x.getActions().get(0).getLink();
+				
+				item.setInspectUrl(inspectUrl);
+				
+				marketItems.add(item);
+				
+			});
+			
+			return marketItems;
+		
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			logger.error("Thread interrompida durante a chamada à Steam API", e);
+			throw new SteamApiProcessingException("Thread interrompida durante a chamada à Steam API", e);
 
-	        if (apiResponse.getResponse() != null && apiResponse.getResponse().getPlayers() != null) {
-	        	
-	            List<Player> players = apiResponse.getResponse().getPlayers();
-	            
-	            if (!players.isEmpty()) {
-	            	
-	                Player player = players.get(0);
-	                
-	                if (player.getSteamid() == null || player.getSteamid().isEmpty()) {
-	                    logger.warn("Steam ID ausente na resposta para Steam ID {}", player.getSteamid());
-	                    throw new SteamApiProcessingException("Steam ID ausente na resposta da API.");
-	                }
-	                
-	                return SteamUserMapper.INSTANCE.toSteamUser(player);
-	                
-	            } else {
-	                logger.warn("Nenhum jogador encontrado na resposta para Steam ID fornecido");
-	                throw new ResourceNotFoundException("Steam ID fornecido não encontrado");
-	            }
-	            
-	        } else {
-	            logger.warn("Resposta da Steam API inválida ou ausente para o Steam ID fornecido.");
-	            throw new SteamApiProcessingException("Resposta da Steam API inválida.");
-	        }
-	        
-	    } catch (JsonProcessingException e) {
-	        logger.error("Erro ao processar a resposta JSON da Steam API", e);
-	        throw new SteamApiProcessingException("Erro ao processar a resposta da API", e);
-	    }
+		} catch (IOException e) {
+			logger.error("Erro de I/O ao chamar a Steam API", e);
+			throw new SteamApiProcessingException("Erro de I/O ao chamar a Steam API", e);
+		}
+		
 	}
 
 	@Override
 	public SteamItemPrice findSteamItemPriceByName(String fullItemName) {
-	    
-	    int maxRetries = 5;
-	    int retryCount = 0;
-	    long waitTime = 500;
 
-	    String uri = HttpRequestBuilderUtil.buildUri(steamCommunityUrl, "market", "priceoverview")
-	            .queryParam("currency", 7) // R$
-	            .queryParam("appid", 730)  // CSGO
-	            .queryParam("market_hash_name", fullItemName)
-	            .encode()
-	            .build()
-	            .toString();
+		int maxRetries = 5;
+		int retryCount = 0;
+		long waitTime = 500;
 
-	    while (retryCount < maxRetries) {
-	            
-	            try {
-	            	
-	                HttpRequest request = HttpRequestBuilderUtil.buildRequest(uri);
+		String uri = HttpRequestBuilderUtil
+				.buildUri(
+					steamCommunityUrl,
+					"market",
+					"priceoverview"
+				)
+				.queryParam("currency", 7) // R$
+				.queryParam("appid", 730) // CSGO
+				.queryParam("market_hash_name", fullItemName)
+				.encode()
+				.build()
+				.toString();
 
-	                HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+		while (retryCount < maxRetries) {
 
-	                if (response.statusCode() == 200) {
-	                    String responseJson = response.body();
+			try {
 
-	                    SteamCommunityPriceOverviewResponse apiResponse = objectMapper.readValue(responseJson, SteamCommunityPriceOverviewResponse.class);
+				HttpRequest request = HttpRequestBuilderUtil.buildRequest(uri);
 
-	                    if (!apiResponse.getSuccess()) {
-	                        logger.error("Steam Market API: retorno sem sucesso para Item '{}'", fullItemName);
-	                        throw new SteamApiProcessingException("Steam Market API: retorno sem sucesso para o item fornecido: " + fullItemName);
-	                    }
+				HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-	                    SteamItemPrice steamItemPrice = SteamItemPriceMapper.INSTANCE.toSteamItemPrice(apiResponse);
+				if (response.statusCode() == 200) {
+					String responseJson = response.body();
 
-	                    return steamItemPrice;
+					SteamCommunityPriceOverviewResponse apiResponse = objectMapper.readValue(responseJson, SteamCommunityPriceOverviewResponse.class);
 
-	                } else if (response.statusCode() == 429 || (response.statusCode() >= 500 && response.statusCode() < 600)) {
+					if (!apiResponse.getSuccess()) {
+						logger.error("Steam Market API: retorno sem sucesso para Item '{}'", fullItemName);
+						throw new SteamApiProcessingException("Steam Market API: retorno sem sucesso para o item fornecido: " + fullItemName);
+					}
 
-	                    retryCount++;
+					SteamItemPrice steamItemPrice = SteamItemPriceMapper.INSTANCE.toSteamItemPrice(apiResponse);
 
-	                    if (retryCount >= maxRetries) {
-	                        logger.error("Máximo de tentativas atingido para Item '{}'. Status: {}", fullItemName, response.statusCode());
-	                        throw new SteamApiProcessingException("Máximo de tentativas atingido para Steam Market API. Status: " + response.statusCode());
-	                    }
+					return steamItemPrice;
 
-	                    logger.info("Tentativa {} de {} para Item '{}'. Status: {}. Retentando em {} ms...", 
-	                                retryCount, maxRetries, fullItemName, response.statusCode(), waitTime);
-	                    
-	                    Thread.sleep(waitTime);
-	                    waitTime *= 2;
+				} else if (response.statusCode() == 429
+						|| (response.statusCode() >= 500 && response.statusCode() < 600)) {
 
-	                    continue;
+					retryCount++;
 
-	                } else {
-	                    logger.error(
-	                            "Erro na chamada à Steam Market API para Item '{}'. Status: {}, Corpo: {}", 
-	                            fullItemName, response.statusCode(), response.body()
-	                    );
-	                    throw new SteamApiProcessingException("Erro na chamada à Steam Market API. Status: " + response.statusCode());
-	                }
+					if (retryCount >= maxRetries) {
+						logger.error("Máximo de tentativas atingido para Item '{}'. Status: {}", fullItemName, response.statusCode());
+						throw new SteamApiProcessingException( "Máximo de tentativas atingido para Steam Market API. Status: " + response.statusCode());
+					}
 
-	            } catch (InterruptedException e) {
-	                Thread.currentThread().interrupt();
-	                logger.error("Thread interrompida durante a chamada à Steam Market API para Item '{}'", fullItemName, e);
-	                throw new SteamApiProcessingException("Thread interrompida durante a chamada à Steam Market API", e);
+					logger.info(
+						"Tentativa {} de {} para Item '{}'. Status: {}. Retentando em {} ms...",
+						retryCount,
+						maxRetries,
+						fullItemName,
+						response.statusCode(),
+						waitTime
+					);
 
-	            } catch (IOException e) {
-	            	
-	                retryCount++;
+					Thread.sleep(waitTime);
+					waitTime *= 2;
 
-	                if (retryCount >= maxRetries) {
-	                    logger.error("Erro de I/O ao chamar a Steam Market API para Item '{}'. Máximo de tentativas atingido.", fullItemName, e);
-	                    throw new SteamApiProcessingException("Erro de I/O ao chamar a Steam Market API", e);
-	                }
+					continue;
 
-	                logger.warn("Erro de I/O na tentativa {} para Item '{}'. Retentando em {} ms...", 
-	                            retryCount, fullItemName, waitTime, e);
-	                
-	                try {
-	                    Thread.sleep(waitTime);
-	                } catch (InterruptedException ie) {
-	                    Thread.currentThread().interrupt();
-	                    logger.error("Thread interrompida durante o backoff para Item '{}'", fullItemName, ie);
-	                    throw new SteamApiProcessingException("Thread interrompida durante o backoff", ie);
-	                }
+				} else {
+					logger.error(
+						"Erro na chamada à Steam Market API para Item '{}'. Status: {}, Corpo: {}",
+						fullItemName,
+						response.statusCode(),
+						response.body()
+					);
+					throw new SteamApiProcessingException("Erro na chamada à Steam Market API. Status: " + response.statusCode());
+				}
 
-	                waitTime *= 2;
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+				logger.error("Thread interrompida durante a chamada à Steam Market API para Item '{}'", fullItemName, e);
+				throw new SteamApiProcessingException("Thread interrompida durante a chamada à Steam Market API", e);
 
-	            } catch (Exception e) {
-	                logger.error("Erro genérico ao chamar a Steam Market API para Item '{}'", fullItemName, e);
-	                throw new SteamApiProcessingException("Erro genérico ao chamar a Steam Market API", e);
-	            }
+			} catch (IOException e) {
 
-	    }
+				retryCount++;
 
-	    logger.error("Máximo de tentativas atingido. Falha ao obter preço para Item '{}'.", fullItemName);
-	    throw new SteamApiProcessingException("Falha ao obter preço do item após várias tentativas.");
+				if (retryCount >= maxRetries) {
+					logger.error(
+						"Erro de I/O ao chamar a Steam Market API para Item '{}'. Máximo de tentativas atingido.",
+						fullItemName,
+						e
+					);
+					throw new SteamApiProcessingException("Erro de I/O ao chamar a Steam Market API", e);
+				}
+
+				logger.warn(
+					"Erro de I/O na tentativa {} para Item '{}'. Retentando em {} ms...",
+					retryCount,
+					fullItemName,
+					waitTime,
+					e
+				);
+
+				try {
+					Thread.sleep(waitTime);
+				} catch (InterruptedException ie) {
+					Thread.currentThread().interrupt();
+					logger.error("Thread interrompida durante o backoff para Item '{}'", fullItemName, ie);
+					throw new SteamApiProcessingException("Thread interrompida durante o backoff", ie);
+				}
+
+				waitTime *= 2;
+
+			} catch (Exception e) {
+				logger.error("Erro genérico ao chamar a Steam Market API para Item '{}'", fullItemName, e);
+				throw new SteamApiProcessingException("Erro genérico ao chamar a Steam Market API", e);
+			}
+
+		}
+
+		logger.error("Máximo de tentativas atingido. Falha ao obter preço para Item '{}'.", fullItemName);
+		throw new SteamApiProcessingException("Falha ao obter preço do item após várias tentativas.");
+	}
+
+	private SteamUser extractPlayerFromResponse(String responseJson) {
+
+		try {
+
+			SteamAPIUserResponse apiResponse = objectMapper.readValue(responseJson, SteamAPIUserResponse.class);
+
+			if (apiResponse.getResponse() != null && apiResponse.getResponse().getPlayers() != null) {
+
+				List<Player> players = apiResponse.getResponse().getPlayers();
+
+				if (!players.isEmpty()) {
+
+					Player player = players.get(0);
+
+					if (player.getSteamid() == null || player.getSteamid().isEmpty()) {
+						logger.warn("Steam ID ausente na resposta para Steam ID {}", player.getSteamid());
+						throw new SteamApiProcessingException("Steam ID ausente na resposta da API.");
+					}
+
+					return SteamUserMapper.INSTANCE.toSteamUser(player);
+
+				} else {
+					logger.warn("Nenhum jogador encontrado na resposta para Steam ID fornecido");
+					throw new ResourceNotFoundException("Steam ID fornecido não encontrado");
+				}
+
+			} else {
+				logger.warn("Resposta da Steam API inválida ou ausente para o Steam ID fornecido.");
+				throw new SteamApiProcessingException("Resposta da Steam API inválida.");
+			}
+
+		} catch (JsonProcessingException e) {
+			logger.error("Erro ao processar a resposta JSON da Steam API", e);
+			throw new SteamApiProcessingException("Erro ao processar a resposta da API", e);
+		}
 	}
 
 }
