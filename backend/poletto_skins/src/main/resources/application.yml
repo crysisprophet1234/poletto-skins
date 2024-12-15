@@ -55,6 +55,11 @@ steam:
   community:
     url: ${STEAM_COMMUNITY_URL}
     
+steamweb:
+  api:
+    url: ${STEAM_WEB_API_URL}
+    key: ${STEAM_WEB_API_KEY}
+    
 csfloat:
   api:
     url: ${CSFLOAT_API_URL}
@@ -68,6 +73,8 @@ management:
         include: 
           - "metrics"
           - "health"
+          - "info"
+          - "caches"
   health:
     mongo:
       enabled: true
